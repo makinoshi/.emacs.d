@@ -1,4 +1,3 @@
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only mac                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -6,14 +5,14 @@
   (setq ns-command-modifier (quote meta)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ load-path                                                     ;;;
+;;; @ Cask                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (require 'cask)
 (cask-initialize)
 (require 'pallet)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ load-path                                                     ;;;
+;;; @ PATH                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; load-path を追加する関数を定義
 (defun add-to-load-path (&rest paths)
@@ -30,12 +29,12 @@
 ;; (add-to-load-path "elisp" ".cask/24.4.1/elpa")
 (add-to-load-path "elisp")
 
-;; PATHの引きつぎ
+;; include PATH from Shell
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ auto install                                                  ;;;
+;;; @ Package control                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; auto-installの設定
 (when (require 'auto-install nil t)
@@ -48,22 +47,19 @@
   ;; install-elisp の関数を利用可能にする
   (auto-install-compatibility-setup))
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ package.el                                                    ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; package管理の設定
 (when (require 'package nil t)
   ;; パッケージリポジトリにMarmaladeを追加
-  (add-to-list 'package-archives '("marmalade"	.	"http://marmalade-repo.org/packages/"))
-  (add-to-list 'package-archives '("melpa"	.	"http://melpa.milkbox.net/packages/"))
-  (add-to-list 'package-archives '("ELPA"	.	"http://tromey.com/elpa/"))
+  (add-to-list 'package-archives '("marmalade"	. "http://marmalade-repo.org/packages/"))
+  (add-to-list 'package-archives '("melpa"	. "http://melpa.milkbox.net/packages/"))
+  (add-to-list 'package-archives '("ELPA"	. "http://tromey.com/elpa/"))
   ;; インストールしたパッケージにロードパスを通してロードする
   (package-initialize))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ wake up                                                       ;;;
+;;; @ Emacs Lisp conding                                            ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; Emacs Lispを書くための拡張 
+;; Emacs Lisp ライブラリ
 (require 'cl)
 (require 'dash)
 (require 's)
@@ -106,14 +102,14 @@
 		;;		(left                 . 70 ) ; 配置左位置
 		;;		(top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
-                (left-fringe          . 3  ) ; 左フリンジ幅
-                (right-fringe         . 3  ) ; 右フリンジ幅
+                (left-fringe          . 5  ) ; 左フリンジ幅
+		(right-fringe	      .	5  ) ; 右フリンジ幅
 		;;                (menu-bar-lines       . 1  ) ; メニューバー
 		;;                (tool-bar-lines       . 1  ) ; ツールバー
 		;;                (vertical-scroll-bars . 1  ) ; スクロールバー
 		;;                (scroll-bar-width     . 17 ) ; スクロールバー幅
                 (cursor-type          . bar) ; カーソル種別
-                (alpha                . 90 ) ; 透明度
+                (alpha                . 85 ) ; 透明度
                 ) default-frame-alist) )
 (setq initial-frame-alist default-frame-alist)
 
@@ -133,12 +129,17 @@
 (menu-bar-mode 0)
 
 ;; popwin
+(setq pop-up-windows nil)
 (require 'popwin)
 (setq display-buffer-function 'popwin:display-buffer)
+(setq popwin:popup-window-position 'bottom)
 
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ File Manager                                                  ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; direx
 (require 'direx)
-(global-set-key (kbd "C-x C-j") 'direx:jump-to-directory-other-window)
+(global-set-key (kbd "C-x j") 'direx:jump-to-directory-other-window)
 ;; http://blog.shibayu36.org/entry/2013/02/12/191459
 (defun direx:jump-to-project-directory ()
   (interactive)
@@ -147,7 +148,7 @@
                   t)))
     (unless result
       (direx:jump-to-directory-other-window))))
-(global-set-key (kbd "C-x C-j") 'direx:jump-to-project-directory)
+(global-set-key (kbd "C-x j") 'direx:jump-to-project-directory)
 ;; direx:direx-modeのバッファをウィンドウ左辺に幅25でポップアップ
 ;; :dedicatedにtを指定することで、direxウィンドウ内でのバッファの切り替えが
 ;; ポップアップ前のウィンドウに移譲される
@@ -158,23 +159,29 @@
 ;;       direx:open-icon "▼"
 ;;       direx:closed-icon "▶")
 
+;; ディレクトリ内のファイル名をそのまま編集する
+;; diredバッファでrを押し、ファイル名を変更後C-c C-cまたはC-x C-sで保存.C-c C-kでキャンセル
+(require 'wdired)
+(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
+
+;; 非アクティブなバッファをマスク
+(require 'hiwin)
+;; hiwin-modeを有効化
+(hiwin-activate)
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - mode line                                            ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 行番号の表示
 (line-number-mode t)
-
 ;; 列番号の表示
 (column-number-mode t)
-
 ;; ファイルサイズを表示
 (size-indication-mode t)
-
 ;; 時計を表示（好みに応じてフォーマットを変更可能）
 (setq display-time-day-and-date t) ; 曜日・月・日を表示
 (setq display-time-24hr-format t)  ; 24時表示
 (display-time-mode t)
-
 ;; バッテリー残量を表示
 (display-battery-mode t)
 
@@ -216,16 +223,11 @@
 (ffap-bindings)
 
 ;; 使わないバッファを自動的に消す
-;; (install-elisp-from-emacswiki "tempbuf.el")
 (require 'tempbuf)
 ;; ファイルを開いたら自動でtempbufを有効にする
 (add-hook 'find-file-hooks 'turn-on-tempbuf-mode)
 ;; diredバッファに対してtempbufを有効にする
 (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode)
-
-;; ディレクトリ内のファイル名をそのまま編集する
-;; diredバッファでrを押し、ファイル名を変更後C-c C-cまたはC-x C-sで保存.C-c C-kでキャンセル
-(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
 
 ;;; 現在行のハイライト
 (defface my-hl-line-face
@@ -249,11 +251,6 @@
 ;; フェイスを変更する
 (set-face-background 'show-paren-match-face nil)
 (set-face-underline-p 'show-paren-match-face "yellow")
-
-;; 非アクティブなバッファをマスク
-(require 'hiwin)
-;; hiwin-modeを有効化
-(hiwin-activate)
 
 ;; color-theme
 (load-theme 'solarized-dark t)
@@ -358,7 +355,7 @@
 (define-key isearch-mode-map (kbd "C-d") 'isearch-delete-char)
 
 ;; C-yで検索文字列にヤンク貼り付け
-(define-key isearch-mode-map (kbd "C-y") 'isearch-yank-kill)
+(define-key isearch-mode-map (kbd "C-y") 'isearch--kill)
 
 ;; C-eで検索文字列を編集
 (define-key isearch-mode-map (kbd "C-e") 'isearch-edit-string)
@@ -604,8 +601,9 @@
   (global-set-key (kbd "C-;")     'helm-mini)
   (global-set-key (kbd "C-x f")   'helm-find)
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
-  (global-set-key (kbd "C-c p")   'helm-c-apropos)
+  (global-set-key (kbd "C-c p")   'helm-c-Apropos)
   (global-set-key (kbd "C-c o")   'helm-swoop)
+  ;; (global-set-key (kb "C-c o")   'helm-occur)
   (global-set-key (kbd "M-y")     'helm-show-kill-ring)
   (space-chord-define global-map "f"     'helm-for-files)
   (space-chord-define global-map "i"     'helm-imenu)
@@ -614,6 +612,7 @@
   (space-chord-define global-map "r"     'helm-resume)
   ;; 検索wordをhelm-swoopで一覧化してくれる設定。isearchの時にC-oを押すと一覧が出る。
   (define-key isearch-mode-map (kbd "C-o") 'helm-swoop-from-isearch)
+  ;; (define-key isearch-mode-map (kbd "C-o") 'helm-occur-from-isearch)
 
   (define-key helm-map (kbd "C-h") 'delete-backward-char)
   (define-key helm-find-files-map (kbd "C-h") 'delete-backward-char)
@@ -723,6 +722,16 @@
 (eval-after-load 'flycheck
   '(custom-set-variables
     '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+
+;; highlight
+(require 'highlight-symbol)
+(global-set-key [(control f3)] 'highlight-symbol-at-point)
+(global-set-key [f3]           'highlight-symbol-next)
+(global-set-key [(shift f3)]   'highlight-symbol-prev)
+(global-set-key [(meta f3)]    'highlight-symbol-query-replace)
+
+(require 'auto-highlight-symbol)
+(global-auto-highlight-symbol-mode t)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ yasnippet                                                     ;;;

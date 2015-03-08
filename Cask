@@ -2,6 +2,17 @@
 (source melpa)
 (source marmalade)
 
+;; for cask
+(depends-on "pallet")
+
+;; Path
+(depends-on "exec-path-from-shell")
+
+;; Package control
+(depends-on "auto-install")
+(depends-on "epl")
+(depends-on "pkg-info")
+
 ;; Emacs lisp coding
 (depends-on "dash")
 (depends-on "s")
@@ -11,14 +22,16 @@
 (depends-on "slime")
 (depends-on "bind-key")
 
-;; Path
-(depends-on "exec-path-from-shell")
+;; Screen - frame
+(depends-on "popwin")
 
-;; Package control
-(depends-on "auto-install")
-(depends-on "epl")
-(depends-on "pkg-info")
-(depends-on "pallet")
+;; Screen - mode line
+
+
+;; Screen - buffer
+(depends-on "tempbuf")
+(depends-on "solarized-theme")
+(depends-on "zenburn-theme")
 
 ;; FileManager
 (depends-on "dired+")
@@ -28,17 +41,16 @@
 
 ;; Navigation
 (depends-on "ace-jump-mode")
-(depends-on "tempbuf")
 (depends-on "recentf")
 (depends-on "recentf-ext")
 (depends-on "popup")
-(depends-on "popwin")
 (depends-on "smooth-scroll")
 (depends-on "yascroll")
 
 ;; Kaizen Visual
 (depends-on "hlinum")
 (depends-on "highlight-symbol")
+(depends-on "auto-highlight-symbol")
 (depends-on "volatile-highlights")
 (depends-on "rainbow-delimiters")
 (depends-on "rainbow-mode")
@@ -50,8 +62,6 @@
 (depends-on "ido-ubiquitous")
 (depends-on "smex")
 (depends-on "tabbar")
-(depends-on "solarized-theme")
-(depends-on "zenburn-theme")
 
 
 ;; Search
