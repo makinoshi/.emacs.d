@@ -27,11 +27,18 @@
 
 ;; Screen - mode line
 
-
 ;; Screen - buffer
 (depends-on "tempbuf")
 (depends-on "solarized-theme")
 (depends-on "zenburn-theme")
+
+;; Screen - cursor
+
+;; Screen - linum
+(depends-on "hlinum")
+
+;; Screen - tab
+(depends-on "tabbar")
 
 ;; FileManager
 (depends-on "dired+")
@@ -48,7 +55,6 @@
 (depends-on "yascroll")
 
 ;; Kaizen Visual
-(depends-on "hlinum")
 (depends-on "highlight-symbol")
 (depends-on "auto-highlight-symbol")
 (depends-on "volatile-highlights")
@@ -61,7 +67,6 @@
 (depends-on "ido")
 (depends-on "ido-ubiquitous")
 (depends-on "smex")
-(depends-on "tabbar")
 
 
 ;; Search
