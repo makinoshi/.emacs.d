@@ -1,8 +1,11 @@
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only mac                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (when (eq system-type 'darwin)
-  (setq ns-command-modifier (quote meta)))
+  (setq ns-command-modifier (quote meta))
+  (global-set-key (kbd "C-M-¥") 'indent-region)
+  )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Cask                                                          ;;;
@@ -10,6 +13,26 @@
 (require 'cask)
 (cask-initialize)
 (require 'pallet)
+
+(require 'caskxy)
+(setq caskxy/cask-cli-path "~/.emacs.d/.cask/24.4.1/elpa/cask-20150109.621/cask-cli.el")
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ el-get                                                        ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; (when load-file-name
+;;   (setq user-emacs-directory (file-name-directory load-file-name)))
+
+;; ;; enabling el-get (install el-get from GitHub if not installed)
+;; (add-to-list 'load-path (locate-user-emacs-file "el-get/el-get"))
+;; (unless (require 'el-get nil 'noerror)
+;;   (with-current-buffer
+;;       (url-retrieve-synchronously
+;;        "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
+;;     (goto-char (point-max))
+;;     (eval-print-last-sexp)))
+
+;; (load "~/.emacs.d/package-bundle")
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ PATH                                                          ;;;
@@ -109,7 +132,7 @@
 		;;                (vertical-scroll-bars . 1  ) ; スクロールバー
 		;;                (scroll-bar-width     . 17 ) ; スクロールバー幅
                 (cursor-type          . bar) ; カーソル種別
-                (alpha                . 85 ) ; 透明度
+                (alpha                . 90 ) ; 透明度
                 ) default-frame-alist) )
 (setq initial-frame-alist default-frame-alist)
 
@@ -133,41 +156,6 @@
 (require 'popwin)
 (setq display-buffer-function 'popwin:display-buffer)
 (setq popwin:popup-window-position 'bottom)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ File Manager                                                  ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; direx
-(require 'direx)
-(global-set-key (kbd "C-x j") 'direx:jump-to-directory-other-window)
-;; http://blog.shibayu36.org/entry/2013/02/12/191459
-(defun direx:jump-to-project-directory ()
-  (interactive)
-  (let ((result (ignore-errors
-                  (direx-project:jump-to-project-root-other-window)
-                  t)))
-    (unless result
-      (direx:jump-to-directory-other-window))))
-(global-set-key (kbd "C-x j") 'direx:jump-to-project-directory)
-;; direx:direx-modeのバッファをウィンドウ左辺に幅25でポップアップ
-;; :dedicatedにtを指定することで、direxウィンドウ内でのバッファの切り替えが
-;; ポップアップ前のウィンドウに移譲される
-(push '(direx:direx-mode :position left :width 40 :dedicated t)
-      popwin:special-display-config)
-;; ツリーの表示で使われる罫線の形状を変更する
-;; (setq direx:leaf-icon "  "
-;;       direx:open-icon "▼"
-;;       direx:closed-icon "▶")
-
-;; ディレクトリ内のファイル名をそのまま編集する
-;; diredバッファでrを押し、ファイル名を変更後C-c C-cまたはC-x C-sで保存.C-c C-kでキャンセル
-(require 'wdired)
-(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
-
-;; 非アクティブなバッファをマスク
-(require 'hiwin)
-;; hiwin-modeを有効化
-(hiwin-activate)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - mode line                                            ;;;
@@ -253,7 +241,15 @@
 (set-face-underline-p 'show-paren-match-face "yellow")
 
 ;; color-theme
-(load-theme 'solarized-dark t)
+;; (load-theme 'solarized-dark t)
+(load-theme 'zenburn t)
+
+;; 色を表す文字列に色をつける
+(require 'rainbow-mode)
+(add-hook 'css-mode-hook  'rainbow-mode)
+(add-hook 'scss-mode-hook 'rainbow-mode)
+(add-hook 'php-mode-hook  'rainbow-mode)
+(add-hook 'web-mode-hook  'rainbow-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - cursor                                               ;;;
@@ -266,17 +262,6 @@
 
 ;; 論理行 (画面上の改行)単位ではなく物理行 (改行文字まで)単位で移動する
 (setq line-move-visual nil)
-
-;; カーソルの移動履歴を保存する
-;; point-undoの設定
-(when (require 'point-undo nil t)
-  (define-key global-map (kbd "M-[") 'point-undo)
-  (define-key global-map (kbd "M-]") 'point-redo))
-
-;; 最後の変更箇所にジャンプする
-(require 'goto-chg)
-(define-key global-map (kbd "<f5>")   'goto-last-change)
-(define-key global-map (kbd "S-<f5>") 'goto-last-change-reverse)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - linum                                                ;;;
@@ -309,12 +294,19 @@
 ;; 文字サイズ
 (set-face-attribute 'linum nil :height 0.75)
 
+;; 現在行の行番号をハイライト
+(require 'hlinum)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(linum-highlight-face ((t (:foreground "black" :background "red")))))
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - tabbar                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (require 'tabbar)
-
-;; tabbar有効化
 (call-interactively 'tabbar-mode t)
 
 ;; ボタン非表示
@@ -338,27 +330,17 @@
 (setq tabbar-separator '(1.0))
 
 ;; タブ切り替え
-(global-set-key (kbd "<C-tab>") 'tabbar-forward-tab)
-					;(global-set-key (kbd "C-q")     'tabbar-backward-tab)
-(global-set-key (kbd "<C-S-tab>")     'tabbar-backward-tab)
+(global-set-key (kbd "<C-tab>")   'tabbar-forward-tab)
+(global-set-key (kbd "<C-S-tab>") 'tabbar-backward-tab)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 大文字・小文字を区別しないでサーチ
-(setq-default case-fold-search nil)
+(setq-default case-fold-search t)
 
 ;; インクリメント検索時に縦スクロールを有効化
-(setq isearch-allow-scroll nil)
-
-;; C-dで検索文字列を一文字削除
-(define-key isearch-mode-map (kbd "C-d") 'isearch-delete-char)
-
-;; C-yで検索文字列にヤンク貼り付け
-(define-key isearch-mode-map (kbd "C-y") 'isearch--kill)
-
-;; C-eで検索文字列を編集
-(define-key isearch-mode-map (kbd "C-e") 'isearch-edit-string)
+(setq isearch-allow-scroll t)
 
 ;; Tabで検索文字列を補完
 (define-key isearch-mode-map (kbd "TAB") 'isearch-yank-word)
@@ -395,26 +377,47 @@
 ;; (global-set-key (kbd "C-c A") 'anzu-query-replace-regexp)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ File Manager                                                  ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; direx
+(require 'direx)
+(global-set-key (kbd "C-x j") 'direx:jump-to-directory-other-window)
+;; http://blog.shibayu36.org/entry/2013/02/12/191459
+(defun direx:jump-to-project-directory ()
+  (interactive)
+  (let ((result (ignore-errors
+                  (direx-project:jump-to-project-root-other-window)
+                  t)))
+    (unless result
+      (direx:jump-to-directory-other-window))))
+(global-set-key (kbd "C-x j") 'direx:jump-to-project-directory)
+;; direx:direx-modeのバッファをウィンドウ左辺に幅25でポップアップ
+;; :dedicatedにtを指定することで、direxウィンドウ内でのバッファの切り替えが
+;; ポップアップ前のウィンドウに移譲される
+(push '(direx:direx-mode :position left :width 40 :dedicated t)
+      popwin:special-display-config)
+;; ツリーの表示で使われる罫線の形状を変更する
+;; (setq direx:leaf-icon "  "
+;;       direx:open-icon "▼"
+;;       direx:closed-icon "▶")
+
+;; ディレクトリ内のファイル名をそのまま編集する
+;; diredバッファでrを押し、ファイル名を変更後C-c C-cまたはC-x C-sで保存.C-c C-kでキャンセル
+(require 'wdired)
+(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
+
+;; 非アクティブなバッファをマスク
+(require 'hiwin)
+;; hiwin-modeを有効化
+(hiwin-activate)
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ replace                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 置換のキーバイドを変更
 (define-key global-map (kbd "C-c r") 'query-replace)
 ;; 正規表現置換のキーバイドを変更
 (define-key global-map (kbd "C-c C-r") 'query-replace-regexp)
-
-;; 選択範囲をi-searchしてくれる設定
-;;; 選択範囲をisearch
-(defadvice isearch-mode (around isearch-mode-default-string (forward &optional regexp op-fun recursive-edit word-p) activate)
-  (if (and transient-mark-mode mark-active (not (eq (mark) (point))))
-      (progn
-        (isearch-update-ring (buffer-substring-no-properties (mark) (point)))
-        (deactivate-mark)
-        ad-do-it
-        (if (not forward)
-            (isearch-repeat-backward)
-          (goto-char (mark))
-          (isearch-repeat-forward)))
-    ad-do-it))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - migemo                                               ;;;
@@ -445,11 +448,26 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; emacs-server起動
 (require 'server)
-;; (defun server-ensure-safe-dir (dir) "Noop" t)
-;; (setq server-socket-dir "~/.emacs.d")
-;; (unless (server-running-p)
-;;   (server-start)
-;;   )
+(defun server-ensure-safe-dir (dir) "Noop" t)
+(setq server-socket-dir "~/.emacs.d")
+(unless (server-running-p)
+  (server-start)
+  )
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ Edit support                                                  ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; カーソルの移動履歴を保存する
+;; point-undoの設定
+(when (require 'point-undo nil t)
+  (define-key global-map (kbd "M-[") 'point-undo)
+  (define-key global-map (kbd "M-]") 'point-redo))
+
+;; 最後の変更箇所にジャンプする
+(require 'goto-chg)
+(define-key global-map (kbd "<f5>")   'goto-last-change)
+(define-key global-map (kbd "S-<f5>") 'goto-last-change-reverse)
+
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ keybinds                                                      ;;;
@@ -495,7 +513,6 @@
 (sequential-command-setup-keys)
 
 ;; "に対して""を挿入することなどを実現
-;; (install-elisp "https://github.com/uk-ar/key-combo/raw/c757f5115800ca2638ec24542146cfef63cf3e2a/key-combo.el")
 (require 'key-combo)
 (key-combo-load-default)
 ;; 参考設定(http://qiita.com/akisute3@github/items/0141c92dca0992732af8)
@@ -575,12 +592,10 @@
 ;;                        key-combo-lisp-default)
 
 ;; 括弧の自動挿入の挙動をオレオレ設定できるflex-autopair.el
-;; (install-elisp "https://raw.github.com/uk-ar/flex-autopair/master/flex-autopair.el")
 (require 'flex-autopair)
 (flex-autopair-mode 1)
 
 ;; キーボード同時押しでコマンドを実行する
-;; (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/key-chord.el")
 (require 'key-chord)
 (setq key-chord-two-keys-delay 0.04)
 (key-chord-mode 1)
@@ -683,7 +698,6 @@
 ;;(define-auto-insert "\\.rb$" "ruby-template.rb")
 
 ;; redoの設定
-;; (install-elisp-from-emacswiki "redo+.el")
 (require 'redo+)
 (define-key global-map (kbd "C-S-/") 'redo)
 ;; 大量のredoに耐えられるようにする
@@ -706,7 +720,6 @@
   (ac-config-default)
   (robe-mode))
 ;; 補完時に大文字小文字を区別しない
-(setq completion-ignore-case t)
 (setq read-file-name-completion-ignore-case t)
 
 ;; undohistの設定
@@ -733,6 +746,26 @@
 (require 'auto-highlight-symbol)
 (global-auto-highlight-symbol-mode t)
 
+(require 'open-junk-file)
+(setq open-junk-file-format "~/junk/%Y-%m-%d-%H%M%S.")
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ my macros                                                     ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; "{"の挿入に対して改行と"}"を挿入
+(defun my-curly-brace ()
+  (interactive)
+  (insert "{}")
+  (backward-char)
+  (smart-newline)
+  (smart-newline))
+
+;; ";"の入力に対して改行を自動挿入
+(defun my-semicolon ()
+  (interactive)
+  (insert ";")
+  (smart-newline))
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ yasnippet                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -745,7 +778,7 @@
 (add-hook 'emacs-lisp-mode-hook 'smart-newline-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ HTML                                                          ;;;
+;;; @ HTML & CSS                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
@@ -764,8 +797,10 @@
 (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
 (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
 (setq emmet-move-cursor-between-quotes t) ;; 最初のクオートの中にカーソルをぶちこむ
+
 ;; indent はスペース2個
-(add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 0)))
+(add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 2)))
+
 ;; C-j は newline のままにしておく
 (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
 (keyboard-translate ?\C-i ?\H-i) ;;C-i と Tabの被りを回避
@@ -793,6 +828,11 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (add-hook 'org-mode-hook 'smart-newline-mode)
 
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ tramp                                                         ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(require 'tramp)
+(setq tramp-default-method "ssh")
 
 
 

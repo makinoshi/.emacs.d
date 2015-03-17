@@ -4,6 +4,7 @@
 
 ;; for cask
 (depends-on "pallet")
+(depends-on "caskxy")
 
 ;; Path
 (depends-on "exec-path-from-shell")
@@ -127,7 +128,7 @@
 (depends-on "htmlize")
 (depends-on "web-mode")
 (depends-on "emmet-mode")
-
+(depends-on "scss-mode")
 
 ;; Markdown
 (depends-on "markdown-mode")
