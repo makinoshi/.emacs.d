@@ -62,6 +62,10 @@
 (require 'bind-key)
 (require 'use-package)
 
+;; use-packageがない場合何もしない
+(unless (require 'use-package nil t)
+  (defmacro use-package (&reset args)))
+
 ;; Emacsからの質問をy/nで回答する
 (fset 'yes-or-no-p 'y-or-n-p)
 
