@@ -22,6 +22,7 @@
 (depends-on "paredit")
 (depends-on "slime")
 (depends-on "bind-key")
+(depends-on "use-package")
 
 ;; Screen - frame
 (depends-on "popwin")

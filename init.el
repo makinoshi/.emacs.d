@@ -1,21 +1,13 @@
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ only mac                                                      ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(when (eq system-type 'darwin)
-  (setq ns-command-modifier (quote meta))
-  (global-set-key (kbd "C-M-¥") 'indent-region)
-  )
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Cask                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'cask)
-(cask-initialize)
+(when (and (not (equal window-system 'w32))
+	   (or (require 'cask nil t) 	; for MacOS X (homebrew)
+	       (require 'cask "~/.cask/cask.el" t))) ;for Linux (install by curl)
+  (cask-initialize))
 (require 'pallet)
 
-(require 'caskxy)
-(setq caskxy/cask-cli-path "~/.emacs.d/.cask/24.4.1/elpa/cask-20150109.621/cask-cli.el")
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ el-get                                                        ;;;
@@ -91,16 +83,27 @@
 (require 'paredit)
 (require 'slime)
 (require 'bind-key)
+(require 'use-package)
 
 ;; Emacsからの質問をy/nで回答する
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; 起動時にバイトコンパイルする(emacsは古くても.elcファイルを優先的にロードするため)
-(install-elisp-from-emacswiki "auto-async-byte-compile.el")
-(when (require 'auto-async-byte-compile nil t)
+(use-package auto-async-byte-compile
+  :init
+  (install-elisp-from-emacswiki "auto-async-byte-compile.el")
+  :config
   ;; 自動コンパイルを無効にするファイル名の正規表現
   (setq auto-async-byte-compile-exclude-files-regexp "init.el")
   (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ only mac                                                      ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(when (eq system-type 'darwin)
+  (setq ns-command-modifier (quote meta))
+  (global-set-key (kbd "C-M-¥") 'indent-region)
+  )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system                                      ;;;
@@ -152,10 +155,12 @@
 (menu-bar-mode 0)
 
 ;; popwin
-(setq pop-up-windows nil)
-(require 'popwin)
-(setq display-buffer-function 'popwin:display-buffer)
-(setq popwin:popup-window-position 'bottom)
+(use-package popwin
+  :init
+  (setq pop-up-windows nil)
+  :config
+  (setq display-buffer-function 'popwin:display-buffer)
+  (setq popwin:popup-window-position 'bottom))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - mode line                                            ;;;
@@ -196,10 +201,11 @@
 (setq truncate-partial-width-windows t)
 
 ;; 同一バッファ名にディレクトリ付与
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-(setq uniquify-ignore-buffers-re "*[^*]+*")
+(use-package uniquify
+  :config
+  (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+  (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;; file名の補完で大文字小文字の区別をしない
 (setq completion-ignore-case t)
@@ -211,14 +217,15 @@
 (ffap-bindings)
 
 ;; 使わないバッファを自動的に消す
-(require 'tempbuf)
-;; ファイルを開いたら自動でtempbufを有効にする
-(add-hook 'find-file-hooks 'turn-on-tempbuf-mode)
-;; diredバッファに対してtempbufを有効にする
-(add-hook 'dired-mode-hook 'turn-on-tempbuf-mode)
+(use-package tempbuf
+  :config
+  ;; ファイルを開いたら自動でtempbufを有効にする
+  (add-hook 'find-file-hooks 'turn-on-tempbuf-mode)
+  ;; diredバッファに対してtempbufを有効にする
+  (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
 
 ;;; 現在行のハイライト
-(defface my-hl-line-face
+(defface my/hl-line-face
   ;; 背景がdarkならば背景色を紺に
   '((((class color) (background dark))
      (:background "Navy" t))
@@ -227,7 +234,7 @@
      (:background "LightGoldenrodYellow" t))
     (t (:bold t)))
   "hl-line's my face")
-(setq hl-line-face 'my-hl-line-face)
+(setq hl-line-face 'my/hl-line-face)
 (global-hl-line-mode t)
 
 ;; 括弧の対応関係のハイライト
@@ -245,11 +252,12 @@
 (load-theme 'zenburn t)
 
 ;; 色を表す文字列に色をつける
-(require 'rainbow-mode)
-(add-hook 'css-mode-hook  'rainbow-mode)
-(add-hook 'scss-mode-hook 'rainbow-mode)
-(add-hook 'php-mode-hook  'rainbow-mode)
-(add-hook 'web-mode-hook  'rainbow-mode)
+(use-package rainbow-mode
+  :config
+  (add-hook 'css-mode-hook  'rainbow-mode)
+  (add-hook 'scss-mode-hook 'rainbow-mode)
+  (add-hook 'php-mode-hook  'rainbow-mode)
+  (add-hook 'web-mode-hook  'rainbow-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - cursor                                               ;;;
@@ -266,7 +274,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - linum                                                ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'linum)
+(use-package linum)
 
 ;; 行移動を契機に描画
 (defvar linum-line-number 0)
@@ -295,7 +303,7 @@
 (set-face-attribute 'linum nil :height 0.75)
 
 ;; 現在行の行番号をハイライト
-(require 'hlinum)
+(use-package hlinum)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -306,32 +314,31 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - tabbar                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'tabbar)
-(call-interactively 'tabbar-mode t)
+(use-package tabbar
+  :config
+  (call-interactively 'tabbar-mode t)
+  ;; ボタン非表示
+  (dolist (btn '(tabbar-buffer-home-button
+		 tabbar-scroll-left-button
+		 tabbar-scroll-right-button))
+    (set btn (cons (cons "" nil) (cons "" nil)))
+    )
+  ;; タブ切替にマウスホイールを使用（0：有効，-1：無効）
+  ;; (call-interactively 'tabbar-mwheel-mode -1)
+  ;; (remove-hook 'tabbar-mode-hook      'tabbar-mwheel-follow)
+  ;; (remove-hook 'mouse-wheel-mode-hook 'tabbar-mwheel-follow)
+  ;; タブグループを使用（t：有効，nil：無効）
+  (defvar tabbar-buffer-groups-function nil)
+  (setq tabbar-buffer-groups-function nil)
+  ;; タブの表示間隔
+  (defvar tabbar-separator nil)
+  (setq tabbar-separator '(1.0))
+  
+  :bind
+  ;; タブ切り替え
+  ("<C-tab>" . tabbar-forward-tab)
+  ("<C-S-tab>" . tabbar-backward-tab))
 
-;; ボタン非表示
-(dolist (btn '(tabbar-buffer-home-button
-               tabbar-scroll-left-button
-               tabbar-scroll-right-button))
-  (set btn (cons (cons "" nil) (cons "" nil)))
-  )
-
-;; タブ切替にマウスホイールを使用（0：有効，-1：無効）
-;; (call-interactively 'tabbar-mwheel-mode -1)
-;; (remove-hook 'tabbar-mode-hook      'tabbar-mwheel-follow)
-;; (remove-hook 'mouse-wheel-mode-hook 'tabbar-mwheel-follow)
-
-;; タブグループを使用（t：有効，nil：無効）
-(defvar tabbar-buffer-groups-function nil)
-(setq tabbar-buffer-groups-function nil)
-
-;; タブの表示間隔
-(defvar tabbar-separator nil)
-(setq tabbar-separator '(1.0))
-
-;; タブ切り替え
-(global-set-key (kbd "<C-tab>")   'tabbar-forward-tab)
-(global-set-key (kbd "<C-S-tab>") 'tabbar-backward-tab)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
@@ -367,21 +374,25 @@
 ;; 検索文字列が現在のバッファでいくつマッチするのかという情報と現在の位置をモードラインに表示するマイナーモードを提供
 ;; バッファが巨大だとanzuが低速化の原因となる場合がある
 ;; そのときは、http://emacs-jp.github.io/packages/mode-line/anzu.html を参照
-(require 'anzu)
-(global-anzu-mode +1)
-(setq anzu-use-migemo t)
-(setq anzu-search-threshold 1000)
-(setq anzu-minimum-input-length 3)
-;; keybindの設定
-;; (global-set-key (kbd "C-c a") 'anzu-query-replace)
-;; (global-set-key (kbd "C-c A") 'anzu-query-replace-regexp)
+(use-package anzu
+  :config
+  (global-anzu-mode +1)
+  (setq anzu-use-migemo t)
+  (setq anzu-search-threshold 1000)
+  (setq anzu-minimum-input-length 3)
+  ;; keybindの設定
+  ;; (global-set-key (kbd "C-c a") 'anzu-query-replace)
+  ;; (global-set-key (kbd "C-c A") 'anzu-query-replace-regexp)
+  )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ File Manager                                                  ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; direx
-(require 'direx)
-(global-set-key (kbd "C-x j") 'direx:jump-to-directory-other-window)
+(use-package direx
+  :bind
+  ("C-x j" . direx:jump-to-directory-other-window))
+
 ;; http://blog.shibayu36.org/entry/2013/02/12/191459
 (defun direx:jump-to-project-directory ()
   (interactive)
@@ -403,55 +414,60 @@
 
 ;; ディレクトリ内のファイル名をそのまま編集する
 ;; diredバッファでrを押し、ファイル名を変更後C-c C-cまたはC-x C-sで保存.C-c C-kでキャンセル
-(require 'wdired)
-(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
+(use-package wdired
+  :config
+  (bind-keys :map dired-mode-map
+	     ("r" . wdired-change-to-dired-mode)))
 
 ;; 非アクティブなバッファをマスク
-(require 'hiwin)
-;; hiwin-modeを有効化
-(hiwin-activate)
+(use-package hiwin
+  :config
+  ;; hiwin-modeを有効化
+  (hiwin-activate))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ replace                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 置換のキーバイドを変更
-(define-key global-map (kbd "C-c r") 'query-replace)
+(bind-key "C-c r" 'query-replace)
 ;; 正規表現置換のキーバイドを変更
-(define-key global-map (kbd "C-c C-r") 'query-replace-regexp)
+(bind-key "C-c C-r" 'query-replace-regexp)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - migemo                                               ;;;
 ;;;   https://github.com/emacs-jp/migemo                            ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'migemo)
+(use-package migemo
+  :config
+  (defvar migemo-command nil)
+  (setq migemo-command "cmigemo")
 
-(defvar migemo-command nil)
-(setq migemo-command "cmigemo")
+  (defvar migemo-options nil)
+  (setq migemo-options '("-q" "--emacs"))
 
-(defvar migemo-options nil)
-(setq migemo-options '("-q" "--emacs"))
+  (defvar migemo-dictionary nil)
+  (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict")
 
-(defvar migemo-dictionary nil)
-(setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict")
+  (defvar migemo-user-dictionary nil)
 
-(defvar migemo-user-dictionary nil)
+  (defvar migemo-regex-dictionary nil)
 
-(defvar migemo-regex-dictionary nil)
+  (defvar migemo-coding-system nil)
+  (setq migemo-coding-system 'utf-8-unix)
 
-(defvar migemo-coding-system nil)
-(setq migemo-coding-system 'utf-8-unix)
-
-(load-library "migemo")
+  (load-library "migemo")
+  )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ server                                                        ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; emacs-server起動
-(require 'server)
-(defun server-ensure-safe-dir (dir) "Noop" t)
-(setq server-socket-dir "~/.emacs.d")
-(unless (server-running-p)
-  (server-start)
+(use-package server
+  :config
+  (defun server-ensure-safe-dir (dir) "Noop" t)
+  (setq server-socket-dir "~/.emacs.d")
+  (unless (server-running-p)
+    (server-start))
   )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -459,14 +475,16 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; カーソルの移動履歴を保存する
 ;; point-undoの設定
-(when (require 'point-undo nil t)
-  (define-key global-map (kbd "M-[") 'point-undo)
-  (define-key global-map (kbd "M-]") 'point-redo))
+(use-package point-undo
+  :bind
+  ("M-[" . point-undo)
+  ("M-]" . point-redo))
 
 ;; 最後の変更箇所にジャンプする
-(require 'goto-chg)
-(define-key global-map (kbd "<f5>")   'goto-last-change)
-(define-key global-map (kbd "S-<f5>") 'goto-last-change-reverse)
+(use-package goto-chg
+  :bind
+  ("<f5>" . goto-last-change)         
+  ("S-<f5>" . goto-last-change-reverse))
 
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -477,11 +495,12 @@
 ;; ?\C-?はDELのキーシケンス
 (keyboard-translate ?\C-h ?\C-?)
 ;; 代わりにC-c h をヘルプに
-(define-key global-map (kbd "C-c h") 'help-command)
+(bind-key "C-c h" 'help-command)
 
 ;; 改行とインデントをRET(C-m)でできるように改善
-(require 'smart-newline)
-(global-set-key (kbd "C-m") 'smart-newline)
+(use-package smart-newline
+  :bind
+  ("C-m" . smart-newline))
 
 (defadvice smart-newline (around C-u activate)
   "C-uを押したら元のC-mの挙動をするようにした。org-modeなどで活用。"
@@ -492,7 +511,7 @@
         (call-interactively (key-binding (kbd "C-m")))))))
 
 ;; 折り返しトグルコマンド
-(define-key global-map (kbd "C-c l") 'toggle-truncate-lines)
+(bind-key "C-c l" 'toggle-truncate-lines)
 
 ;; "C-t" でウィンドウを切り替える。分割していない時は左右分割して移動
 (defun other-window-or-split ()
@@ -500,21 +519,24 @@
   (when (one-window-p)
     (split-window-horizontally))
   (other-window 1))
-(define-key global-map (kbd "C-t") 'other-window-or-split)
+(bind-key "C-t" 'other-window-or-split)
 
 ;; goto-lineコマンドをM-g M-g からM-gへ
-(define-key global-map (kbd "M-g") 'goto-line)
+(bind-key "M-g" 'goto-line)
 
 ;; 同じコマンドを連続実行したときの振る舞いを変更する
 ;; (auto-install-batch sequential-command)
 ;; C-a C-a はバッファ先頭、C-e C-eはバッファ末尾
 ;; M-uは大文字、M-lは小文字
-(require 'sequential-command-config)
-(sequential-command-setup-keys)
+(use-package sequential-command-config
+  :config
+  (sequential-command-setup-keys))
 
 ;; "に対して""を挿入することなどを実現
-(require 'key-combo)
-(key-combo-load-default)
+(use-package key-combo
+  :config
+  (key-combo-load-default))
+
 ;; 参考設定(http://qiita.com/akisute3@github/items/0141c92dca0992732af8)
 ;; (key-combo-mode 1)
 ;; ;;; 各モードに対するキー設定
@@ -592,24 +614,29 @@
 ;;                        key-combo-lisp-default)
 
 ;; 括弧の自動挿入の挙動をオレオレ設定できるflex-autopair.el
-(require 'flex-autopair)
-(flex-autopair-mode 1)
+(use-package flex-autopair
+  :config
+  (flex-autopair-mode 1))
 
 ;; キーボード同時押しでコマンドを実行する
-(require 'key-chord)
-(setq key-chord-two-keys-delay 0.04)
-(key-chord-mode 1)
+(use-package key-chord
+  :config
+  (setq key-chord-two-keys-delay 0.04)
+  (key-chord-mode 1))
 
 ;; 「スペースから始まるkey-chord」を定義するEmacs Lisp
-(install-elisp-from-emacswiki "space-chord.el")
-(require 'space-chord)
-(setq space-chord-delay 0.08)
+(use-package space-chord
+  :init
+  (install-elisp-from-emacswiki "space-chord.el")
+  :config
+  (setq space-chord-delay 0.08))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ helm                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; (require 'helm)
-(when (require 'helm-config nil t)
+(use-package helm-config
+  :config
   (helm-mode 1)
   ;; キーバインドを設定
   (global-set-key (kbd "M-x")     'helm-M-x)
@@ -618,7 +645,6 @@
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
   (global-set-key (kbd "C-c p")   'helm-c-Apropos)
   (global-set-key (kbd "C-c o")   'helm-swoop)
-  ;; (global-set-key (kb "C-c o")   'helm-occur)
   (global-set-key (kbd "M-y")     'helm-show-kill-ring)
   (space-chord-define global-map "f"     'helm-for-files)
   (space-chord-define global-map "i"     'helm-imenu)
@@ -627,7 +653,6 @@
   (space-chord-define global-map "r"     'helm-resume)
   ;; 検索wordをhelm-swoopで一覧化してくれる設定。isearchの時にC-oを押すと一覧が出る。
   (define-key isearch-mode-map (kbd "C-o") 'helm-swoop-from-isearch)
-  ;; (define-key isearch-mode-map (kbd "C-o") 'helm-occur-from-isearch)
 
   (define-key helm-map (kbd "C-h") 'delete-backward-char)
   (define-key helm-find-files-map (kbd "C-h") 'delete-backward-char)
@@ -661,16 +686,17 @@
                         ;; and not required because the directory name is prepended
                         (substring input-pattern 1)
                       (concat ".*" input-pattern))))))
+  ;; helmの出る位置を設定
+  (setq helm-split-window-default-side 'below)
+  ;; popwinに登録
+  (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
   )
 
-;; helmの出る位置を設定
-(setq helm-split-window-default-side 'below)
-;; popwinに登録
-(push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
-
 ;; helm-migemo
-(require 'helm-migemo)
-(setq helm-use-migemo t)
+(use-package helm-migemo
+  :config
+  (setq helm-use-migemo t))
+
 ;; 候補が表示されないときがあるので
 ;; migemoらないように設定
 (defadvice helm-c-apropos
@@ -685,7 +711,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ magit                                                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'magit)
+(use-package magit)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ coding support                                                ;;;
@@ -698,8 +724,9 @@
 ;;(define-auto-insert "\\.rb$" "ruby-template.rb")
 
 ;; redoの設定
-(require 'redo+)
-(define-key global-map (kbd "C-S-/") 'redo)
+(use-package redo+
+  :bind ("C-S-/" . redo))
+
 ;; 大量のredoに耐えられるようにする
 (setq undo-limit 600000)
 (setq undo-strong-limit 900000)
@@ -711,22 +738,29 @@
 (define-key global-map (kbd "C-c C-SPC") 'cua-set-rectangle-mark)
 
 ;; auto-compliete
-(when (require 'auto-complete-config nil t)
+(use-package auto-complete-config
+  :config
   (add-to-list 'ac-dictionary-directories
                "~/.emacs.d/elisp/ac-dict")
-  (define-key ac-mode-map (kbd "TAB")       'auto-complete)
-  (define-key ac-completing-map (kbd "C-n") 'ac-next)
-  (define-key ac-completing-map (kbd "C-p") 'ac-previous)
   (ac-config-default)
-  (robe-mode))
+  (robe-mode)
+  (bind-keys :map ac-mode-map
+	     ("TAB" . auto-complete))
+  (bind-keys :map ac-completing-map
+	     ("C-n" . ac-next)
+	     ("C-p" . ac-previous)))
+
 ;; 補完時に大文字小文字を区別しない
 (setq read-file-name-completion-ignore-case t)
 
 ;; undohistの設定
-(when (require 'undohist nil t)
+(use-package undohist
+  :config
   (undohist-initialize))
+
 ;; undo-treeの設定
-(when (require 'undo-tree nil t)
+(use-package undo-tree
+  :config
   (global-undo-tree-mode))
 
 ;; flycheck
@@ -737,23 +771,26 @@
     '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
 ;; highlight
-(require 'highlight-symbol)
-(global-set-key [(control f3)] 'highlight-symbol-at-point)
-(global-set-key [f3]           'highlight-symbol-next)
-(global-set-key [(shift f3)]   'highlight-symbol-prev)
-(global-set-key [(meta f3)]    'highlight-symbol-query-replace)
+(use-package highlight-symbol
+  :bind
+  ([(control-f3)]      . highlight-symbol-at-point)
+  ([f3]	       . highlight-symbol-next)
+  ([shift f3] . highlight-symbol-prev)
+  ([(meta f3)]  . highlight-symbol-query-replace))
 
-(require 'auto-highlight-symbol)
-(global-auto-highlight-symbol-mode t)
+(use-package auto-highlight-symbol
+  :config
+  (global-auto-highlight-symbol-mode t))
 
-(require 'open-junk-file)
-(setq open-junk-file-format "~/junk/%Y-%m-%d-%H%M%S.")
+(use-package open-junk-file
+  :config
+  (setq open-junk-file-format "~/junk/%Y-%m-%d-%H%M%S."))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ my macros                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; "{"の挿入に対して改行と"}"を挿入
-(defun my-curly-brace ()
+(defun my/curly-brace ()
   (interactive)
   (insert "{}")
   (backward-char)
@@ -761,7 +798,7 @@
   (smart-newline))
 
 ;; ";"の入力に対して改行を自動挿入
-(defun my-semicolon ()
+(defun my/semicolon ()
   (interactive)
   (insert ";")
   (smart-newline))
@@ -780,48 +817,56 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ HTML & CSS                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(use-package web-mode
+  :mode(
+  ("\\.phtml\\'" . web-mode)
+  ("\\.tpl\\.php\\'" . web-mode)
+  ("\\.[agj]sp\\'" . web-mode)
+  ("\\.as[cp]x\\'" . web-mode)
+  ("\\.erb\\'" . web-mode)
+  ("\\.mustache\\'" . web-mode)
+  ("\\.djhtml\\'" . web-mode)
+  ("\\.html?\\'" . web-mode)))
 
 ;; Emment(Zen-coding後継)
 ;; (auto-install-from-url "https://raw.github.com/smihica/emmet-mode/master/emmet-mode.el")
-(require 'emmet-mode)
-(add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
-(add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
-(add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
-(setq emmet-move-cursor-between-quotes t) ;; 最初のクオートの中にカーソルをぶちこむ
+(use-package emmet-mode
+  :config
+  (setq emmet-indentation 2)
+  (add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
+  (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
+  (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
+  (setq emmet-move-cursor-between-quotes t) ;; 最初のクオートの中にカーソルをぶちこむ
+  ;; C-j は newline のままにしておく
+  (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
+  (keyboard-translate ?\C-i ?\H-i) ;;C-i と Tabの被りを回避
+  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line) ;; C-i で展開
+  )
 
-;; indent はスペース2個
-(add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 2)))
-
-;; C-j は newline のままにしておく
-(eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
-(keyboard-translate ?\C-i ?\H-i) ;;C-i と Tabの被りを回避
-(define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line) ;; C-i で展開
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ scss                                                          ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(use-package scss-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ markdown                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(autoload 'markdown-mode "markdown-mode"
-  "Major mode for editing Markdown files" t)
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(use-package markdown-mode
+  :mode
+  ("¥¥.md¥¥'" . markdown-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Ruby                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(add-hook 'ruby-mode-hook 'smart-newline-mode)
+(use-package ruby-mode
+  :config
+  (add-hook 'ruby-mode-hook 'smart-newline-mode))
+
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Javascript                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'js2-mode)
+(use-package js2-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
@@ -831,9 +876,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ tramp                                                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'tramp)
-(setq tramp-default-method "ssh")
-
+(use-package tramp
+  :config
+  (setq tramp-default-method "ssh"))
 
 
 (custom-set-variables
