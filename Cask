@@ -63,8 +63,6 @@
 (depends-on "rainbow-delimiters")
 (depends-on "rainbow-mode")
 (depends-on "powerline")
-(depends-on "visual-regexp")
-(depends-on "visual-regexp-steroids")
 (depends-on "elisp-slime-nav")
 (depends-on "ido")
 (depends-on "ido-ubiquitous")
@@ -76,7 +74,9 @@
 (depends-on "ag")
 (depends-on "wgrep")
 (depends-on "migemo")
-
+(depends-on "swiper")
+(depends-on "visual-regexp")
+(depends-on "visual-regexp-steroids")
 
 ;; git
 (depends-on "magit")

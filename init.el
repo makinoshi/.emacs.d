@@ -390,6 +390,18 @@
   ;; (global-set-key (kbd "C-c A") 'anzu-query-replace-regexp)
   )
 
+(defun isearch-forward-or-swiper (use-swiper)
+  (interactive "P")
+  (let (current-prefix-arg)
+    (call-interactively (if use-swiper 'swiper 'isearch-forward))))
+;;; バックエンドのivyがスペースを".*"に置換してしまうため、無効にする
+;;; これをしないと純粋に正規表現isearchの置き換えにならない
+(use-package ivy
+  :init
+  (bind-key "C-s" 'isearch-forward-or-swiper)
+  :config
+  (fset 'ivy--regex 'identity))
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ File Manager                                                  ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -436,7 +448,8 @@
 ;; 置換のキーバイドを変更
 (bind-key "C-c r" 'query-replace)
 ;; 正規表現置換のキーバイドを変更
-(bind-key "C-c C-r" 'query-replace-regexp)
+;; (bind-key "C-c C-r" 'query-replace-regexp)
+(bind-key "C-c C-r" 'vr/query-replace)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - migemo                                               ;;;
