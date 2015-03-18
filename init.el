@@ -5,9 +5,8 @@
 (when (and (not (equal window-system 'w32))
 	   (or (require 'cask nil t) 	; for MacOS X (homebrew)
 	       (require 'cask "~/.cask/cask.el" t))) ;for Linux (install by curl)
-  (cask-initialize))
-(require 'pallet)
-
+  (cask-initialize)
+  (require 'pallet))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ el-get                                                        ;;;
@@ -45,31 +44,9 @@
 (add-to-load-path "elisp")
 
 ;; include PATH from Shell
-(when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Package control                                               ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; auto-installの設定
-(when (require 'auto-install nil t)
-  ;; インストールディレクトリを設定する 初期値は ~/.emacs.d/auto-install/
-  (setq auto-install-directory "~/.emacs.d/elisp/")
-  ;; EmacsWikiに登録されているelisp の名前を取得する
-  (auto-install-update-emacswiki-package-name t)
-  ;; 必要であればプロキシの設定を行う
-  ;; (setq url-proxy-services '(("http" . "localhost:8339")))
-  ;; install-elisp の関数を利用可能にする
-  (auto-install-compatibility-setup))
-
-;; package管理の設定
-(when (require 'package nil t)
-  ;; パッケージリポジトリにMarmaladeを追加
-  (add-to-list 'package-archives '("marmalade"	. "http://marmalade-repo.org/packages/"))
-  (add-to-list 'package-archives '("melpa"	. "http://melpa.milkbox.net/packages/"))
-  (add-to-list 'package-archives '("ELPA"	. "http://tromey.com/elpa/"))
-  ;; インストールしたパッケージにロードパスを通してロードする
-  (package-initialize))
+(exec-path-from-shell-initialize)
+;; (when (memq window-system '(mac ns))
+;;   (exec-path-from-shell-initialize))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Emacs Lisp conding                                            ;;;
@@ -96,6 +73,31 @@
   ;; 自動コンパイルを無効にするファイル名の正規表現
   (setq auto-async-byte-compile-exclude-files-regexp "init.el")
   (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ Package control                                               ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; auto-installの設定
+(use-package auto-install
+  :config
+  ;; インストールディレクトリを設定する 初期値は ~/.emacs.d/auto-install/
+  (setq auto-install-directory "~/.emacs.d/elisp/")
+  ;; EmacsWikiに登録されているelisp の名前を取得する
+  (auto-install-update-emacswiki-package-name t)
+  ;; 必要であればプロキシの設定を行う
+  ;; (setq url-proxy-services '(("http" . "localhost:8339")))
+  ;; install-elisp の関数を利用可能にする
+  (auto-install-compatibility-setup))
+
+;; package管理の設定
+(use-package package
+  :config
+  ;; パッケージリポジトリにMarmaladeを追加
+  (add-to-list 'package-archives '("marmalade"	. "http://marmalade-repo.org/packages/"))
+  (add-to-list 'package-archives '("melpa"	. "http://melpa.milkbox.net/packages/"))
+  (add-to-list 'package-archives '("ELPA"	. "http://tromey.com/elpa/"))
+  ;; インストールしたパッケージにロードパスを通してロードする
+  (package-initialize))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only mac                                                      ;;;
@@ -338,7 +340,6 @@
   ;; タブ切り替え
   ("<C-tab>" . tabbar-forward-tab)
   ("<C-S-tab>" . tabbar-backward-tab))
-
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
@@ -818,7 +819,7 @@
 ;;; @ HTML & CSS                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package web-mode
-  :mode(
+  :mode
   ("\\.phtml\\'" . web-mode)
   ("\\.tpl\\.php\\'" . web-mode)
   ("\\.[agj]sp\\'" . web-mode)
@@ -826,7 +827,7 @@
   ("\\.erb\\'" . web-mode)
   ("\\.mustache\\'" . web-mode)
   ("\\.djhtml\\'" . web-mode)
-  ("\\.html?\\'" . web-mode)))
+  ("\\.html?\\'" . web-mode))
 
 ;; Emment(Zen-coding後継)
 ;; (auto-install-from-url "https://raw.github.com/smihica/emmet-mode/master/emmet-mode.el")
@@ -846,7 +847,15 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ scss                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package scss-mode)
+(use-package scss-mode
+  :mode
+  ("¥¥.scss¥¥'" . scss-mode)
+  ("¥¥.css¥¥'" . scss-mode)
+  :config
+  (bind-keys :map scss-mode-map
+	     ("{" 'my/curly-brace)
+	     (";" 'my/semicolon))
+  (setq css-indent-offset 2))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ markdown                                                      ;;;
@@ -862,11 +871,12 @@
   :config
   (add-hook 'ruby-mode-hook 'smart-newline-mode))
 
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Javascript                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package js2-mode)
+(use-package js2-mode
+  :mode
+  ("¥¥.js¥¥'" . js2-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
