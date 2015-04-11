@@ -1,10 +1,9 @@
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Cask                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (when (and (not (equal window-system 'w32))
-	   (or (require 'cask nil t) 	; for MacOS X (homebrew)
-	       (require 'cask "~/.cask/cask.el" t))) ;for Linux (install by curl)
+           (or (require 'cask nil t) 	; for MacOS X (homebrew)
+               (require 'cask "~/.cask/cask.el" t))) ;for Linux (install by curl)
   (cask-initialize)
   (require 'pallet))
 
@@ -66,18 +65,6 @@
 (unless (require 'use-package nil t)
   (defmacro use-package (&reset args)))
 
-;; Emacsからの質問をy/nで回答する
-(fset 'yes-or-no-p 'y-or-n-p)
-
-;; 起動時にバイトコンパイルする(emacsは古くても.elcファイルを優先的にロードするため)
-(use-package auto-async-byte-compile
-  :init
-  (install-elisp-from-emacswiki "auto-async-byte-compile.el")
-  :config
-  ;; 自動コンパイルを無効にするファイル名の正規表現
-  (setq auto-async-byte-compile-exclude-files-regexp "init.el")
-  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Package control                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -102,6 +89,19 @@
   (add-to-list 'package-archives '("ELPA"	. "http://tromey.com/elpa/"))
   ;; インストールしたパッケージにロードパスを通してロードする
   (package-initialize))
+
+;; Emacsからの質問をy/nで回答する
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; 起動時にバイトコンパイルする(emacsは古くても.elcファイルを優先的にロードするため)
+(use-package auto-async-byte-compile
+  :init
+  (unless (require 'auto-async-byte-compile nil t)
+    (install-elisp-from-emacswiki "auto-async-byte-compile.el"))
+  :config
+  ;; 自動コンパイルを無効にするファイル名の正規表現
+  (setq auto-async-byte-compile-exclude-files-regexp "init.el")
+  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only mac                                                      ;;;
@@ -131,15 +131,15 @@
 (setq default-frame-alist
       (append '((width                . 204)  ; フレーム幅
                 (height               . 60 ) ; フレーム高
-		;;		(left                 . 70 ) ; 配置左位置
-		;;		(top                  . 28 ) ; 配置上位置
+                ;;		(left                 . 70 ) ; 配置左位置
+                ;;		(top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
                 (left-fringe          . 5  ) ; 左フリンジ幅
-		(right-fringe	      .	5  ) ; 右フリンジ幅
-		;;                (menu-bar-lines       . 1  ) ; メニューバー
-		;;                (tool-bar-lines       . 1  ) ; ツールバー
-		;;                (vertical-scroll-bars . 1  ) ; スクロールバー
-		;;                (scroll-bar-width     . 17 ) ; スクロールバー幅
+                (right-fringe	      .	5  ) ; 右フリンジ幅
+                ;;                (menu-bar-lines       . 1  ) ; メニューバー
+                ;;                (tool-bar-lines       . 1  ) ; ツールバー
+                ;;                (vertical-scroll-bars . 1  ) ; スクロールバー
+                ;;                (scroll-bar-width     . 17 ) ; スクロールバー幅
                 (cursor-type          . bar) ; カーソル種別
                 (alpha                . 90 ) ; 透明度
                 ) default-frame-alist) )
@@ -189,13 +189,13 @@
 (defun count-lines-and-chars ()
   (if mark-active
       (format "%d lines,%d chars "
-	      (count-lines (region-beginning) (region-end))
-	      (- (region-end) (region-beginning)))
+              (count-lines (region-beginning) (region-end))
+              (- (region-end) (region-beginning)))
     ;; これだとエコーエリアがチラつく
     ;;(count-lines-region (region-beginning) (region-end))
     ""))
 (add-to-list 'default-mode-line-format
-	     '(:eval (count-lines-and-chars)))
+             '(:eval (count-lines-and-chars)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
@@ -263,7 +263,44 @@
   (add-hook 'css-mode-hook  'rainbow-mode)
   (add-hook 'scss-mode-hook 'rainbow-mode)
   (add-hook 'php-mode-hook  'rainbow-mode)
-  (add-hook 'web-mode-hook  'rainbow-mode))
+  (add-hook 'web-mode-hook  'rainbow-mode)
+  (add-hook 'js2-mode-hook  'rainbow-mode))
+
+;; ediff
+(use-package ediff
+  :config
+  ;; コントロール用のバッファを同一フレーム内に表示
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  ;; diffのバッファを上下ではなく左右に並べる
+  (setq ediff-split-window-function 'split-window-horizontally))
+
+
+(use-package expand-region
+  :bind
+  ("C-@" . er/expand-region)
+  ("C-`" . er/contract-region))
+(use-package multiple-cursors)
+
+;; 最初のキーに続けて入力したものは指定したコマンドとして扱う
+(use-package smartrep
+  :config
+  (smartrep-define-key
+      global-map "C-." '(("C-n" . 'mc/mark-next-like-this)
+                         ("C-p" . 'mc/mark-previous-like-this)
+                         ("*"   . 'mc/mark-all-like-this))))
+
+;; リージョンに対するマイナーモードを提供
+(use-package region-bindings-mode
+  :config
+  (region-bindings-mode-enable)
+  ;; 発動させてくないモードを設定
+  ;; (setq region-bindings-mode-disabled-modes '(foo-mode bar-mode))
+  ;; multiple-cursorsと連携
+  (bind-keys :map region-bindings-mode-map
+             ("a" . mc/mark-all-like-this)
+             ("p" . mc/mark-previous-like-this)
+             ("n" . mc/mark-next-like-this)
+             ("m" . mc/mark-more-like-this)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - cursor                                               ;;;
@@ -325,8 +362,8 @@
   (call-interactively 'tabbar-mode t)
   ;; ボタン非表示
   (dolist (btn '(tabbar-buffer-home-button
-		 tabbar-scroll-left-button
-		 tabbar-scroll-right-button))
+                 tabbar-scroll-left-button
+                 tabbar-scroll-right-button))
     (set btn (cons (cons "" nil) (cons "" nil)))
     )
   ;; タブ切替にマウスホイールを使用（0：有効，-1：無効）
@@ -348,18 +385,24 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; 選択範囲をisearch
+(defadvice isearch-mode (around isearch-mode-default-string (forward &optional regexp op-fun recursive-edit word-p) activate)
+  (if (and transient-mark-mode mark-active (not (eq (mark) (point))))
+      (progn
+        (isearch-update-ring (buffer-substring-no-properties (mark) (point)))
+        (deactivate-mark)
+        ad-do-it
+        (if (not forward)
+            (isearch-repeat-backward)
+          (goto-char (mark))
+          (isearch-repeat-forward)))
+    ad-do-it))
+
 ;; 大文字・小文字を区別しないでサーチ
 (setq-default case-fold-search t)
 
-;; インクリメント検索時に縦スクロールを有効化
-(setq isearch-allow-scroll t)
-
 ;; Tabで検索文字列を補完
 (define-key isearch-mode-map (kbd "TAB") 'isearch-yank-word)
-
-;; C-gで検索を終了
-(define-key isearch-mode-map (kbd "C-g")
-  '(lambda() (interactive) (isearch-done)))
 
 ;; 日本語の検索文字列をミニバッファに表示
 (define-key isearch-mode-map (kbd "<compend>")
@@ -402,45 +445,22 @@
   :config
   (fset 'ivy--regex 'identity))
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ File Manager                                                  ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; direx
-(use-package direx
+;; ace-jump-mode
+(use-package ace-jump-mode
+  :config
+  (setq ace-jump-mode-gray-background nil)
+  (setq ace-jump-word-mode-use-query-char nil)
+  (setq ace-jump-mode-move-keys
+        (append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil))
   :bind
-  ("C-x j" . direx:jump-to-directory-other-window))
+  ("C-j" . ace-jump-word-mode)
+  ("C-c j" . ace-jump-line-mode))
 
-;; http://blog.shibayu36.org/entry/2013/02/12/191459
-(defun direx:jump-to-project-directory ()
-  (interactive)
-  (let ((result (ignore-errors
-                  (direx-project:jump-to-project-root-other-window)
-                  t)))
-    (unless result
-      (direx:jump-to-directory-other-window))))
-(global-set-key (kbd "C-x j") 'direx:jump-to-project-directory)
-;; direx:direx-modeのバッファをウィンドウ左辺に幅25でポップアップ
-;; :dedicatedにtを指定することで、direxウィンドウ内でのバッファの切り替えが
-;; ポップアップ前のウィンドウに移譲される
-(push '(direx:direx-mode :position left :width 40 :dedicated t)
-      popwin:special-display-config)
-;; ツリーの表示で使われる罫線の形状を変更する
-;; (setq direx:leaf-icon "  "
-;;       direx:open-icon "▼"
-;;       direx:closed-icon "▶")
-
-;; ディレクトリ内のファイル名をそのまま編集する
-;; diredバッファでrを押し、ファイル名を変更後C-c C-cまたはC-x C-sで保存.C-c C-kでキャンセル
-(use-package wdired
+(use-package replace-from-region
   :config
-  (bind-keys :map dired-mode-map
-	     ("r" . wdired-change-to-dired-mode)))
-
-;; 非アクティブなバッファをマスク
-(use-package hiwin
-  :config
-  ;; hiwin-modeを有効化
-  (hiwin-activate))
+  (bind-keys :map region-bindings-mode-map
+             ("q" . query-replace-from-region)
+             ("C-q" . query-replace-regexp-from-region)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ replace                                                       ;;;
@@ -475,6 +495,46 @@
 
   (load-library "migemo")
   )
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ File Manager                                                  ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; direx
+(use-package direx
+  :bind
+  ("C-x j" . direx:jump-to-directory-other-window))
+
+;; http://blog.shibayu36.org/entry/2013/02/12/191459
+(defun direx:jump-to-project-directory ()
+  (interactive)
+  (let ((result (ignore-errors
+                  (direx-project:jump-to-project-root-other-window)
+                  t)))
+    (unless result
+      (direx:jump-to-directory-other-window))))
+(global-set-key (kbd "C-x j") 'direx:jump-to-project-directory)
+;; direx:direx-modeのバッファをウィンドウ左辺に幅25でポップアップ
+;; :dedicatedにtを指定することで、direxウィンドウ内でのバッファの切り替えが
+;; ポップアップ前のウィンドウに移譲される
+(push '(direx:direx-mode :position left :width 40 :dedicated t)
+      popwin:special-display-config)
+;; ツリーの表示で使われる罫線の形状を変更する
+;; (setq direx:leaf-icon "  "
+;;       direx:open-icon "▼"
+;;       direx:closed-icon "▶")
+
+;; ディレクトリ内のファイル名をそのまま編集する
+;; diredバッファでrを押し、ファイル名を変更後C-c C-cまたはC-x C-sで保存.C-c C-kでキャンセル
+(use-package wdired
+  :config
+  (bind-keys :map dired-mode-map
+             ("r" . wdired-change-to-dired-mode)))
+
+;; 非アクティブなバッファをマスク
+(use-package hiwin
+  :config
+  ;; hiwin-modeを有効化
+  (hiwin-activate))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ server                                                        ;;;
@@ -537,99 +597,17 @@
   (when (one-window-p)
     (split-window-horizontally))
   (other-window 1))
-(bind-key "C-t" 'other-window-or-split)
+(bind-key* "C-t" 'other-window-or-split)
 
 ;; goto-lineコマンドをM-g M-g からM-gへ
 (bind-key "M-g" 'goto-line)
 
 ;; 同じコマンドを連続実行したときの振る舞いを変更する
-;; (auto-install-batch sequential-command)
 ;; C-a C-a はバッファ先頭、C-e C-eはバッファ末尾
 ;; M-uは大文字、M-lは小文字
 (use-package sequential-command-config
   :config
   (sequential-command-setup-keys))
-
-;; "に対して""を挿入することなどを実現
-(use-package key-combo
-  :config
-  (key-combo-load-default))
-
-;; 参考設定(http://qiita.com/akisute3@github/items/0141c92dca0992732af8)
-;; (key-combo-mode 1)
-;; ;;; 各モードに対するキー設定
-;; (setq key-combo-lisp-mode-hooks
-;;       '(lisp-mode-hook
-;; 	emacs-lisp-mode-hook
-;; 	lisp-interaction-mode-hook
-;; 	inferior-gauche-mode-hook
-;; 	scheme-mode-hook))
-
-;; (setq key-combo-lisp-default
-;;       '(("."  . " . ")
-;; 	(","  . (key-combo-execute-orignal))
-;; 	(",@" . " ,@")
-;; 	(";"  . (";;;; " ";"))
-;; 	(" = "	. (" =	" "eq " "equal "))
-;; 	(" >= " . " >= ")))
-
-;; (setq key-combo-common-mode-hooks
-;;       '(c-mode-common-hook
-;;         php-mode-hook
-;;         ruby-mode-hook
-;;         cperl-mode-hook
-;;         javascript-mode-hook
-;;         js-mode-hook
-;;         js2-mode-hook
-;; 	))
-
-;; (setq key-combo-common-default
-;;       '((","  . (", " ","))
-;;         (" = "  . ("  =  " "  ==  " "  ===  " " = "))
-;;         (" => " . "  =>  ")
-;;         (" = ~" . "  = ~ ")
-;;         (" = *" . "  = * ")
-;;         ("+"  . (" + " " + =  " "+"))
-;;         ("+ = " . " + =  ")
-;;         ("-"  . (" - " " - =  " "-"))
-;;         ("- = " . " - =  ")
-;;         ("->" . " -> ")
-;;         (">"  . (" > " "  =>  " "  >=  " ">"))
-;;         (" >= " . "  >=  ")
-;;         ("%"  . (" % " " % =  " "%"))
-;;         ("% = "  . " % =  ")
-;;         ("!" . (" ! =  " " !~ " "!"))
-;;         ("! = "  . " ! =  " )
-;;         ("!~" . " !~ ")
-;;         ("~" . ("  = ~ " "~"))
-;;         ("::" . " :: ")
-;;         ("&"  . (" & " " && " "&"))
-;;         ("& = " . " & =  ")
-;;         ("&& = " . " && =  ")
-;;         ("*"  . (" * " "**" "*"))
-;;         ("* = "  . " * =  " )
-;;         ("<" . (" < " " < =  " "<"))
-;;         ("< = " . " < =  ")
-;;         ("<< = " . " << =  ")
-;;         ("<-" . " <- ")
-;;         ("|"  . (" || =  " " || " "|"))
-;;         ("| = " . " | =  ")
-;;         ("|| = " . " || =  ")
-;;         ("/" . ("/`!!'/" " / " "// "))
-;;         ("/ = " . " / =  ")
-;;         ("/*" . "/* `!!' */")
-;;         ("{" . ("{`!!'}" "{"))
-;;         ("{|" . "{ |`!!'|  }")
-;;         ("\"" . ("\"`!!'\"" "\""))
-;;         ("'" . ("'`!!''" "'"))
-;;         ("(" . ("(`!!')" "("))))
-
-;; (key-combo-define-hook key-combo-common-mode-hooks
-;;                        'key-combo-common-load-default
-;;                        key-combo-common-default)
-;; (key-combo-define-hook key-combo-lisp-mode-hooks
-;;                        'key-combo-lisp-load-default
-;;                        key-combo-lisp-default)
 
 ;; 括弧の自動挿入の挙動をオレオレ設定できるflex-autopair.el
 (use-package flex-autopair
@@ -645,9 +623,35 @@
 ;; 「スペースから始まるkey-chord」を定義するEmacs Lisp
 (use-package space-chord
   :init
-  (install-elisp-from-emacswiki "space-chord.el")
+  (unless (require 'space-chord nil t)
+    (install-elisp-from-emacswiki "space-chord.el"))
   :config
   (setq space-chord-delay 0.08))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ my macros                                                     ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; "{"の挿入に対して改行と"}"を挿入
+(defun my/curly-brace ()
+  (interactive)
+  (insert "{}")
+  (backward-char)
+  (smart-newline)
+  (smart-newline))
+
+;; ";"の入力に対して改行を自動挿入
+(defun my/semicolon ()
+  (interactive)
+  (insert ";")
+  (smart-newline))
+
+;; "|"をpairにする
+(defun my/vertical-bar-pair ()
+  ;; (add-to-list 'flex-autopair-pairs '(?| . ?|))
+  (interactive)
+  (insert "||")
+  (backward-char)
+  )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ helm                                                          ;;;
@@ -718,11 +722,11 @@
 ;; 候補が表示されないときがあるので
 ;; migemoらないように設定
 (defadvice helm-c-apropos
-  (around ad-helm-apropos activate)
+    (around ad-helm-apropos activate)
   (let ((helm-use-migemo nil))
     ad-do-it))
 (defadvice helm-M-x
-  (around ad-helm-M-x activate)
+    (around ad-helm-M-x activate)
   (let ((helm-use-migemo nil))
     ad-do-it))
 
@@ -763,10 +767,21 @@
   (ac-config-default)
   (robe-mode)
   (bind-keys :map ac-mode-map
-	     ("TAB" . auto-complete))
+             ("TAB" . auto-complete))
   (bind-keys :map ac-completing-map
-	     ("C-n" . ac-next)
-	     ("C-p" . ac-previous)))
+             ("C-n" . ac-next)
+             ("C-p" . ac-previous)))
+
+;; hippie-expand
+(bind-key "M-/" 'hippie-expand)
+;; 補完候補探索順を指定
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-file-name-partially
+        try-complete-file-name))
+
 
 ;; 補完時に大文字小文字を区別しない
 (setq read-file-name-completion-ignore-case t)
@@ -804,28 +819,214 @@
   :config
   (setq open-junk-file-format "~/junk/%Y-%m-%d-%H%M%S."))
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ my macros                                                     ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; "{"の挿入に対して改行と"}"を挿入
-(defun my/curly-brace ()
-  (interactive)
-  (insert "{}")
-  (backward-char)
-  (smart-newline)
-  (smart-newline))
+;; バッファをコンパイル・実行
+(use-package quickrun
+  :config
+  (push '("*quickrun*") popwin:special-display-config)
+  :bind
+  ("C-c C-c" . quickrun)
+  ("C-c c" . quickrun-with-arg))
 
-;; ";"の入力に対して改行を自動挿入
-(defun my/semicolon ()
-  (interactive)
-  (insert ";")
-  (smart-newline))
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ smartchr                                                      ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; 同一キの入力を補助
+(use-package smartchr
+  :init
+  (unless (require 'smartchr nil t)
+    (install-elisp
+     "https://raw.githubusercontent.com/imakado/emacs-smartchr/master/smartchr.el")))
+
+(defun my/smartchr-braces ()
+  "Insert a pair of braces."
+  (lexical-let (beg end)
+    (smartchr-make-struct
+     :insert-fn (lambda ()
+                  (setq beg (point))
+                  (insert "{\n\n}")
+                  (indent-region beg (point))
+                  (forward-line -1)
+                  (indent-according-to-mode)
+                  (goto-char (point-at-eol))
+                  (setq end (save-excursion
+                              (re-search-forward "[[:space:][:cntrl:]]+}" nil t))))
+     :cleanup-fn (lambda ()
+                   (delete-region beg end)))))
+
+(defun my/smartchr-semicolon ()
+  "Insert ';' and newline-and-indent"
+  (lexical-let (beg end)
+    (smartchr-make-struct
+     :insert-fn (lambda ()
+                  (indent-according-to-mode)
+                  (setq beg (point))
+                  (insert ";")
+                  (newline-and-indent)
+                  (setq end (point)))
+     :cleanup-fn (lambda ()
+                   (delete-region beg end)))))
+
+(defun my/smartchr-arrow ()
+  "Insert ' ->' and newline-and-indent"
+  (lexical-let (beg end)
+    (smartchr-make-struct
+     :insert-fn (lambda ()
+                  (setq beg (point))
+                  (insert " ->")
+                  (coffee-newline-and-indent)
+                  (setq end (point)))
+     :cleanup-fn (lambda ()
+                   (delete-region beg end)))))
+
+(defun my/smartchr-fat-arrow ()
+  "Insert ' =>' and newline-and-indent"
+  (lexical-let (beg end)
+    (smartchr-make-struct
+     :insert-fn (lambda ()
+                  (setq beg (point))
+                  (insert " =>")
+                  (coffee-newline-and-indent)
+                  (setq end (point)))
+     :cleanup-fn (lambda ()
+                   (delete-region beg end)))))
+
+(defun smartchr-keybindings-ruby ()
+  (local-set-key (kbd ",")  (smartchr '(", " ",")))
+  (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
+  (local-set-key (kbd "~")  (smartchr '(" =~ " "~")))
+  (local-set-key (kbd "+")  (smartchr '(" + " "+" " += ")))
+  (local-set-key (kbd "-")  (smartchr '(" - " "-" " -= ")))
+  (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
+  (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= " "->")))
+  (local-set-key (kbd "%")  (smartchr '(" % " "%" " %= ")))
+  (local-set-key (kbd "!")  (smartchr '("!" " != " " !~ ")))
+  (local-set-key (kbd "&")  (smartchr '(" & " " && " "&")))
+  (local-set-key (kbd "*")  (smartchr '(" * " "**" "*")))
+  (local-set-key (kbd "|")  (smartchr '("|`!!'|" " ||= " " || " "|")))
+  (local-set-key (kbd "/")  (smartchr '("/" "/`!!'/" " / " "// ")))
+  (local-set-key (kbd "#")  (smartchr '("#{`!!'}" "#")))
+  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
+  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
+  (local-set-key (kbd "{")  (smartchr '("{`!!'}" "{|`!!'|  }" "{")))
+  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
+  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
+
+(defun smartchr-keybindings-c/c++ ()
+  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
+  (local-set-key (kbd ",")  (smartchr '(", " ",")))
+  (local-set-key (kbd "=")  (smartchr '(" = " " == " "=")))
+  (local-set-key (kbd "+")  (smartchr '(" + " "++" " += " "+")))
+  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
+  (local-set-key (kbd ">")  (smartchr '(" > " " >> " " >= " "->" ">")))
+  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
+  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
+  (local-set-key (kbd "&")  (smartchr '(" && " " & " "&")))
+  (local-set-key (kbd "*")  (smartchr '("*" " * " " *= ")))
+  (local-set-key (kbd "<")  (smartchr '(" < " " << " " <= " "<`!!'>" "<")))
+  (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
+  (local-set-key (kbd "/")  (smartchr '("/" " / " " /= ")))
+  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
+  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
+  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
+  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
+  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
+
+(defun smartchr-keybindings-awk ()
+  (local-set-key (kbd ",")  (smartchr '(", " ",")))
+  (local-set-key (kbd "=")  (smartchr '(" = " " == " "=")))
+  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
+  (local-set-key (kbd "~")  (smartchr '(" ~ " " !~ " "~")))
+  (local-set-key (kbd ">")  (smartchr '(" > " " >= " ">")))
+  (local-set-key (kbd "<")  (smartchr '(" < " " <= " "<")))
+  (local-set-key (kbd "+")  (smartchr '(" + " "++" " += " "+")))
+  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
+  (local-set-key (kbd "|")  (smartchr '(" || " "|")))
+  (local-set-key (kbd "&")  (smartchr '(" && " "&")))
+  (local-set-key (kbd "/")  (smartchr '("/`!!'/" " / " "/")))
+  (local-set-key (kbd "{")  (smartchr '("{`!!'}" my/smartchr-braces "{")))
+  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
+
+(defun smartchr-keybindings-php ()
+  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
+  (local-set-key (kbd ".")  (smartchr '("." " . " " .= ")))
+  (local-set-key (kbd ",")  (smartchr '(", " ",")))
+  (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
+  (local-set-key (kbd "+")  (smartchr '(" + " "++" " += " "+")))
+  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
+  (local-set-key (kbd ">")  (smartchr '(" > " "->" " => " " >= " ">")))
+  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
+  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
+  (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
+  (local-set-key (kbd "*")  (smartchr '(" * " " *= " "**" "*")))
+  (local-set-key (kbd "<")  (smartchr '(" < " " << " " <= " "<")))
+  (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
+  (local-set-key (kbd "/")  (smartchr '(" / " " /= " "/`!!'/" "/")))
+  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
+  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
+  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
+  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
+  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
+
+(defun smartchr-keybindings-js ()
+  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
+  (local-set-key (kbd ",")  (smartchr '(", " ",")))
+  (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
+  (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
+  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
+  (local-set-key (kbd ">")  (smartchr '(" > " " => " " >= " ">")))
+  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
+  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
+  (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
+  (local-set-key (kbd "*")  (smartchr '(" * " " *= " "**" "*")))
+  (local-set-key (kbd "<")  (smartchr '(" < " " << " " <= " "<")))
+  (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
+  (local-set-key (kbd "/")  (smartchr '(" / " " /= " "/`!!'/" "/")))
+  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
+  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
+  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
+  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
+  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
+
+(defun smartchr-keybindings-coffee ()
+  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
+  (local-set-key (kbd ",")  (smartchr '(", " ",")))
+  (local-set-key (kbd "=")  (smartchr '(" = " " == " "=")))
+  (local-set-key (kbd "+")  (smartchr '(" + " "++" " += " "+")))
+  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
+  (local-set-key (kbd ">")  (smartchr '(" > " my/smartchr-arrow " >= " my/smartchr-fat-arrow ">")))
+  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
+  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
+  (local-set-key (kbd "?")  (smartchr '("?" " ?= ")))
+  (local-set-key (kbd "&")  (smartchr '(" && " " & " "&")))
+  (local-set-key (kbd "*")  (smartchr '("*" " * " " *= ")))
+  (local-set-key (kbd "<")  (smartchr '(" < " " << " " <= " "<`!!'>" "<")))
+  (local-set-key (kbd "|")  (smartchr '("|" " ||= ")))
+  (local-set-key (kbd "/")  (smartchr '("/" " / " " /= ")))
+  (local-set-key (kbd "#")  (smartchr '("#{`!!'}" "#")))
+  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
+  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
+  (local-set-key (kbd "{")  (smartchr '("{`!!'}" "{")))
+  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
+  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
+
+(defun smartchr-keybindings-web-erb ()
+  (local-set-key (kbd "<") (smartchr '("<%= `!!' %>" "<% `!!' %>" "<`!!'>" "<"))))
+
+(add-hook 'c++-mode-hook 'smartchr-keybindings-c/c++)
+(add-hook 'awk-mode-hook 'smartchr-keybindings-awk)
+(add-hook 'php-mode-hook 'smartchr-keybindings-php)
+(add-hook 'projectile-rails-mode-hook
+          '(lambda ()
+             (and (eq major-mode 'web-mode) (smartchr-keybindings-web-erb))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ yasnippet                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; (require 'yasnippet)
-;; (yas-global-mode 1)
+(use-package yasnippet
+  :config
+  (yas-global-mode 1)
+  :bind
+  ("C-:" . yas-expand))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ emacs lisp                                                    ;;;
@@ -844,13 +1045,16 @@
   ("\\.erb\\'" . web-mode)
   ("\\.mustache\\'" . web-mode)
   ("\\.djhtml\\'" . web-mode)
-  ("\\.html?\\'" . web-mode))
+  ("\\.html?\\'" . web-mode)
+  :config
+  (setq tab-width 2)
+  (setq indent-tabs-mode nil)
+  (setq web-mode-markup-indent-offset 2))
 
 ;; Emment(Zen-coding後継)
-;; (auto-install-from-url "https://raw.github.com/smihica/emmet-mode/master/emmet-mode.el")
 (use-package emmet-mode
   :config
-  (setq emmet-indentation 2)
+  (setq emmet-indentation 2) ;; indent 2 spaces
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
   (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
   (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
@@ -870,8 +1074,8 @@
   ("¥¥.css¥¥'" . scss-mode)
   :config
   (bind-keys :map scss-mode-map
-	     ("{" 'my/curly-brace)
-	     (";" 'my/semicolon))
+             ("{" 'my/curly-brace)
+             (";" 'my/semicolon))
   (setq css-indent-offset 2))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -885,15 +1089,168 @@
 ;;; @ Ruby                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package ruby-mode
+  :mode
+  ("¥¥.rb¥¥'" . ruby-mode)
+  ("Capfile$" . ruby-mode)
+  ("Gemfile$" . ruby-mode)
+  :init
+  (add-hook 'ruby-mode-hook 'smart-newline-mode)
+  (add-hook 'ruby-mode-hook 'smartchr-keybindings-ruby)
   :config
-  (add-hook 'ruby-mode-hook 'smart-newline-mode))
+  (setq tab-width 2)
+  (setq indent-tabs-mode nil)
+  (setq ruby-indent-level tab-width)
+  (use-package ruby-end)
+  (use-package ruby-block
+    :config
+    (ruby-block-mode t)
+    (setq ruby-block-highlight-toggle t))
+  (use-package inf-ruby)
+  (use-package robe)
+  (use-package rbenv
+    :config
+    (global-rbenv-mode)
+    (setq rbenv-installation-dir "~/.rbenv/bin/rbenv"))
+  (bind-keys :map ruby-mode-map
+             ("|" 'my/vertical-bar-pair))
+  )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Javascript                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package js2-mode
   :mode
-  ("¥¥.js¥¥'" . js2-mode))
+  ("¥¥.js¥¥'" . js2-mode)
+  :config
+  (add-hook 'js2-mode-hook 'smart-newline-mode)
+  ;; (add-hook 'js2-mode-hook 'js-indent-hook)
+  (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
+  (add-hook 'js2-mode-hook 'tern-mode)
+  (use-package jquery-doc
+    :config
+    (add-hook 'js2-mode-hook 'jquery-doc-setup))
+  (setq tab-width 2
+        indent-tabs-mode nil)
+  (use-package tern-auto-complete
+    :config
+    (tern-ac-setup)))
+
+;; (add-hook 'coffee-mode-hook 'smartchr-keybindings-coffee)
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ sql                                                           ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(unless (require 'sql nil t)
+  (install-elisp "http://www.emacswiki.org/emacs/download/sql.el"))
+(unless (require 'sql-indent nil t)
+  (install-elisp "http://www.emacswiki.org/emacs/download/sql-indent.el"))
+;; (unless (require 'sql-complete nil t)
+;;   (install-elisp "http://www.emacswiki.org/emacs/download/sql-complete.el"))
+(unless (require 'sql-transform nil t)
+  (install-elisp "http://www.emacswiki.org/emacs/download/sql-transform.el"))
+
+;; C-c C-c : 'sql-send-paragraph
+;; C-c C-r : 'sql-send-region
+;; C-c C-s : 'sql-send-string
+;; C-c C-b : 'sql-send-buffer
+;; C-c C-c : 'sql-send-paragraph
+;; C-c C-r : 'sql-send-region
+;; C-c C-s : 'sql-send-string
+;; C-c C-b : 'sql-send-buffer
+(require 'sql)
+
+(add-hook 'sql-interactive-mode-hook
+          #'(lambda ()
+              (interactive)
+              (set-buffer-process-coding-system 'sjis-unix 'sjis-unix )
+              (setq show-trailing-whitespace nil)))
+
+;; starting SQL mode loading sql-indent / sql-complete
+(eval-after-load "sql"
+  '(progn
+     (load-library "sql-indent")
+     ;; (load-library "sql-complete")
+     (load-library "sql-transform")))
+
+(setq auto-mode-alist
+      (cons '("\\.sql$" . sql-mode) auto-mode-alist))
+
+(sql-set-product-feature
+ 'ms :font-lock 'sql-mode-ms-font-lock-keywords)
+
+(defcustom sql-ms-program "sqlcmd"
+  "Command to start sqlcmd by SQL Server."
+  :type 'file
+  :group 'SQL)
+
+(sql-set-product-feature
+ 'ms :sql-program 'sql-ms-program)
+(sql-set-product-feature
+ 'ms :sqli-prompt-regexp "^[0-9]*>")
+(sql-set-product-feature
+ 'ms :sqli-prompt-length 5)
+
+(defcustom sql-ms-login-params
+  '(user password server database)
+  "Login parameters to needed to connect to mssql."
+  :type '(repeat (choice
+                  (const user)
+                  (const password)
+                  (const server)
+                  (const database)))
+  :group 'SQL)
+
+(defcustom sql-ms-options '("-U" "-P" "-S" "-d")
+  "List of additional options for `sql-ms-program'."
+  :type '(repeat string)
+  :group 'SQL)
+
+(defun sql-connect-ms ()
+  "Connect ti SQL Server DB in a comint buffer."
+  ;; Do something with `sql-user', `sql-password',
+  ;; `sql-database', and `sql-server'.
+  (let ((f #'(lambda (op val)
+               (unless (string= "" val)
+                 (setq sql-ms-options
+                       (append (list op val) sql-ms-options)))))
+        (params `(("-U" . ,sql-user)("-P" . ,sql-password)
+                  ("-S" . ,sql-server)("-d" . ,sql-database))))
+    (dolist (pair params)
+      (funcall f (car pair)(cdr pair)))
+    (sql-connect-1 sql-ms-program sql-ms-options)))
+
+(sql-set-product-feature
+ 'ms :sqli-login 'sql-ms-login-params)
+(sql-set-product-feature
+ 'ms :sqli-connect 'sql-connect-ms)
+
+(defun run-mssql ()
+  "Run mssql by SQL Server as an inferior process."
+  (interactive)
+  (sql-product-interactive 'ms))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ R                                                             ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(use-package ess-site
+  :mode
+  ("¥¥.r¥¥'" . R-mode)
+  ("¥¥.r¥¥'" . ess-site)
+  :config
+  (setq ess-use-auto-complete t)
+  (bind-keys :map ess-mode-map
+	     ("C-c v" 'ess-R-dv-pprint))
+  (use-package ess-R-object-popup
+    :config
+    (bind-keys :map ess-mode-map
+	       ("C-c C-g" 'ess-R-object-popup)))
+  (use-package helm-R
+    :config
+    (bind-keys :map ess-mode-map
+	       ("C-c h" 'helm-for-R))
+    (bind-keys :map inferior-ess-mode-map
+	       ("C-c h" 'helm-for-R))))
+
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
@@ -905,16 +1262,37 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package tramp
   :config
-  (setq tramp-default-method "ssh"))
+  (setq tramp-default-method "sshx")
+  (add-to-list 'backup-directory-alist
+	       (cons tramp-file-name-regexp nil)))
 
+;; 自動でsudoする設定
+(defun file-root-p (filename)
+  "Return t if file FILENAME created by root."
+  (eq 0 (nth 2 (file-attributes filename))))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" default)))
- '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
- '(magit-use-overlays nil))
+(defun th-rename-tramp-buffer ()
+  (when (file-remote-p (buffer-file-name))
+    (rename-buffer
+     (format "%s:%s"
+             (file-remote-p (buffer-file-name) 'method)
+             (buffer-name)))))
+
+(add-hook 'find-file-hook
+          'th-rename-tramp-buffer)
+
+(defadvice find-file (around th-find-file activate)
+  "Open FILENAME using tramp's sudo method if it's read-only."
+  (if (and (file-root-p (ad-get-arg 0))
+           (not (file-writable-p (ad-get-arg 0)))
+           (y-or-n-p (concat "File "
+                             (ad-get-arg 0)
+                             " is read-only.  Open it as root? ")))
+      (th-find-file-sudo (ad-get-arg 0))
+    ad-do-it))
+
+(defun th-find-file-sudo (file)
+  "Opens FILE with root privileges."
+  (interactive "F")
+  (set-buffer (find-file (concat "/sudo::" file))))
+

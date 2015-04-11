@@ -70,6 +70,7 @@
 
 
 ;; Search
+(depends-on "replace-from-region")
 (depends-on "anzu")
 (depends-on "ag")
 (depends-on "wgrep")
@@ -109,7 +110,6 @@
 (depends-on "point-undo")
 (depends-on "move-text")
 (depends-on "sequential-command")
-(depends-on "key-combo")
 (depends-on "flex-autopair")
 (depends-on "key-chord")
 
@@ -121,8 +121,11 @@
 (depends-on "smart-newline")
 (depends-on "multiple-cursors")
 (depends-on "expand-region")
+(depends-on "smartrep")
+(depends-on "region-bindings-mode")
 (depends-on "smartparens")
 (depends-on "open-junk-file")
+(depends-on "quickrun")
 
 
 ;; HTML+CSS
@@ -134,9 +137,16 @@
 ;; Markdown
 (depends-on "markdown-mode")
 
+;; blog
+(depends-on "weblogger")
+(depends-on "xml-rpc")
+
 ;; Javascript
 (depends-on "js2-mode")
 (depends-on "json-mode")
+(depends-on "tern")
+(depends-on "tern-auto-complete")
+(depends-on "jquery-doc")
 
 ;; altjs
 (depends-on "coffee-mode")
@@ -148,6 +158,13 @@
 (depends-on "inf-ruby")
 (depends-on "robe")
 (depends-on "rspec-mode")
+(depends-on "rbenv")
+
+;; R
+(depends-on "ess")
+(depends-on "helm-R")
+(depends-on "ess-R-data-view")
+(depends-on "ess-R-object-popup")
 
 ;; php
 (depends-on "php-mode")
@@ -169,3 +186,6 @@
 
 ;; ocml
 (depends-on "tuareg")
+
+;; sql
+
