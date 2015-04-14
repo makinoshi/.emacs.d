@@ -26,6 +26,9 @@
 
 ;; Screen - frame
 (depends-on "popwin")
+(depends-on "e2wm")
+(depends-on "e2wm-bookmark" :git "https://github.com/myuhe/e2wm-bookmark.el.git")
+(depends-on "svg-clock")
 
 ;; Screen - mode line
 
@@ -45,6 +48,8 @@
 ;; FileManager
 (depends-on "dired+")
 (depends-on "direx")
+(depends-on "image-dired+")
+(depends-on "image+")
 (depends-on "wdired")
 (depends-on "hiwin")
 
@@ -165,6 +170,10 @@
 (depends-on "helm-R")
 (depends-on "ess-R-data-view")
 (depends-on "ess-R-object-popup")
+(depends-on "cacoo")
+(depends-on "window-layout" :git "https://github.com/kiwanami/emacs-window-layout.git")
+(depends-on "inlineR" :git "https://github.com/myuhe/inlineR.el.git")
+(depends-on "e2wm-R" :git "https://github.com/myuhe/e2wm-R.el.git")
 
 ;; php
 (depends-on "php-mode")

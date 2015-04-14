@@ -119,7 +119,8 @@
 ;; テキストファイル／新規バッファの文字コード
 (prefer-coding-system 'utf-8-unix)
 ;; ファイル名の文字コード
-(set-file-name-coding-system 'utf-8-unix)
+(use-package ucs-normalize)
+(set-file-name-coding-system 'utf-8-hfs)
 ;; キーボード入力の文字コード
 (set-keyboard-coding-system 'utf-8-unix)
 ;; サブプロセスのデフォルト文字コード
@@ -167,6 +168,18 @@
   :config
   (setq display-buffer-function 'popwin:display-buffer)
   (setq popwin:popup-window-position 'bottom))
+
+;; e2wm(IDE likeなフレームを提供)
+(use-package e2wm
+  :config
+  (use-package e2wm-bookmark)
+  (autoload 'e2wm:start-management "e2wm-vcs" "load e2wm-vcs" t)
+  (autoload 'e2wm:dp-vcs "e2wm-vcs" "load e2wm-vcs" t)
+  (autoload 'e2wm:start-management "e2wm-bookmark" "load e2wm-bookmark" t)
+  (use-package e2wm-R)
+  :bind
+  ("M-+" . e2wm:start-management)
+  ("C-c R" . e2wm:start-R-code))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - mode line                                            ;;;
@@ -265,6 +278,18 @@
   (add-hook 'php-mode-hook  'rainbow-mode)
   (add-hook 'web-mode-hook  'rainbow-mode)
   (add-hook 'js2-mode-hook  'rainbow-mode))
+
+;; かっこに色をつける
+(defun my/rainbow-delimiters-mode-turn-on ()
+  (rainbow-delimiters-mode t))
+(add-hook 'css-mode-hook  'my/rainbow-delimiters-mode-turn-on)
+(add-hook 'scss-mode-hook 'my/rainbow-delimiters-mode-turn-on)
+(add-hook 'php-mode-hook  'my/rainbow-delimiters-mode-turn-on)
+(add-hook 'web-mode-hook  'my/rainbow-delimiters-mode-turn-on)
+(add-hook 'js2-mode-hook  'my/rainbow-delimiters-mode-turn-on)
+(add-hook 'ruby-mode-hook  'my/rainbow-delimiters-mode-turn-on)
+(add-hook 'ess-mode-hook  'my/rainbow-delimiters-mode-turn-on)
+
 
 ;; ediff
 (use-package ediff
@@ -499,6 +524,13 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ File Manager                                                  ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
+(setq dired-dwim-target t)
+;; ディレクトリを再帰的にコピーする
+(setq dired-recursive-copies 'always)
+;; diredバッファでC-sした時にファイル名だけにマッチするように
+(setq dired-isearch-filenames t)
+
 ;; direx
 (use-package direx
   :bind
@@ -530,6 +562,17 @@
   (bind-keys :map dired-mode-map
              ("r" . wdired-change-to-dired-mode)))
 
+;; image+
+(use-package image+
+  :config
+  (imagex-auto-adjust-mode 1)
+  (imagex-global-sticky-mode 1))
+
+;; image-dired+
+(use-package image-dired+
+  :config
+  (image-diredx-async-mode 1))
+
 ;; 非アクティブなバッファをマスク
 (use-package hiwin
   :config
@@ -545,8 +588,7 @@
   (defun server-ensure-safe-dir (dir) "Noop" t)
   (setq server-socket-dir "~/.emacs.d")
   (unless (server-running-p)
-    (server-start))
-  )
+    (server-start)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Edit support                                                  ;;;
@@ -765,6 +807,7 @@
   (add-to-list 'ac-dictionary-directories
                "~/.emacs.d/elisp/ac-dict")
   (ac-config-default)
+  (global-auto-complete-mode t)
   (robe-mode)
   (bind-keys :map ac-mode-map
              ("TAB" . auto-complete))
@@ -897,11 +940,11 @@
   (local-set-key (kbd "+")  (smartchr '(" + " "+" " += ")))
   (local-set-key (kbd "-")  (smartchr '(" - " "-" " -= ")))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
-  (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= " "->")))
-  (local-set-key (kbd "%")  (smartchr '(" % " "%" " %= ")))
+  (local-set-key (kbd ">")  (smartchr '(">" " => " " > " " >= " "->")))
+  (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
   (local-set-key (kbd "!")  (smartchr '("!" " != " " !~ ")))
   (local-set-key (kbd "&")  (smartchr '(" & " " && " "&")))
-  (local-set-key (kbd "*")  (smartchr '(" * " "**" "*")))
+  (local-set-key (kbd "*")  (smartchr '("*" " * " "**" )))
   (local-set-key (kbd "|")  (smartchr '("|`!!'|" " ||= " " || " "|")))
   (local-set-key (kbd "/")  (smartchr '("/" "/`!!'/" " / " "// ")))
   (local-set-key (kbd "#")  (smartchr '("#{`!!'}" "#")))
@@ -1009,6 +1052,26 @@
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
+(defun smartchr-keybindings-R ()
+  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
+  (local-set-key (kbd ",")  (smartchr '(", " ",")))
+  (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
+  (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
+  (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
+  (local-set-key (kbd ">")  (smartchr '(" > " " => " " >= " ">")))
+  (local-set-key (kbd "<")  (smartchr '(" <- " "<")))  
+  (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
+  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
+  (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
+  (local-set-key (kbd "*")  (smartchr '(" * " " *= " "**" "*")))
+  (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
+  (local-set-key (kbd "/")  (smartchr '(" / " " /= " "/`!!'/" "/")))
+  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
+  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
+  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
+  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
+  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
+
 (defun smartchr-keybindings-web-erb ()
   (local-set-key (kbd "<") (smartchr '("<%= `!!' %>" "<% `!!' %>" "<`!!'>" "<"))))
 
@@ -1083,7 +1146,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package markdown-mode
   :mode
-  ("¥¥.md¥¥'" . markdown-mode))
+  ("¥¥.md¥¥'" . markdown-mode)
+  :config
+  (add-hook 'markdown-mode-hook 'emmet-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Ruby                                                          ;;;
@@ -1121,10 +1186,11 @@
 (use-package js2-mode
   :mode
   ("¥¥.js¥¥'" . js2-mode)
+  :init
+  (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
   :config
   (add-hook 'js2-mode-hook 'smart-newline-mode)
   ;; (add-hook 'js2-mode-hook 'js-indent-hook)
-  (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
   (add-hook 'js2-mode-hook 'tern-mode)
   (use-package jquery-doc
     :config
@@ -1234,8 +1300,10 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package ess-site
   :mode
-  ("¥¥.r¥¥'" . R-mode)
-  ("¥¥.r¥¥'" . ess-site)
+  ("¥¥.R¥¥'" . R-mode)
+  ;; ("¥¥.R¥¥'" . ess-site)
+  :init
+  (add-hook 'ess-mode-hook 'smartchr-keybindings-R)
   :config
   (setq ess-use-auto-complete t)
   (bind-keys :map ess-mode-map
@@ -1250,7 +1318,6 @@
 	       ("C-c h" 'helm-for-R))
     (bind-keys :map inferior-ess-mode-map
 	       ("C-c h" 'helm-for-R))))
-
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
@@ -1294,5 +1361,5 @@
 (defun th-find-file-sudo (file)
   "Opens FILE with root privileges."
   (interactive "F")
-  (set-buffer (find-file (concat "/sudo::" file))))
+  (set-buffer (find-file (concat "/sudo::" File))))
 
