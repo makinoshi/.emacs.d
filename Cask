@@ -28,7 +28,7 @@
 (depends-on "popwin")
 (depends-on "e2wm")
 (depends-on "e2wm-bookmark" :git "https://github.com/myuhe/e2wm-bookmark.el.git")
-(depends-on "svg-clock")
+;;(depends-on "svg-clock")
 
 ;; Screen - mode line
 
@@ -55,6 +55,7 @@
 
 ;; Navigation
 (depends-on "ace-jump-mode")
+(depends-on "ace-pinyin")
 (depends-on "recentf")
 (depends-on "recentf-ext")
 (depends-on "popup")
