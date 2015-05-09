@@ -1017,19 +1017,19 @@
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
 (defun smartchr-keybindings-js ()
-  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
+  ;; (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
   (local-set-key (kbd ",")  (smartchr '(", " ",")))
-  (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
+  (local-set-key (kbd "=")  (smartchr '(" = " " === " "=" " == ")))
   (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
   (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
-  (local-set-key (kbd ">")  (smartchr '(" > " " => " " >= " ">")))
-  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
-  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
-  (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
   (local-set-key (kbd "*")  (smartchr '(" * " " *= " "**" "*")))
-  (local-set-key (kbd "<")  (smartchr '(" < " " << " " <= " "<")))
+  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
+  (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
+  (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= ")))
+  (local-set-key (kbd "!")  (smartchr '("!" " !== ")))
+  (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
   (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
-  (local-set-key (kbd "/")  (smartchr '(" / " " /= " "/`!!'/" "/")))
+  (local-set-key (kbd "/")  (smartchr '("/" " / " " /= " "/`!!'/")))
   (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
   (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
   (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
@@ -1161,7 +1161,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package ruby-mode
   :mode
-  ("¥¥.rb¥¥'" . ruby-mode)
+  ("\\.rb\\'" . ruby-mode)
   ("Capfile$" . ruby-mode)
   ("Gemfile$" . ruby-mode)
   :init
@@ -1192,7 +1192,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package js2-mode
   :mode
-  ("¥¥.js¥¥'" . js2-mode)
+  ("\\.js\\'" . js2-mode)
   :init
   (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
   :config
