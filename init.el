@@ -72,7 +72,7 @@
 (use-package auto-install
   :config
   ;; インストールディレクトリを設定する 初期値は ~/.emacs.d/auto-install/
-  (setq auto-install-directory "~/.emacs.d/elisp/")
+  (setq auto-install-directory (concat user-emacs-directory "elisp/"))
   ;; EmacsWikiに登録されているelisp の名前を取得する
   (auto-install-update-emacswiki-package-name t)
   ;; 必要であればプロキシの設定を行う
@@ -84,9 +84,9 @@
 (use-package package
   :config
   ;; パッケージリポジトリにMarmaladeを追加
-  (add-to-list 'package-archives '("marmalade"	. "http://marmalade-repo.org/packages/"))
-  (add-to-list 'package-archives '("melpa"	. "http://melpa.milkbox.net/packages/"))
+  (add-to-list 'package-archives '("melpa-stable"	. "http://melpa-stable.milkbox.net/packages/"))
   (add-to-list 'package-archives '("ELPA"	. "http://tromey.com/elpa/"))
+  (add-to-list 'package-archives '("marmalade"	. "http://marmalade-repo.org/packages/"))
   ;; インストールしたパッケージにロードパスを通してロードする
   (package-initialize))
 
@@ -108,8 +108,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (when (eq system-type 'darwin)
   (setq ns-command-modifier (quote meta))
-  (global-set-key (kbd "C-M-¥") 'indent-region)
-  )
+  (global-set-key (kbd "C-M-¥") 'indent-region))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system                                      ;;;
@@ -290,7 +289,6 @@
 (add-hook 'ruby-mode-hook  'my/rainbow-delimiters-mode-turn-on)
 (add-hook 'ess-mode-hook  'my/rainbow-delimiters-mode-turn-on)
 
-
 ;; ediff
 (use-package ediff
   :config
@@ -298,7 +296,6 @@
   (setq ediff-window-setup-function 'ediff-setup-windows-plain)
   ;; diffのバッファを上下ではなく左右に並べる
   (setq ediff-split-window-function 'split-window-horizontally))
-
 
 (use-package expand-region
   :bind
@@ -332,10 +329,8 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; カーソルの点滅
 (blink-cursor-mode 0)
-
 ;; 非アクティブウィンドウのカーソル表示
 (setq-default cursor-in-non-selected-windows t)
-
 ;; 論理行 (画面上の改行)単位ではなく物理行 (改行文字まで)単位で移動する
 (setq line-move-visual nil)
 
@@ -389,8 +384,7 @@
   (dolist (btn '(tabbar-buffer-home-button
                  tabbar-scroll-left-button
                  tabbar-scroll-right-button))
-    (set btn (cons (cons "" nil) (cons "" nil)))
-    )
+    (set btn (cons (cons "" nil) (cons "" nil))))
   ;; タブ切替にマウスホイールを使用（0：有効，-1：無効）
   ;; (call-interactively 'tabbar-mwheel-mode -1)
   ;; (remove-hook 'tabbar-mode-hook      'tabbar-mwheel-follow)
@@ -401,7 +395,6 @@
   ;; タブの表示間隔
   (defvar tabbar-separator nil)
   (setq tabbar-separator '(1.0))
-  
   :bind
   ;; タブ切り替え
   ("<C-tab>" . tabbar-forward-tab)
@@ -434,14 +427,10 @@
   '(lambda() (interactive) (isearch-update)))
 (define-key isearch-mode-map (kbd "<kanji>")
   'isearch-toggle-input-method)
-(add-hook
- 'isearch-mode-hook
- '(lambda() (setq w32-ime-composition-window (minibuffer-window)))
- )
-(add-hook
- 'isearch-mode-end-hook
- '(lambda() (setq w32-ime-composition-window nil))
- )
+(add-hook 'isearch-mode-hook
+ '(lambda() (setq w32-ime-composition-window (minibuffer-window))))
+(add-hook 'isearch-mode-end-hook
+ '(lambda() (setq w32-ime-composition-window nil)))
 
 ;; anzuの設定
 ;; 検索文字列が現在のバッファでいくつマッチするのかという情報と現在の位置をモードラインに表示するマイナーモードを提供
@@ -480,7 +469,7 @@
   (ace-pinyin-global-mode 1)
   :bind
   ("C-j" . ace-jump-word-mode)
-  ;; ("C-j" . ace-jump-char-mode)
+  ;; ("C-j" . ace-jump-char-mode) ;うまく動作しない
   ("C-c j" . ace-jump-line-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -514,8 +503,7 @@
   (defvar migemo-coding-system nil)
   (setq migemo-coding-system 'utf-8-unix)
 
-  (load-library "migemo")
-  )
+  (load-library "migemo"))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ File Manager                                                  ;;;
@@ -584,15 +572,15 @@
 ;;; @ server                                                        ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; emacs-server起動
+(require 'server)
+(unless (server-running-p)
+  (server-start))
 ;; (use-package server
 ;;   :config
 ;;   (defun server-ensure-safe-dir (dir) "Noop" t)
 ;;   (setq server-socket-dir "~/.emacs.d")
 ;;   (unless (server-running-p)
 ;;     (server-start)))
-(when (require 'server nil t)
-  (if (not (server-running-p))
-      (server-start)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Edit support                                                  ;;;
@@ -763,8 +751,7 @@
   ;; helmの出る位置を設定
   (setq helm-split-window-default-side 'below)
   ;; popwinに登録
-  (push '("^\*helm .+\*$" :regexp t) popwin:special-display-config)
-  )
+  (push '("^\*helm .+\*\\'" :regexp t) popwin:special-display-config))
 
 ;; helm-migemo
 (use-package helm-migemo
@@ -799,7 +786,7 @@
 ;; 次に指定したディレクトリをロードする (最後の/は必須)
 (setq auto-insert-directory "~/.emacs.d/insert/")
 ;; 次で"\\.rb$"の代わりに'ruby-modeにすると、メジャーモードがruby-modeのときに挿入してくれる
-;;(define-auto-insert "\\.rb$" "ruby-template.rb")
+;;(define-auto-insert "\\.rb\\'" "ruby-template.rb")
 
 ;; redoの設定
 (use-package redo+
@@ -1030,8 +1017,8 @@
   (local-set-key (kbd "=")  (smartchr '(" = " " === " "=" " == ")))
   (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
   (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
-  (local-set-key (kbd "*")  (smartchr '(" * " " *= " "**" "*")))
-  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
+  (local-set-key (kbd "*")  (smartchr '("*" " * " " *= " "**")))
+  (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
   (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= ")))
   (local-set-key (kbd "!")  (smartchr '("!" " !== ")))
@@ -1127,6 +1114,9 @@
   (setq tab-width 2)
   (setq indent-tabs-mode nil)
   (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-html-offset 2)
+  (setq web-mode-css-offset 2)
+  (setq web-mode-script-offset 2)
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template)))
 
@@ -1134,23 +1124,26 @@
 (use-package emmet-mode
   :config
   (setq emmet-indentation 2) ;; indent 2 spaces
+  (setq tab-width 2)
+  (setq indent-tabs-mode nil)
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
   (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
   (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
   (setq emmet-move-cursor-between-quotes t) ;; 最初のクオートの中にカーソルを
   ;; C-j は newline のままにしておく
   (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
-  (keyboard-translate ?\C-i ?\H-i) ;;C-i と Tabの被りを回避
-  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line) ;; C-i で展開
-  )
+  ;;C-i と Tabの被りを回避
+  (keyboard-translate ?\C-i ?\H-i)
+  ;; C-i で展開
+  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ scss                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package scss-mode
   :mode
-  ("¥¥.scss¥¥'" . scss-mode)
-  ("¥¥.css¥¥'" . scss-mode)
+  ("\\.scss\\'" . scss-mode)
+  ("\\.css\\'" . scss-mode)
   :config
   (bind-keys :map scss-mode-map
              ("{" . my/curly-brace)
@@ -1162,7 +1155,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package markdown-mode
   :mode
-  ("¥¥.md¥¥'" . markdown-mode)
+  ("\\.md\\'" . markdown-mode)
   :config
   (add-hook 'markdown-mode-hook 'emmet-mode))
 
@@ -1172,8 +1165,8 @@
 (use-package ruby-mode
   :mode
   ("\\.rb\\'" . ruby-mode)
-  ("Capfile$" . ruby-mode)
-  ("Gemfile$" . ruby-mode)
+  ("Capfile\\'" . ruby-mode)
+  ("Gemfile\\'" . ruby-mode)
   :init
   (add-hook 'ruby-mode-hook 'smart-newline-mode)
   (add-hook 'ruby-mode-hook 'smartchr-keybindings-ruby)
@@ -1197,7 +1190,7 @@
              ("|" . my/vertical-bar-pair)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Javascript                                                    ;;;
+;;; @ JavaScript                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package js2-mode
   :mode
@@ -1255,7 +1248,7 @@
      (load-library "sql-transform")))
 
 (setq auto-mode-alist
-      (cons '("\\.sql$" . sql-mode) auto-mode-alist))
+      (cons '("\\.sql\\'" . sql-mode) auto-mode-alist))
 
 (sql-set-product-feature
  'ms :font-lock 'sql-mode-ms-font-lock-keywords)
@@ -1315,7 +1308,7 @@
 ;;; @ R                                                             ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 拡張子が r, R の場合に R-mode を起動
-(add-to-list 'auto-mode-alist '("\\.[rR]$" . R-mode))
+(add-to-list 'auto-mode-alist '("\\.[rR]\\'" . R-mode))
 ;; R-mode を起動する時に ess-site をロード
 (autoload 'R-mode "ess-site" "Emacs Speaks Statistics mode" t)
 ;; R を起動する時に ess-site をロード
