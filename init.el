@@ -696,8 +696,14 @@
   ;; (add-to-list 'flex-autopair-pairs '(?| . ?|))
   (interactive)
   (insert "||")
-  (backward-char)
-  )
+  (backward-char))
+
+;; HTMLに挿入するテンプレートの構文を追加
+(defun my/underscore-html-template ()
+  "insert template syntax to HTML"
+  (interactive)
+  (insert "<% %>")
+  (backward-char 3))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ helm                                                          ;;;
@@ -1118,7 +1124,9 @@
   :config
   (setq tab-width 2)
   (setq indent-tabs-mode nil)
-  (setq web-mode-markup-indent-offset 2))
+  (setq web-mode-markup-indent-offset 2)
+  (bind-keys :map web-mode-map
+             ("C-c t" 'my/underscore-html-template)))
 
 ;; Emment(Zen-coding後継)
 (use-package emmet-mode
@@ -1127,7 +1135,7 @@
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
   (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
   (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
-  (setq emmet-move-cursor-between-quotes t) ;; 最初のクオートの中にカーソルをぶちこむ
+  (setq emmet-move-cursor-between-quotes t) ;; 最初のクオートの中にカーソルを
   ;; C-j は newline のままにしておく
   (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
   (keyboard-translate ?\C-i ?\H-i) ;;C-i と Tabの被りを回避
