@@ -1126,7 +1126,7 @@
   (setq indent-tabs-mode nil)
   (setq web-mode-markup-indent-offset 2)
   (bind-keys :map web-mode-map
-             ("C-c t" 'my/underscore-html-template)))
+             ("C-c t" . my/underscore-html-template)))
 
 ;; Emment(Zen-coding後継)
 (use-package emmet-mode
@@ -1151,8 +1151,8 @@
   ("¥¥.css¥¥'" . scss-mode)
   :config
   (bind-keys :map scss-mode-map
-             ("{" 'my/curly-brace)
-             (";" 'my/semicolon))
+             ("{" . my/curly-brace)
+             (";" . my/semicolon))
   (setq css-indent-offset 2))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1192,7 +1192,7 @@
     (global-rbenv-mode)
     (setq rbenv-installation-dir "~/.rbenv/bin/rbenv"))
   (bind-keys :map ruby-mode-map
-             ("|" 'my/vertical-bar-pair))
+             ("|" . my/vertical-bar-pair))
   )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1382,9 +1382,9 @@
 (use-package helm-R
   :config
   (bind-keys :map ess-mode-map
-	     ("C-c h" 'helm-for-R))
+	     ("C-c h" . helm-for-R))
   (bind-keys :map inferior-ess-mode-map
-	     ("C-c h" 'helm-for-R)))
+	     ("C-c h" . helm-for-R)))
 
 ;; 
 (use-package ess-R-data-view
