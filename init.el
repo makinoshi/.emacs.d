@@ -787,7 +787,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package magit
   :bind
-  ("C-c g" . magit-status))
+  ("C-c g" . magit-status)
+  :config
+  (push '("^\*magit*" :regexp t) popwin:special-display-config))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ coding support                                                ;;;
@@ -1192,8 +1194,7 @@
     (global-rbenv-mode)
     (setq rbenv-installation-dir "~/.rbenv/bin/rbenv"))
   (bind-keys :map ruby-mode-map
-             ("|" . my/vertical-bar-pair))
-  )
+             ("|" . my/vertical-bar-pair)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Javascript                                                    ;;;
