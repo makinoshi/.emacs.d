@@ -1,8 +1,11 @@
 # .emacs.d
 
-## install Emacs
+This repository includes makinoshi's Emacs config.
 
-## install cask
+
+## Install Emacs
+
+## Install cask
 
 ## git clone this repository
 
