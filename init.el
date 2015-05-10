@@ -774,9 +774,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package magit
   :bind
-  ("C-c g" . magit-status)
-  :config
-  (push '("^\*magit*" :regexp t) popwin:special-display-config))
+  ("C-c g" . magit-status))
+  ;; :config
+  ;; (push '("^\*magit*" :regexp t) popwin:special-display-config))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ coding support                                                ;;;
@@ -784,7 +784,7 @@
 ;; ファイル作成時にテンプレートを挿入
 (auto-insert-mode)
 ;; 次に指定したディレクトリをロードする (最後の/は必須)
-(setq auto-insert-directory "~/.emacs.d/insert/")
+(setq auto-insert-directory (concat user-emacs-directory "insert/"))
 ;; 次で"\\.rb$"の代わりに'ruby-modeにすると、メジャーモードがruby-modeのときに挿入してくれる
 ;;(define-auto-insert "\\.rb\\'" "ruby-template.rb")
 
@@ -806,7 +806,7 @@
 (use-package auto-complete-config
   :config
   (add-to-list 'ac-dictionary-directories
-               "~/.emacs.d/elisp/ac-dict")
+               (concat user-emacs-directory "elisp/ac-dict/"))
   (ac-config-default)
   (global-auto-complete-mode t)
   (robe-mode)
@@ -1796,4 +1796,28 @@ function."
   "Opens FILE with root privileges."
   (interactive "F")
   (set-buffer (find-file (concat "/sudo::" File))))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ English                                                       ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; aspell
+;; Have to install
+;; brew install aspell --lang=en
+;; echo "lang en_US" > ~/.aspell.conf
+(setq-default ispell-program-name "aspell")
+(eval-after-load "ispell"
+  ;; 日本語混じりでも使用可能にする
+  '(add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
+;; (setq-default ispell-program-name "/usr/local/bin/aspell")
+
+;; google-translate
+(use-package google-translate
+  :config
+  (custom-set-variables
+   '(google-translate-default-source-language "en")
+   '(google-translate-default-target-language "ja"))
+  (push '("*Google Translate*") popwin:special-display-config)
+  :bind
+  ("C-c C-t" . google-translate-at-point))
+
 

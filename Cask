@@ -199,3 +199,5 @@
 
 ;; sql
 
+;; English
+(depends-on "google-translate")
