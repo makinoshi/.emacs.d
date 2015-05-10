@@ -1104,21 +1104,21 @@
   ("\\.djhtml\\'" . web-mode)
   ("\\.html?\\'" . web-mode)
   :config
-  (setq tab-width 2)
-  (setq indent-tabs-mode nil)
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-html-offset 2)
-  (setq web-mode-css-offset 2)
-  (setq web-mode-script-offset 2)
+  (setq tab-width 2
+        indent-tabs-mode nil
+        web-mode-markup-indent-offset 2
+        web-mode-html-offset 2
+        web-mode-css-offset 2
+        web-mode-script-offset 2)
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template)))
 
 ;; Emment(Zen-coding後継)
 (use-package emmet-mode
   :config
-  (setq emmet-indentation 2) ;; indent 2 spaces
-  (setq tab-width 2)
-  (setq indent-tabs-mode nil)
+  (setq emmet-indentation 2
+        tab-width 2
+        dindent-tabs-mode nil)
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
   (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
   (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
@@ -1185,20 +1185,37 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ JavaScript                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun js-indent-hook ()
+  (setq js-indent-level 2
+        js-expr-indent-offset 2
+        indent-tabs-mode nil)
+  ;; switchのcaseラベルをインデントする関数を定義
+  (defun my/js-indent-line ()
+    (interactive)
+    (let* ((parse-status (save-excursion (syntax-ppss (point-at-bol))))
+           (offset (- (current-column) (current-indentation)))
+           (indentation (js--proper-indentation parse-status)))
+      (back-to-indentation)
+      (if (looking-at "case\\s-")
+          (indent-line-to (+ indentation 2))
+        (js-indent-line))
+      (when (> offset 0) (forward-char offset))))
+  ;; caseラベルのインデント処理をセット
+  (set (make-local-variable 'indent-line-function) 'my/js-indent-line))
+
 (use-package js2-mode
   :mode
   ("\\.js\\'" . js2-mode)
   :init
+  (add-hook 'js-mode-hook 'js-indent-hook)
   (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
-  :config
   (add-hook 'js2-mode-hook 'smart-newline-mode)
-  ;; (add-hook 'js2-mode-hook 'js-indent-hook)
+  (add-hook 'js2-mode-hook 'js-indent-hook)
   (add-hook 'js2-mode-hook 'tern-mode)
+  :config
   (use-package jquery-doc
     :config
     (add-hook 'js2-mode-hook 'jquery-doc-setup))
-  (setq tab-width 2
-        indent-tabs-mode nil)
   (use-package tern-auto-complete
     :config
     (tern-ac-setup)))
