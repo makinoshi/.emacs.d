@@ -428,9 +428,9 @@
 (define-key isearch-mode-map (kbd "<kanji>")
   'isearch-toggle-input-method)
 (add-hook 'isearch-mode-hook
- '(lambda() (setq w32-ime-composition-window (minibuffer-window))))
+          '(lambda() (setq w32-ime-composition-window (minibuffer-window))))
 (add-hook 'isearch-mode-end-hook
- '(lambda() (setq w32-ime-composition-window nil)))
+          '(lambda() (setq w32-ime-composition-window nil)))
 
 ;; anzuの設定
 ;; 検索文字列が現在のバッファでいくつマッチするのかという情報と現在の位置をモードラインに表示するマイナーモードを提供
@@ -768,8 +768,8 @@
 (use-package magit
   :bind
   ("C-c g" . magit-status))
-  ;; :config
-  ;; (push '("^\*magit*" :regexp t) popwin:special-display-config))
+;; :config
+;; (push '("^\*magit*" :regexp t) popwin:special-display-config))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ coding support                                                ;;;
@@ -1369,9 +1369,9 @@
 (use-package helm-R
   :config
   (bind-keys :map ess-mode-map
-	     ("C-c h" . helm-for-R))
+             ("C-c h" . helm-for-R))
   (bind-keys :map inferior-ess-mode-map
-	     ("C-c h" . helm-for-R)))
+             ("C-c h" . helm-for-R)))
 
 ;; 
 (use-package ess-R-data-view
@@ -1444,7 +1444,7 @@ function."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ### Perspective Definition
- 
+
 ;;; code / Code editing perspective
 ;;;--------------------------------------------------
 (cond
@@ -1469,21 +1469,21 @@ function."
  
  ((equal system-name "desktop")
   (setq e2wm:c-R-code-recipe
-  '(| (:left-max-size 60)
-      (- (:upper-size-ratio 0.3)
-         R-graphics-list
-         (- (:upper-size-ratio 0.5)
-            R-graphics
-            history))
-      (- (:upper-size-ratio 0.7)
-         (| (:right-max-size 60)
-            (- (:upper-size-ratio 0.7)
-               main
-               proc)
+        '(| (:left-max-size 60)
             (- (:upper-size-ratio 0.3)
-               R-dired
-               imenu))
-         sub)))
+               R-graphics-list
+               (- (:upper-size-ratio 0.5)
+                  R-graphics
+                  history))
+            (- (:upper-size-ratio 0.7)
+               (| (:right-max-size 60)
+                  (- (:upper-size-ratio 0.7)
+                     main
+                     proc)
+                  (- (:upper-size-ratio 0.3)
+                     R-dired
+                     imenu))
+               sub)))
   
   (setq e2wm:c-code-recipe
         '(| (:left-max-size 60)
@@ -1501,121 +1501,90 @@ function."
           (:name files :plugin files :plugin-args (:sort time :show-hidden nil))
           (:name history :plugin history-list)
           (:name sub :buffer "*info*" :default-hide t)
-          (:name imenu :plugin imenu :default-hide nil))))
- 
-;;  (office-p
-;;   (setq e2wm:c-code-recipe
-;;         '(| (:left-max-size 35)
-;;             (- (:upper-size-ratio 0.4)
-;;                files
-;;                (- (:upper-size-ratio 0.5)
-;;                   bookmarks history))
-;;             (- (:upper-size-ratio 0.7)
-;;                (| (:right-max-size 35)
-;;                   main imenu)
-;;                sub)))
-;;   (setq e2wm:c-code-winfo
-;;         '((:name main)
-;;           (:name bookmarks :plugin bookmarks-list)
-;;           (:name files :plugin files :plugin-args (:sort time :show-hidden nil))
-;;           (:name history :plugin history-list)
-;;           (:name sub :buffer "*info*" :default-hide t)
-;;           (:name imenu :plugin imenu :default-hide t)))
- 
-;; (setq e2wm:c-R-code-recipe
-;;   '(| (:left-max-size 35)
-;;       (- (:upper-size-ratio 0.3)
-;;          R-graphics-list
-;;          (- (:upper-size-ratio 0.5)
-;;             R-graphics
-;;             history))
-;;       (- (:upper-size-ratio 0.7)
-;;          (| (:right-max-size 35)
-;;             (- (:upper-size-ratio 0.7)
-;;                main
-;;                proc)
-;;             (- (:upper-size-ratio 0.3)
-;;                R-dired
-;;                imenu))
-;;          sub))))
-)
- 
+          (:name imenu :plugin imenu :default-hide nil)))))
+
 (defun e2wm:dp-htwo ()
   (interactive)
   (e2wm:pst-change 'htwo))
- 
+
 ;; キーバインド
 (eval-after-load 'R-mode
-  '(setq e2wm:pst-minor-mode-keymap
-	 (e2wm:define-keymap
-	  '(("C-S-p"    . e2wm:pst-history-forward-command) ; 履歴を進む
-	    ("C-S-n"    . e2wm:pst-history-back-command) ; 履歴をもどる
-	    ("M-m"      . e2wm:pst-window-select-main-command)
-	    ("prefix q" . e2wm:stop-management)
-	    ("prefix l" . e2wm:pst-update-windows-command)
-	    ("prefix 1" . e2wm:dp-code)
-	    ("prefix 2" . e2wm:dp-two) 
-	    ("prefix 3" . e2wm:dp-htwo)
-	    ("prefix 4" . e2wm:dp-doc)
-	    ("prefix 5" . e2wm:dp-array)
-	    ("prefix 6" . e2wm:dp-R-code)
-	    ("prefix 7" . e2wm:dp-R-view)
-	    ("prefix v" . e2wm:dp-vcs))
-	  e2wm:prefix-key)))
+  '(progn
+     (setq e2wm:pst-minor-mode-keymap
+           (e2wm:define-keymap
+            '(("C-S-p"    . e2wm:pst-history-forward-command) ; 履歴を進む
+              ("C-S-n"    . e2wm:pst-history-back-command) ; 履歴をもどる
+              ("M-m"      . e2wm:pst-window-select-main-command)
+              ("prefix q" . e2wm:stop-management)
+              ("prefix l" . e2wm:pst-update-windows-command)
+              ("prefix 1" . e2wm:dp-code)
+              ("prefix 2" . e2wm:dp-two) 
+              ("prefix 3" . e2wm:dp-htwo)
+              ("prefix 4" . e2wm:dp-doc)
+              ("prefix 5" . e2wm:dp-array)
+              ("prefix 6" . e2wm:dp-R-code)
+              ("prefix 7" . e2wm:dp-R-view)
+              ("prefix v" . e2wm:dp-vcs))
+            e2wm:prefix-key))
+     (setq e2wm:dp-code-minor-mode-map
+           (e2wm:define-keymap
+            '(("prefix I" . e2wm:dp-code-imenu-toggle-command)
+              ("prefix S" . e2wm:dp-code-sub-toggle-command)
+              ("prefix C" . e2wm:dp-code-toggle-clock-command)
+              ("prefix c" . e2wm:dp-code-toggle-svg-clock-command)
+              ("prefix M" . e2wm:dp-code-main-maximize-toggle-command)
+              ("prefix h" . e2wm:dp-code-navi-history-command) 
+              ("prefix f" . e2wm:dp-code-navi-files-command) 
+              ("prefix i" . e2wm:dp-code-navi-imenu-command) 
+              ("prefix s" . e2wm:dp-code-navi-sub-command) 
+              ("C-c m"    . e2wm:dp-code-popup-messages)
+              ("prefix b" . e2wm:dp-code-navi-bookmarks-command))
+            e2wm:prefix-key))
+     (e2wm:add-keymap
+      e2wm:def-plugin-files-mode-map
+      '(("k" . e2wm:def-plugin-files-updir-command)
+        ("C-S-n"     . e2wm:dp-two-right-history-down-command)
+        ("C-S-p"     . e2wm:dp-two-right-history-up-command)
+        ("prefix h"  . e2wm:dp-two-navi-history-command)
+        ("prefix l"  . e2wm:pst-update-windows-command)
+        ("prefix j"  . e2wm:dp-two-navi-left-command)
+        ("prefix k"  . e2wm:dp-two-navi-right-command)
+        ("prefix d"  . e2wm:dp-two-double-column-command)
+        ("prefix S"  . e2wm:dp-two-sub-toggle-command)
+        ("prefix -"  . e2wm:dp-two-swap-buffers-command)
+        ("prefix H"  . e2wm:dp-two-history-toggle-command)
+        ("prefix M"  . e2wm:dp-two-main-maximize-toggle-command))
+      e2wm:prefix-key)
+     (setq e2wm:def-plugin-history-list-mode-map 
+           (e2wm:define-keymap 
+            '(("k" . previous-line)
+              ("j" . next-line)
+              ("p" . previous-line)
+              ("n" . next-line)
+              ("d" . e2wm:def-plugin-history-list-kill-command)
+              ("<SPC>" . e2wm:def-plugin-history-list-show-command)
+              ("C-m"   . e2wm:def-plugin-history-list-select-command)
+              ("q"     . e2wm:pst-window-select-main-command)
+              )))))
 
-(eval-after-load 'R-mode
-  '(setq e2wm:dp-code-minor-mode-map
-	 (e2wm:define-keymap
-	  '(("prefix I" . e2wm:dp-code-imenu-toggle-command)
-	    ("prefix S" . e2wm:dp-code-sub-toggle-command)
-	    ("prefix C" . e2wm:dp-code-toggle-clock-command)
-	    ("prefix c" . e2wm:dp-code-toggle-svg-clock-command)
-	    ("prefix M" . e2wm:dp-code-main-maximize-toggle-command)
-	    ("prefix h" . e2wm:dp-code-navi-history-command) 
-	    ("prefix f" . e2wm:dp-code-navi-files-command) 
-	    ("prefix i" . e2wm:dp-code-navi-imenu-command) 
-	    ("prefix s" . e2wm:dp-code-navi-sub-command) 
-	    ("C-c m"    . e2wm:dp-code-popup-messages)
-	    ("prefix b" . e2wm:dp-code-navi-bookmarks-command))
-	  e2wm:prefix-key)))
-
-(eval-after-load 'R-mode
-  '(e2wm:add-keymap
-    e2wm:def-plugin-files-mode-map
-    '(("k" . e2wm:def-plugin-files-updir-command)
-      ) e2wm:prefix-key))
-
-(eval-after-load 'R-mode
-  '(setq e2wm:def-plugin-history-list-mode-map 
-	 (e2wm:define-keymap 
-	  '(("k" . previous-line)
-	    ("j" . next-line)
-	    ("p" . previous-line)
-	    ("n" . next-line)
-	    ("d" . e2wm:def-plugin-history-list-kill-command)
-	    ("<SPC>" . e2wm:def-plugin-history-list-show-command)
-	    ("C-m"   . e2wm:def-plugin-history-list-select-command)
-	    ("q"     . e2wm:pst-window-select-main-command)
-	    ))))
- 
 (custom-set-faces
  '(e2wm:face-history-list-normal  ((t (:foreground "#f0dfaf" ))))
  (custom-set-faces
   '(e2wm:face-history-list-select1 ((t (:foreground "#cc9393")))))
  (custom-set-faces
   '(e2wm:face-history-list-select2 ((t (:foreground "#8cd0d3" ))))))
- 
+
 ;; (when win-p
 ;;   (setq e2wm:def-plugin-clock-download-file "D:/tmp/wmclock.jpg")
 ;;   (setq e2wm:def-plugin-clock-resized-file  "D:/tmp/wmclock.jpg"))
 ;;↑cygwin環境の場合は "C:/cygwin/tmp/wmclock.jpg" とかにすると良いかも
- 
+
 (defun e2wm:dp-code-popup-messages ()
   (interactive)
   (e2wm:dp-code-popup-sub "*Messages*")
   (e2wm:start-close-popup-window-timer)
   (e2wm:pst-window-select-main-command))
- 
+
 (defun e2wm:dp-code-popup (buf)
   ;;とりあえず全部subで表示してみる
   (let ((cb (current-buffer)))
@@ -1657,27 +1626,11 @@ function."
      (t
       (e2wm:dp-code-popup-sub buf)
       t))))
- 
-(eval-after-load 'R-mode
-  '(e2wm:add-keymap
-    e2wm:dp-two-minor-mode-map
-    '(("C-S-n"     . e2wm:dp-two-right-history-down-command)
-      ("C-S-p"     . e2wm:dp-two-right-history-up-command)
-      ("prefix h"  . e2wm:dp-two-navi-history-command)
-      ("prefix l"  . e2wm:pst-update-windows-command)
-      ("prefix j"  . e2wm:dp-two-navi-left-command)
-      ("prefix k"  . e2wm:dp-two-navi-right-command)
-      ("prefix d"  . e2wm:dp-two-double-column-command)
-      ("prefix S"  . e2wm:dp-two-sub-toggle-command)
-      ("prefix -"  . e2wm:dp-two-swap-buffers-command)
-      ("prefix H"  . e2wm:dp-two-history-toggle-command)
-      ("prefix M"  . e2wm:dp-two-main-maximize-toggle-command))
-    e2wm:prefix-key))
- 
+
 (add-hook 'e2wm:post-stop-hook
           (lambda ()
             (setq display-buffer-function 'popwin:display-buffer)))
- 
+
 (eval-after-load "elscreen" 
   '(progn
      ;; overrides storages for elscreen
@@ -1733,7 +1686,7 @@ function."
          ad-do-it
          (when default-wcfg
            (set-window-configuration default-wcfg))))
- 
+     
      ;; apply defadvices to some elscreen functions
      (loop for i in '(elscreen-goto 
                       elscreen-kill 
@@ -1763,7 +1716,7 @@ function."
   :config
   (setq tramp-default-method "sshx")
   (add-to-list 'backup-directory-alist
-	       (cons tramp-file-name-regexp nil)))
+               (cons tramp-file-name-regexp nil)))
 
 ;; 自動でsudoする設定
 (defun file-root-p (filename)
