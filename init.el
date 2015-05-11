@@ -1094,6 +1094,12 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ HTML & CSS                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun web-mode-hooks ()
+  "Hooks for web-mode"
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2))
+
 (use-package web-mode
   :mode
   ("\\.phtml\\'" . web-mode)
@@ -1104,26 +1110,25 @@
   ("\\.mustache\\'" . web-mode)
   ("\\.djhtml\\'" . web-mode)
   ("\\.html?\\'" . web-mode)
+  :init
+  (add-hook 'web-mode-hook 'web-mode-hooks)
   :config
-  (setq tab-width 2
-        indent-tabs-mode nil
-        web-mode-markup-indent-offset 2
-        web-mode-html-offset 2
-        web-mode-css-offset 2
-        web-mode-script-offset 2)
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template)))
 
 ;; Emment(Zen-coding後継)
-(use-package emmet-mode
-  :config
+(defun emmet-mode-hooks ()
+  "Hooks for emmet-mode"
   (setq emmet-indentation 2
-        tab-width 2
-        dindent-tabs-mode nil)
+        emmet-move-cursor-between-quotes t))
+
+(use-package emmet-mode
+  :init
+  (add-hook 'emmet-mode-hook 'emmet-mode-hooks)
+  :config
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
   (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
   (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
-  (setq emmet-move-cursor-between-quotes t) ;; 最初のクオートの中にカーソルを
   ;; C-j は newline のままにしておく
   (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
   ;;C-i と Tabの被りを回避
