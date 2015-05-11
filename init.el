@@ -1010,7 +1010,7 @@
   (local-set-key (kbd ",")  (smartchr '(", " ",")))
   (local-set-key (kbd "=")  (smartchr '(" = " " === " "=" " == ")))
   (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
-  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
+  (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
   (local-set-key (kbd "*")  (smartchr '("*" " * " " *= " "**")))
   (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
@@ -1735,6 +1735,12 @@ function."
 ;;; @ org-mode                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (add-hook 'org-mode-hook 'smart-newline-mode)
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ term                                                          ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; multi-term→起動しない
+(use-package multi-term)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ tramp                                                         ;;;

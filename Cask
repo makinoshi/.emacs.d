@@ -201,3 +201,6 @@
 
 ;; English
 (depends-on "google-translate")
+
+;; term
+(depends-on "multi-term")
