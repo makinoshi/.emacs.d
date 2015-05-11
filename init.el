@@ -44,8 +44,6 @@
 
 ;; include PATH from Shell
 (exec-path-from-shell-initialize)
-;; (when (memq window-system '(mac ns))
-;;   (exec-path-from-shell-initialize))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Emacs Lisp conding                                            ;;;
@@ -265,6 +263,9 @@
 (set-face-background 'show-paren-match-face nil)
 (set-face-underline-p 'show-paren-match-face "yellow")
 
+;; 行の折り返し表示の切替
+(bind-key "C-c l" 'toggle-truncate-lines)
+
 ;; color-theme
 ;; (load-theme 'solarized-dark t)
 (load-theme 'zenburn t)
@@ -314,15 +315,15 @@
 ;; リージョンに対するマイナーモードを提供
 (use-package region-bindings-mode
   :config
-  (region-bindings-mode-enable)
-  ;; 発動させてくないモードを設定
-  ;; (setq region-bindings-mode-disabled-modes '(foo-mode bar-mode))
   ;; multiple-cursorsと連携
   (bind-keys :map region-bindings-mode-map
              ("a" . mc/mark-all-like-this)
              ("p" . mc/mark-previous-like-this)
              ("n" . mc/mark-next-like-this)
-             ("m" . mc/mark-more-like-this)))
+             ("m" . mc/mark-more-like-this))
+  (region-bindings-mode-enable))
+  ;; 発動させてくないモードを設定
+  ;; (setq region-bindings-mode-disabled-modes '(foo-mode bar-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - cursor                                               ;;;
@@ -542,7 +543,7 @@
 ;; ディレクトリ内のファイル名をそのまま編集する
 ;; diredバッファでrを押し、ファイル名を変更後C-c C-cまたはC-x C-sで保存.C-c C-kでキャンセル
 (use-package wdired
-  :config
+  :init
   (bind-keys :map dired-mode-map
              ("r" . wdired-change-to-dired-mode)))
 
@@ -798,16 +799,16 @@
 ;; auto-complete
 (use-package auto-complete-config
   :config
-  (add-to-list 'ac-dictionary-directories
-               (concat user-emacs-directory "elisp/ac-dict/"))
-  (ac-config-default)
-  (global-auto-complete-mode t)
-  (robe-mode)
   (bind-keys :map ac-mode-map
              ("TAB" . auto-complete))
   (bind-keys :map ac-completing-map
              ("C-n" . ac-next)
-             ("C-p" . ac-previous)))
+             ("C-p" . ac-previous))
+  (add-to-list 'ac-dictionary-directories
+               (concat user-emacs-directory "elisp/ac-dict/"))
+  (ac-config-default)
+  (global-auto-complete-mode t)
+  (robe-mode))
 
 ;; hippie-expand
 (bind-key "M-/" 'hippie-expand)
@@ -861,8 +862,8 @@
   :config
   (push '("*quickrun*") popwin:special-display-config)
   :bind
-  ("C-c C-c" . quickrun)
-  ("C-c c" . quickrun-with-arg))
+  ("C-c C-q" . quickrun)
+  ("C-c q" . quickrun-with-arg))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ smartchr                                                      ;;;
@@ -1160,6 +1161,8 @@
   ("\\.rb\\'" . ruby-mode)
   ("Capfile\\'" . ruby-mode)
   ("Gemfile\\'" . ruby-mode)
+  :interpreter
+  ("ruby" . ruby-mode)
   :init
   (add-hook 'ruby-mode-hook 'smart-newline-mode)
   (add-hook 'ruby-mode-hook 'smartchr-keybindings-ruby)
@@ -1206,13 +1209,15 @@
 (use-package js2-mode
   :mode
   ("\\.js\\'" . js2-mode)
+  :interpreter
+  ("node" . js2-mode)
   :init
   (add-hook 'js-mode-hook 'js-indent-hook)
   (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
   (add-hook 'js2-mode-hook 'smart-newline-mode)
-  (add-hook 'js2-mode-hook 'js-indent-hook)
   (add-hook 'js2-mode-hook 'tern-mode)
   :config
+  (add-hook 'js2-mode-hook 'js-indent-hook)
   (use-package jquery-doc
     :config
     (add-hook 'js2-mode-hook 'jquery-doc-setup))
