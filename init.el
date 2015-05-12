@@ -699,7 +699,6 @@
   (global-set-key (kbd "C-;")     'helm-mini)
   (global-set-key (kbd "C-x f")   'helm-find)
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
-  (global-set-key (kbd "C-c p")   'helm-c-Apropos)
   (global-set-key (kbd "C-c o")   'helm-swoop)
   (global-set-key (kbd "M-y")     'helm-show-kill-ring)
   (space-chord-define global-map "f"     'helm-for-files)
@@ -748,9 +747,7 @@
   (push '("^\*helm .+\*\\'" :regexp t) popwin:special-display-config))
 
 ;; helm-migemo
-(use-package helm-migemo
-  :config
-  (setq helm-use-migemo t))
+(use-package helm-migemo)
 ;; http://rubikitch.com/2014/12/19/helm-migemo/
 (eval-after-load "helm-migemo"
   '(defun helm-compile-source--candidates-in-buffer (source)
@@ -765,16 +762,11 @@
                    (volatile) (match identity)))
        source)))
 
-;; 候補が表示されないときがあるので
-;; migemoらないように設定
-;; (defadvice helm-c-apropos
-;;     (around ad-helm-apropos activate)
-;;   (let ((helm-use-migemo nil))
-;;     ad-do-it))
-(defadvice helm-M-x
-    (around ad-helm-M-x activate)
-  (let ((helm-use-migemo nil))
-    ad-do-it))
+;; ace-isearch
+;; 1文字→ace-jump-mode
+;; 2〜5文字→isearch
+;; 6文字以上→helm-swoop
+(global-ace-isearch-mode 1)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ magit                                                         ;;;

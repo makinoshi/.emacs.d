@@ -84,6 +84,7 @@
 (depends-on "swiper")
 (depends-on "visual-regexp")
 (depends-on "visual-regexp-steroids")
+(depends-on "ace-isearch")
 
 ;; git
 (depends-on "magit")
