@@ -751,13 +751,26 @@
 (use-package helm-migemo
   :config
   (setq helm-use-migemo t))
+;; http://rubikitch.com/2014/12/19/helm-migemo/
+(eval-after-load "helm-migemo"
+  '(defun helm-compile-source--candidates-in-buffer (source)
+     (helm-aif (assoc 'candidates-in-buffer source)
+         (append source
+                 `((candidates
+                    . ,(or (cdr it)
+                           (lambda ()
+                             ;; Do not use `source' because other plugins
+                             ;; (such as helm-migemo) may change it
+                             (helm-candidates-in-buffer (helm-get-current-source)))))
+                   (volatile) (match identity)))
+       source)))
 
 ;; 候補が表示されないときがあるので
 ;; migemoらないように設定
-(defadvice helm-c-apropos
-    (around ad-helm-apropos activate)
-  (let ((helm-use-migemo nil))
-    ad-do-it))
+;; (defadvice helm-c-apropos
+;;     (around ad-helm-apropos activate)
+;;   (let ((helm-use-migemo nil))
+;;     ad-do-it))
 (defadvice helm-M-x
     (around ad-helm-M-x activate)
   (let ((helm-use-migemo nil))
