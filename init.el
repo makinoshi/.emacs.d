@@ -251,7 +251,17 @@
     (t (:bold t)))
   "hl-line's my face")
 (setq hl-line-face 'my/hl-line-face)
-(global-hl-line-mode t)
+
+;; カーソル移動が重くなる原因に対処
+;; http://rubikitch.com/2015/05/14/global-hl-line-mode-timer/
+;; (global-hl-line-mode t)
+(defun global-hl-line-timer-function ()
+  (global-hl-line-unhighlight-all)
+  (let ((global-hl-line-mode t))
+    (global-hl-line-highlight)))
+(setq global-hl-line-timer
+      (run-with-idle-timer 0.1 t 'global-hl-line-timer-function))
+;; (cancel-timer global-hl-line-timer)
 
 ;; 括弧の対応関係のハイライト
 ;; paren-mode：対応する括弧を強調して表示する
@@ -1150,8 +1160,8 @@
   ("\\.css\\'" . scss-mode)
   :config
   (bind-keys :map scss-mode-map
-             ("{" . my/curly-brace)
-             (";" . my/semicolon))
+             ("{" . my/curly-brace))
+             ;; (";" . my/semicolon))
   (setq css-indent-offset 2))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
