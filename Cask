@@ -64,7 +64,7 @@
 
 ;; Kaizen Visual
 (depends-on "highlight-symbol")
-(depends-on "auto-highlight-symbol")
+(depends-on "highlight-thing")
 (depends-on "volatile-highlights")
 (depends-on "rainbow-delimiters")
 (depends-on "rainbow-mode")
@@ -151,6 +151,7 @@
 ;; Javascript
 (depends-on "js2-mode")
 (depends-on "json-mode")
+(depends-on "ac-js2")
 (depends-on "tern")
 (depends-on "tern-auto-complete")
 (depends-on "jquery-doc")

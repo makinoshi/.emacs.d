@@ -254,13 +254,14 @@
 
 ;; カーソル移動が重くなる原因に対処
 ;; http://rubikitch.com/2015/05/14/global-hl-line-mode-timer/
-;; (global-hl-line-mode t)
+(global-hl-line-mode t)
 (defun global-hl-line-timer-function ()
   (global-hl-line-unhighlight-all)
   (let ((global-hl-line-mode t))
     (global-hl-line-highlight)))
 (setq global-hl-line-timer
       (run-with-idle-timer 0.1 t 'global-hl-line-timer-function))
+(global-hl-line-mode 0)
 ;; (cancel-timer global-hl-line-timer)
 
 ;; 括弧の対応関係のハイライト
@@ -286,8 +287,7 @@
   (add-hook 'css-mode-hook  'rainbow-mode)
   (add-hook 'scss-mode-hook 'rainbow-mode)
   (add-hook 'php-mode-hook  'rainbow-mode)
-  (add-hook 'web-mode-hook  'rainbow-mode)
-  (add-hook 'js2-mode-hook  'rainbow-mode))
+  (add-hook 'web-mode-hook  'rainbow-mode))
 
 ;; かっこに色をつける
 (defun my/rainbow-delimiters-mode-turn-on ()
@@ -859,14 +859,22 @@
 ;; highlight
 (use-package highlight-symbol
   :bind
-  ([(control-f3)]      . highlight-symbol-at-point)
-  ([f3]	       . highlight-symbol-next)
+  ([(control-f3)] . highlight-symbol-at-point)
+  ([f3] . highlight-symbol-next)
   ([shift f3] . highlight-symbol-prev)
-  ([(meta f3)]  . highlight-symbol-query-replace))
+  ([(meta f3)] . highlight-symbol-query-replace))
 
-(use-package auto-highlight-symbol
+;; highlight-thing
+(use-package highlight-thing
   :config
-  (global-auto-highlight-symbol-mode t))
+  (setq highlight-thing-delay-seconds 0.5)
+  (setq highlight-thing-what-thing 'symbol)
+  (global-highlight-thing-mode)
+  ;; 関数内に限定
+  (setq highlight-thing-limit-to-defun t)
+  ;; hook
+  ;; (add-hook 'prog-mode-hook 'highlight-thing-mode)
+  )
 
 (use-package open-junk-file
   :config
@@ -1030,7 +1038,7 @@
   (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
   (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= ")))
-  (local-set-key (kbd "!")  (smartchr '("!" " !== ")))
+  (local-set-key (kbd "!")  (smartchr '("!" " !== " " != ")))
   (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
   (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
   (local-set-key (kbd "/")  (smartchr '("/" " / " " /= " "/`!!'/")))
@@ -1125,11 +1133,34 @@
   ("\\.mustache\\'" . web-mode)
   ("\\.djhtml\\'" . web-mode)
   ("\\.html?\\'" . web-mode)
+  ("\\.jsx?\\'" . web-mode)  
   :init
   (add-hook 'web-mode-hook 'web-mode-hooks)
   :config
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template)))
+
+;; jsxの設定
+(defadvice web-mode-highlight-part (around tweak-jsx activate)
+  (if (equal web-mode-content-type "jsx")
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
+    ad-do-it))
+
+;; jsxhintの設定
+(eval-after-load "web-mode" '(flycheck-define-checker jsxhint-checker
+			       "A JSX syntax and style checker based on JSXHint."
+			       :command ("jsxhint" source)
+			       :error-patterns
+			       ((error line-start (1+ nonl) ": line " line ", col " column ", " (message) line-end))
+			       :modes (web-mode)))
+
+(add-hook 'web-mode-hook
+          (lambda ()
+            (when (equal web-mode-content-type "jsx")
+              ;; enable flycheck
+              (flycheck-select-checker 'jsxhint-checker)
+              (flycheck-mode))))
 
 ;; Emment(Zen-coding後継)
 (defun emmet-mode-hooks ()
@@ -1225,6 +1256,12 @@
       (when (> offset 0) (forward-char offset))))
   ;; caseラベルのインデント処理をセット
   (set (make-local-variable 'indent-line-function) 'my/js-indent-line))
+(add-hook 'js-mode-hook 'js2-minor-mode)
+
+(use-package ac-js2
+  :config
+  (add-hook 'js2-mode 'ac-js2-mode)
+  (setq ac-js2-evaluate-calls t))
 
 (use-package js2-mode
   :mode
@@ -1236,6 +1273,7 @@
   (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
   (add-hook 'js2-mode-hook 'smart-newline-mode)
   (add-hook 'js2-mode-hook 'tern-mode)
+  (add-hook 'js2-mode-hook 'emmet-mode)
   :config
   (add-hook 'js2-mode-hook 'js-indent-hook)
   (use-package jquery-doc
