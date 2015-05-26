@@ -143,6 +143,7 @@
 
 ;; Markdown
 (depends-on "markdown-mode")
+(depends-on "realtime-preview" :git "https://github.com/niku/realtime-preview.el.git")
 
 ;; blog
 (depends-on "weblogger")
@@ -150,6 +151,7 @@
 
 ;; Javascript
 (depends-on "js2-mode")
+(depends-on "jsx-mode")
 (depends-on "json-mode")
 (depends-on "ac-js2")
 (depends-on "tern")

@@ -102,26 +102,33 @@
   (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ only mac                                                      ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(when (eq system-type 'darwin)
-  (setq ns-command-modifier (quote meta))
-  (global-set-key (kbd "C-M-¥") 'indent-region))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; デフォルトの文字コード
 (set-default-coding-systems 'utf-8-unix)
 ;; テキストファイル／新規バッファの文字コード
 (prefer-coding-system 'utf-8-unix)
-;; ファイル名の文字コード
-(use-package ucs-normalize)
-(set-file-name-coding-system 'utf-8-hfs)
-;; キーボード入力の文字コード
-(set-keyboard-coding-system 'utf-8-unix)
-;; サブプロセスのデフォルト文字コード
-(setq default-process-coding-system '(undecided-dos . utf-8-unix))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ only for mac                                                  ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(when (eq system-type 'darwin)
+  (setq ns-command-modifier (quote meta))
+  (global-set-key (kbd "C-M-¥") 'indent-region)
+  ;; ファイル名の文字コード
+  (use-package ucs-normalize)
+  (set-file-name-coding-system 'utf-8-hfs)
+  ;; キーボード入力の文字コード
+  (set-keyboard-coding-system 'utf-8-unix)
+  ;; サブプロセスのデフォルト文字コード
+  (setq default-process-coding-system '(undecided-dos . utf-8-unix)))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ only for windows                                              ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(when (eq window-system 'w32)
+  (set-file-name-coding-system 'cp932)
+  (setq locale-coding-system 'cp932))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - frame                                                ;;;
@@ -519,6 +526,11 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ File Manager                                                  ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; バックアップファイルを作らない
+(setq make-backup-file nil)
+;; オートセーブファイルを作らない
+(setq auto-save-default nil)
+
 ;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
 (setq dired-dwim-target t)
 ;; ディレクトリを再帰的にコピーする
@@ -862,19 +874,24 @@
   ([(control-f3)] . highlight-symbol-at-point)
   ([f3] . highlight-symbol-next)
   ([shift f3] . highlight-symbol-prev)
-  ([(meta f3)] . highlight-symbol-query-replace))
+  ([(meta f3)] . highlight-symbol-query-replace)
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'highlight-symbol-mode)
+  (add-hook 'web-mode-hook 'highlight-symbol-mode)
+  (add-hook 'ruby-mode-hook 'highlight-symbol-mode)
+  (add-hook 'js2-mode-hook 'highlight-symbol-mode))
 
 ;; highlight-thing
-(use-package highlight-thing
-  :config
-  (setq highlight-thing-delay-seconds 0.5)
-  (setq highlight-thing-what-thing 'symbol)
-  (global-highlight-thing-mode)
-  ;; 関数内に限定
-  (setq highlight-thing-limit-to-defun t)
-  ;; hook
-  ;; (add-hook 'prog-mode-hook 'highlight-thing-mode)
-  )
+;; (use-package highlight-thing
+;;   :config
+;;   (setq highlight-thing-delay-seconds 0.5)
+;;   (setq highlight-thing-what-thing 'symbol)
+;;   ;; (global-highlight-thing-mode)
+;;   ;; 関数内に限定
+;;   (setq highlight-thing-limit-to-defun t)
+;;   ;; hook
+;;   (add-hook 'ruby-mode-hook 'highlight-thing-mode)
+;;   (add-hook 'js2-mode-hook 'highlight-thing-mode))
 
 (use-package open-junk-file
   :config
@@ -1028,6 +1045,24 @@
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
+(defun smartchr-keybindings-web ()
+  (local-set-key (kbd ",")  (smartchr '(", " ",")))
+  (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
+  (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
+  (local-set-key (kbd "*")  (smartchr '("*" " * " " *= " "**")))
+  (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
+  (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
+  (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= ")))
+  (local-set-key (kbd "!")  (smartchr '("!" " !== " " != ")))
+  (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
+  (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
+  (local-set-key (kbd "/")  (smartchr '("/" " / " " /= " "/`!!'/")))
+  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
+  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
+  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
+  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
+  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
+
 (defun smartchr-keybindings-js ()
   ;; (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
   (local-set-key (kbd ",")  (smartchr '(", " ",")))
@@ -1137,10 +1172,15 @@
   :init
   (add-hook 'web-mode-hook 'web-mode-hooks)
   :config
+  (add-hook 'web-mode-hook 'smartchr-keybindings-web)
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template)))
 
 ;; jsxの設定
+(use-package jsx-mode
+  :config
+  (setq jsx-indent-level 2))
+
 (defadvice web-mode-highlight-part (around tweak-jsx activate)
   (if (equal web-mode-content-type "jsx")
       (let ((web-mode-enable-part-face nil))
@@ -1275,6 +1315,9 @@
   (add-hook 'js2-mode-hook 'tern-mode)
   (add-hook 'js2-mode-hook 'emmet-mode)
   :config
+  ;; (add-hook 'js2-mode-hook
+  ;; 	    '(lambda ()
+  ;; 	       (setq js2-basic-offset 2)))
   (add-hook 'js2-mode-hook 'js-indent-hook)
   (use-package jquery-doc
     :config
