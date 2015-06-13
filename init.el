@@ -1051,6 +1051,7 @@
   (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
   (local-set-key (kbd "*")  (smartchr '("*" " * " " *= " "**")))
   (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
+  (local-set-key (kbd "=")  (smartchr '(" = " "=\"`!!'\""  "=")))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
   (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= ")))
   (local-set-key (kbd "!")  (smartchr '("!" " !== " " != ")))
@@ -1275,6 +1276,8 @@
     (setq rbenv-installation-dir "~/.rbenv/bin/rbenv"))
   (bind-keys :map ruby-mode-map
              ("|" . my/vertical-bar-pair)))
+
+(use-package chef-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ JavaScript                                                    ;;;
@@ -1826,6 +1829,17 @@ function."
      (add-hook 'e2wm:pre-start-hook 'e2wm:elscreen-override)
      (add-hook 'e2wm:post-stop-hook 'e2wm:elscreen-revert)))
 
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ nginx                                                         ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun nginx-mode-hooks ()
+  (setq nginx-indent-level 2)
+  (setq nginx-indent-tabs-mode nil))
+
+(use-package nginx-mode
+  :config
+  (add-hook 'nginx-mode-hook 'nginx-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;

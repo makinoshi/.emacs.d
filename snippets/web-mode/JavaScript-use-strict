@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: JavaScript-use-strict
+# key: us
+# --
+'use strict';
+$0

@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: template-syntax
+# key: tmp
+# --
+<%$1 %>$0
