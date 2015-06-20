@@ -430,7 +430,7 @@
   :bind
   ;; タブ切り替え
   ("<C-tab>" . tabbar-forward-tab)
-  ("<C-S-tab>" . tabbar-backward-tab))
+  ("<C-S-tab>" . tabbar-backward-tab)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
