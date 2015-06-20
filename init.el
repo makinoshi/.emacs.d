@@ -130,7 +130,7 @@
   ;; input method
   (use-package mozc
     :config
-    (set-language-environment "Japanese")
+    (set-language-environment "UTF-8")
     (setq default-input-method "japanese-mozc")
     (setq mozc-candidate-style 'overlay))
   ;; font
