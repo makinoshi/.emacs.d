@@ -170,6 +170,10 @@
 (depends-on "rspec-mode")
 (depends-on "rbenv")
 
+;; Python
+(depends-on "python-mode")
+(depends-on "ac-python")
+
 ;; R
 (depends-on "ess")
 (depends-on "helm-R")

@@ -1127,7 +1127,8 @@
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
 (defun smartchr-keybindings-web-erb ()
-  (local-set-key (kbd "<") (smartchr '("<%= `!!' %>" "<% `!!' %>" "<`!!'>" "<"))))
+  (local-set-key (kbd "<") (smartchr '("<%= `!!' %>" "<% `!!' %>" "<`!!'>" "<")))
+  (local-set-key (kbd "&") (smartchr '("&" " && " " & " " &= "))))
 
 (add-hook 'c++-mode-hook 'smartchr-keybindings-c/c++)
 (add-hook 'awk-mode-hook 'smartchr-keybindings-awk)
@@ -1170,6 +1171,7 @@
   ("\\.djhtml\\'" . web-mode)
   ("\\.html?\\'" . web-mode)
   ("\\.jsx?\\'" . web-mode)  
+  ("\\.css?\\'" . web-mode)  
   :init
   (add-hook 'web-mode-hook 'web-mode-hooks)
   :config
@@ -1216,6 +1218,7 @@
   (add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
   (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
   (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
+  (add-hook 'scss-mode-hook 'emmet-mode)
   ;; C-j は newline のままにしておく
   (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
   ;;C-i と Tabの被りを回避
@@ -1226,15 +1229,21 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ scss                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun scss-mode-hooks ()
+  "scss-mode-hook"
+  (and
+   (set (make-local-variable 'css-indent-offset) 2)
+   (set (make-local-variable 'scss-compile-at-save) nil)))
+
 (use-package scss-mode
   :mode
   ("\\.scss\\'" . scss-mode)
-  ("\\.css\\'" . scss-mode)
   :config
-  (bind-keys :map scss-mode-map
-             ("{" . my/curly-brace))
+  (add-hook 'scss-mode-hook 'scss-mode-hooks)
+  ;; (bind-keys :map scss-mode-map
+  ;;            ("{" . my/curly-brace))
              ;; (";" . my/semicolon))
-  (setq css-indent-offset 2))
+  )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ markdown                                                      ;;;
