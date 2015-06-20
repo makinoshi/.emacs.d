@@ -82,7 +82,7 @@
 (use-package package
   :config
   ;; パッケージリポジトリにMarmaladeを追加
-  (add-to-list 'package-archives '("melpa-stable"	. "http://melpa-stable.milkbox.net/packages/"))
+  (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/"))
   (add-to-list 'package-archives '("ELPA"	. "http://tromey.com/elpa/"))
   (add-to-list 'package-archives '("marmalade"	. "http://marmalade-repo.org/packages/"))
   ;; インストールしたパッケージにロードパスを通してロードする
@@ -122,6 +122,19 @@
   (set-keyboard-coding-system 'utf-8-unix)
   ;; サブプロセスのデフォルト文字コード
   (setq default-process-coding-system '(undecided-dos . utf-8-unix)))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ only for ubuntu                                               ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(when (eq system-type 'gnu/linux)
+  ;; input method
+  (use-package mozc
+    :config
+    (set-language-environment "Japanese")
+    (setq default-input-method "japanese-mozc")
+    (setq mozc-candidate-style 'overlay))
+  ;; font
+  (set-frame-font "ricty-12"))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only for windows                                              ;;;
@@ -395,14 +408,15 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - tabbar                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package tabbar
+(when (eq system-type 'darwin)
+  (use-package tabbar
   :config
   (call-interactively 'tabbar-mode t)
   ;; ボタン非表示
-  (dolist (btn '(tabbar-buffer-home-button
-                 tabbar-scroll-left-button
-                 tabbar-scroll-right-button))
-    (set btn (cons (cons "" nil) (cons "" nil))))
+  ;; (dolist (btn '(tabbar-buffer-home-button
+  ;;                tabbar-scroll-left-button
+  ;;                tabbar-scroll-right-button))
+  ;;   (set btn (cons (cons "" nil) (cons "" nil))))
   ;; タブ切替にマウスホイールを使用（0：有効，-1：無効）
   ;; (call-interactively 'tabbar-mwheel-mode -1)
   ;; (remove-hook 'tabbar-mode-hook      'tabbar-mwheel-follow)
@@ -718,7 +732,7 @@
   (helm-mode 1)
   ;; キーバインドを設定
   (global-set-key (kbd "M-x")     'helm-M-x)
-  (global-set-key (kbd "C-;")     'helm-mini)
+  (global-set-key (kbd "M-m")     'helm-mini)
   (global-set-key (kbd "C-x f")   'helm-find)
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
   (global-set-key (kbd "C-c o")   'helm-swoop)

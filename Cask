@@ -1,6 +1,6 @@
 (source gnu)
-(source melpa)
 (source marmalade)
+(source melpa)
 
 ;; for cask
 (depends-on "pallet")
@@ -24,9 +24,12 @@
 (depends-on "bind-key")
 (depends-on "use-package")
 
+;; input
+(depends-on "mozc")
+
 ;; Screen - frame
 (depends-on "popwin")
-(depends-on "e2wm")
+(depends-on "e2wm" :git "https://github.com/myuhe/e2wm-R.el.git")
 (depends-on "e2wm-bookmark" :git "https://github.com/myuhe/e2wm-bookmark.el.git")
 ;;(depends-on "svg-clock")
 
@@ -180,9 +183,9 @@
 (depends-on "ess-R-data-view")
 (depends-on "ess-R-object-popup")
 (depends-on "cacoo")
-(depends-on "window-layout" :git "https://github.com/kiwanami/emacs-window-layout.git")
-(depends-on "inlineR" :git "https://github.com/myuhe/inlineR.el.git")
-(depends-on "e2wm-R" :git "https://github.com/myuhe/e2wm-R.el.git")
+;;(depends-on "window-layout" :git "https://github.com/kiwanami/emacs-window-layout.git")
+;;(depends-on "inlineR" :git "https://github.com/myuhe/inlineR.el.git")
+;;(depends-on "e2wm-R" :git "https://github.com/myuhe/e2wm-R.el.git")
 
 ;; php
 (depends-on "php-mode")
