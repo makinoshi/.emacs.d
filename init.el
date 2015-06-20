@@ -1303,6 +1303,21 @@
 (use-package chef-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ Python                                                        ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun python-mode-hooks ()
+  "python mode hooks"
+  (setq indent-tabs-mode nil
+	python-indent 4
+	python-pylint t
+	tab-width 4))
+(add-hook 'python-mode-hook 'python-mode-hooks)
+
+(use-package ac-python
+  :config
+  (add-to-list 'ac-modes 'python-2-mode))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ JavaScript                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (defun js-indent-hook ()
