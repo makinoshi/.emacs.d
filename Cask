@@ -26,6 +26,7 @@
 
 ;; input
 (depends-on "mozc")
+(depends-on "editorconfig")
 
 ;; Screen - frame
 (depends-on "popwin")
@@ -160,6 +161,7 @@
 (depends-on "tern")
 (depends-on "tern-auto-complete")
 (depends-on "jquery-doc")
+(depends-on "react-snippets")
 
 ;; altjs
 (depends-on "coffee-mode")

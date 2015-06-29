@@ -134,7 +134,9 @@
     (setq default-input-method "japanese-mozc")
     (setq mozc-candidate-style 'overlay))
   ;; font
-  (set-frame-font "ricty-12"))
+  (set-frame-font "ricty-12")
+  ;; editorconfig
+  (setq edconf-exec-path "/usr/bin/editorconfig"))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only for windows                                              ;;;
@@ -541,7 +543,7 @@
 ;;; @ File Manager                                                  ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; バックアップファイルを作らない
-(setq make-backup-file nil)
+(setq make-backup-files nil)
 ;; オートセーブファイルを作らない
 (setq auto-save-default nil)
 
@@ -1065,7 +1067,7 @@
   (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
   (local-set-key (kbd "*")  (smartchr '("*" " * " " *= " "**")))
   (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
-  (local-set-key (kbd "=")  (smartchr '(" = " "=\"`!!'\""  "=")))
+  (local-set-key (kbd "=")  (smartchr '("=\"`!!'\""  "=" " = " " === ")))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
   (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= ")))
   (local-set-key (kbd "!")  (smartchr '("!" " !== " " != ")))
@@ -1074,7 +1076,7 @@
   (local-set-key (kbd "/")  (smartchr '("/" " / " " /= " "/`!!'/")))
   (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
   (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
-  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
+  (local-set-key (kbd "{")  (smartchr '("{`!!'}" my/smartchr-braces "{")))
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
@@ -1157,6 +1159,7 @@
 (use-package yasnippet
   :config
   (yas-global-mode 1)
+  (use-package react-snippets)
   :bind
   ("C-:" . yas-expand))
 
