@@ -136,7 +136,8 @@
   ;; font
   (set-frame-font "ricty-12")
   ;; editorconfig
-  (setq edconf-exec-path "/usr/bin/editorconfig"))
+  (setq edconf-exec-path "/usr/bin/editorconfig")
+  (load "editorconfig"))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only for windows                                              ;;;
@@ -628,7 +629,7 @@
 ;; 最後の変更箇所にジャンプする
 (use-package goto-chg
   :bind
-  ("<f5>" . goto-last-change)         
+  ("<f5>" . goto-last-change)
   ("S-<f5>" . goto-last-change-reverse))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1096,7 +1097,7 @@
   (local-set-key (kbd "/")  (smartchr '("/" " / " " /= " "/`!!'/")))
   (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
   (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
-  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
+  (local-set-key (kbd "{")  (smartchr '("{`!!'}" my/smartchr-braces "{")))
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
@@ -1129,7 +1130,7 @@
   (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
   (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
   (local-set-key (kbd ">")  (smartchr '(" > " " => " " >= " ">")))
-  (local-set-key (kbd "<")  (smartchr '(" <- " "<")))  
+  (local-set-key (kbd "<")  (smartchr '(" <- " "<")))
   (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
   (local-set-key (kbd "!")  (smartchr '(" != " "!")))
   (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
@@ -1187,8 +1188,8 @@
   ("\\.mustache\\'" . web-mode)
   ("\\.djhtml\\'" . web-mode)
   ("\\.html?\\'" . web-mode)
-  ("\\.jsx?\\'" . web-mode)  
-  ("\\.css?\\'" . web-mode)  
+  ("\\.jsx?\\'" . web-mode)
+  ("\\.css?\\'" . web-mode)
   :init
   (add-hook 'web-mode-hook 'web-mode-hooks)
   :config
@@ -1237,7 +1238,7 @@
   (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
   (add-hook 'scss-mode-hook 'emmet-mode)
   ;; C-j は newline のままにしておく
-  (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
+  (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
   ;;C-i と Tabの被りを回避
   (keyboard-translate ?\C-i ?\H-i)
   ;; C-i で展開
@@ -1486,7 +1487,7 @@
   ;; comment-region のコメントアウトに # を使う（デフォルト##）
   (make-variable-buffer-local 'comment-add)
   (setq comment-add 0)
-  
+
   ;; 最初に ESS を呼び出した時の処理
   (when (not ess-loaded-p)
     ;; アンダースコアの入力が " <- " にならないようにする
@@ -1516,7 +1517,7 @@
         (mapcar (lambda (el) (add-to-list 'ac-trigger-commands el))
                 '(ess-smart-comma smart-operator-comma skeleton-pair-insert-maybe))
         (setq ac-sources '(ac-source-R ac-source-filename)))))
-  
+
   (if from-iess-p
       ;; R のプロセスが他になければウィンドウを分割する
       (if (> (length ess-process-name-list) 0)
@@ -1540,7 +1541,7 @@
   (bind-keys :map inferior-ess-mode-map
              ("C-c h" . helm-for-R)))
 
-;; 
+;;
 (use-package ess-R-data-view
   :config
   (define-key ess-mode-map (kbd "C-c v") 'ess-R-dv-pprint)
@@ -1633,7 +1634,7 @@ function."
           (:name history :plugin history-list)
           (:name sub :buffer "*info*" :default-hide t)
           (:name imenu :plugin imenu :default-hide t))))
- 
+
  ((equal system-name "desktop")
   (setq e2wm:c-R-code-recipe
         '(| (:left-max-size 60)
@@ -1651,7 +1652,7 @@ function."
                      R-dired
                      imenu))
                sub)))
-  
+
   (setq e2wm:c-code-recipe
         '(| (:left-max-size 60)
             (- (:upper-size-ratio 0.4)
@@ -1685,7 +1686,7 @@ function."
               ("prefix q" . e2wm:stop-management)
               ("prefix l" . e2wm:pst-update-windows-command)
               ("prefix 1" . e2wm:dp-code)
-              ("prefix 2" . e2wm:dp-two) 
+              ("prefix 2" . e2wm:dp-two)
               ("prefix 3" . e2wm:dp-htwo)
               ("prefix 4" . e2wm:dp-doc)
               ("prefix 5" . e2wm:dp-array)
@@ -1700,10 +1701,10 @@ function."
               ("prefix C" . e2wm:dp-code-toggle-clock-command)
               ("prefix c" . e2wm:dp-code-toggle-svg-clock-command)
               ("prefix M" . e2wm:dp-code-main-maximize-toggle-command)
-              ("prefix h" . e2wm:dp-code-navi-history-command) 
-              ("prefix f" . e2wm:dp-code-navi-files-command) 
-              ("prefix i" . e2wm:dp-code-navi-imenu-command) 
-              ("prefix s" . e2wm:dp-code-navi-sub-command) 
+              ("prefix h" . e2wm:dp-code-navi-history-command)
+              ("prefix f" . e2wm:dp-code-navi-files-command)
+              ("prefix i" . e2wm:dp-code-navi-imenu-command)
+              ("prefix s" . e2wm:dp-code-navi-sub-command)
               ("C-c m"    . e2wm:dp-code-popup-messages)
               ("prefix b" . e2wm:dp-code-navi-bookmarks-command))
             e2wm:prefix-key))
@@ -1722,8 +1723,8 @@ function."
         ("prefix H"  . e2wm:dp-two-history-toggle-command)
         ("prefix M"  . e2wm:dp-two-main-maximize-toggle-command))
       e2wm:prefix-key)
-     (setq e2wm:def-plugin-history-list-mode-map 
-           (e2wm:define-keymap 
+     (setq e2wm:def-plugin-history-list-mode-map
+           (e2wm:define-keymap
             '(("k" . previous-line)
               ("j" . next-line)
               ("p" . previous-line)
@@ -1755,7 +1756,7 @@ function."
 (defun e2wm:dp-code-popup (buf)
   ;;とりあえず全部subで表示してみる
   (let ((cb (current-buffer)))
-    (e2wm:message "#DP CODE popup : %s (current %s / backup %s)" 
+    (e2wm:message "#DP CODE popup : %s (current %s / backup %s)"
                   buf cb e2wm:override-window-cfg-backup))
   (let ((buf-name (buffer-name buf))
         (wm (e2wm:pst-get-wm)))
@@ -1798,14 +1799,14 @@ function."
           (lambda ()
             (setq display-buffer-function 'popwin:display-buffer)))
 
-(eval-after-load "elscreen" 
+(eval-after-load "elscreen"
   '(progn
      ;; overrides storages for elscreen
      (defadvice e2wm:frame-param-get (around e2wm:ad-override-els (name &optional frame))
        ;; frame is not used...
        (e2wm:message "** e2wm:frame-param-get : %s " name) ;
        (let ((alst (cdr (assq 'e2wm-frame-prop
-                              (elscreen-get-screen-property 
+                              (elscreen-get-screen-property
                                (elscreen-get-current-screen))))))
          (setq ad-return-value (and alst (cdr (assq name alst))))))
      (defadvice e2wm:frame-param-set (around e2wm:ad-override-els (name val &optional frame))
@@ -1819,7 +1820,7 @@ function."
          (setq ad-return-value val)))
      ;; grab switch events
      (defun e2wm:elscreen-define-advice (function)
-       (eval 
+       (eval
         `(defadvice ,function (around e2wm:ad-override-els)
            (e2wm:message "** %s vvvv" ',function)
            (when (e2wm:managed-p)
@@ -1830,9 +1831,9 @@ function."
            (e2wm:message "** ad-do-it ->")
            ad-do-it
            (e2wm:message "** ad-do-it <-")
-           (e2wm:message "** e2wm:param %s" 
+           (e2wm:message "** e2wm:param %s"
                          (cdr (assq 'e2wm-frame-prop
-                                    (elscreen-get-screen-property 
+                                    (elscreen-get-screen-property
                                      (elscreen-get-current-screen)))))
            (when (e2wm:managed-p)
              (e2wm:message "** e2wm:managed")
@@ -1853,10 +1854,10 @@ function."
          ad-do-it
          (when default-wcfg
            (set-window-configuration default-wcfg))))
-     
+
      ;; apply defadvices to some elscreen functions
-     (loop for i in '(elscreen-goto 
-                      elscreen-kill 
+     (loop for i in '(elscreen-goto
+                      elscreen-kill
                       elscreen-clone
                       elscreen-swap)
            do (e2wm:elscreen-define-advice i))
@@ -1954,5 +1955,3 @@ function."
   (push '("*Google Translate*") popwin:special-display-config)
   :bind
   ("C-c C-t" . google-translate-at-point))
-
-
