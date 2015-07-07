@@ -26,7 +26,6 @@
 
 ;; input
 (depends-on "mozc")
-(depends-on "editorconfig")
 
 ;; Screen - frame
 (depends-on "popwin")
