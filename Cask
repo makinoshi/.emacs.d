@@ -67,7 +67,7 @@
 
 ;; Kaizen Visual
 (depends-on "highlight-symbol")
-(depends-on "highlight-thing")
+(depends-on "auto-highlight-symbol")
 (depends-on "volatile-highlights")
 (depends-on "rainbow-delimiters")
 (depends-on "rainbow-mode")
@@ -126,6 +126,7 @@
 
 ;; coding assist
 (depends-on "flycheck")
+(depends-on "flycheck-pos-tip")
 (depends-on "yasnippet")
 (depends-on "projectile")
 (depends-on "smart-newline")

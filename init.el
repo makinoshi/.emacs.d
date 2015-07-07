@@ -145,7 +145,8 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (when (eq window-system 'w32)
   (set-file-name-coding-system 'cp932)
-  (setq locale-coding-system 'cp932))
+  (setq locale-coding-system 'cp932)
+  (set-frame-font "consolas"))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - frame                                                ;;;
@@ -880,16 +881,26 @@
   (global-undo-tree-mode))
 
 ;; flycheck
+(require 'flycheck)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 ;; ツールチップに表示
 (eval-after-load 'flycheck
   '(custom-set-variables
     '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
+;; flycheck-pos-tip
+(eval-after-load 'flycheck
+  '(custom-set-variables
+    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+
 ;; highlight
+(use-package auto-highlight-symbol
+  :config
+  (global-auto-highlight-symbol-mode t))
+
 (use-package highlight-symbol
   :bind
-  ([(control-f3)] . highlight-symbol-at-point)
+  ([(control f3)] . highlight-symbol-at-point)
   ([f3] . highlight-symbol-next)
   ([shift f3] . highlight-symbol-prev)
   ([(meta f3)] . highlight-symbol-query-replace)
@@ -897,19 +908,8 @@
   (add-hook 'emacs-lisp-mode-hook 'highlight-symbol-mode)
   (add-hook 'web-mode-hook 'highlight-symbol-mode)
   (add-hook 'ruby-mode-hook 'highlight-symbol-mode)
-  (add-hook 'js2-mode-hook 'highlight-symbol-mode))
-
-;; highlight-thing
-;; (use-package highlight-thing
-;;   :config
-;;   (setq highlight-thing-delay-seconds 0.5)
-;;   (setq highlight-thing-what-thing 'symbol)
-;;   ;; (global-highlight-thing-mode)
-;;   ;; 関数内に限定
-;;   (setq highlight-thing-limit-to-defun t)
-;;   ;; hook
-;;   (add-hook 'ruby-mode-hook 'highlight-thing-mode)
-;;   (add-hook 'js2-mode-hook 'highlight-thing-mode))
+  (add-hook 'js2-mode-hook 'highlight-symbol-mode)
+  (add-hook 'python-mode-hook 'highlight-symbol-mode))
 
 (use-package open-junk-file
   :config
@@ -1239,6 +1239,68 @@
   )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ JavaScript                                                    ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun js-indent-hook ()
+  (setq js-indent-level 2
+        js-expr-indent-offset 2
+        indent-tabs-mode nil)
+  ;; switchのcaseラベルをインデントする関数を定義
+  (defun my/js-indent-line ()
+    (interactive)
+    (let* ((parse-status (save-excursion (syntax-ppss (point-at-bol))))
+           (offset (- (current-column) (current-indentation)))
+           (indentation (js--proper-indentation parse-status)))
+      (back-to-indentation)
+      (if (looking-at "case\\s-")
+          (indent-line-to (+ indentation 2))
+        (js-indent-line))
+      (when (> offset 0) (forward-char offset))))
+  ;; caseラベルのインデント処理をセット
+  (set (make-local-variable 'indent-line-function) 'my/js-indent-line))
+(add-hook 'js-mode-hook 'js2-minor-mode)
+
+(use-package ac-js2
+  :config
+  (add-hook 'js2-mode 'ac-js2-mode)
+  (setq ac-js2-evaluate-calls t))
+
+;; disable jshint since we prefer eslint checking
+(setq-default flycheck-disabled-checkers
+	      (append flycheck-disabled-checkers
+		      '(javascript-jshint)))
+
+;; use eslint with web-mode for jsx files
+(flycheck-add-mode 'javascript-eslint 'web-mode)
+
+;; disable json-jsonlist checking for json files
+(setq-default flycheck-disabled-checkers
+	      (append flycheck-disabled-checkers
+		      '(json-jsonlist)))
+
+(use-package js2-mode
+  :mode
+  ("\\.js\\'" . js2-mode)
+  :interpreter
+  ("node" . js2-mode)
+  :init
+  (add-hook 'js-mode-hook 'js-indent-hook)
+  (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
+  (add-hook 'js2-mode-hook 'smart-newline-mode)
+  (add-hook 'js2-mode-hook 'tern-mode)
+  (add-hook 'js2-mode-hook 'emmet-mode)
+  :config
+  (add-hook 'js2-mode-hook 'js-indent-hook)
+  (use-package jquery-doc
+    :config
+    (add-hook 'js2-mode-hook 'jquery-doc-setup))
+  (use-package tern-auto-complete
+    :config
+    (tern-ac-setup)))
+
+;; (add-hook 'coffee-mode-hook 'smartchr-keybindings-coffee)
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ markdown                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package markdown-mode
@@ -1295,58 +1357,6 @@
 (use-package ac-python
   :config
   (add-to-list 'ac-modes 'python-2-mode))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ JavaScript                                                    ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun js-indent-hook ()
-  (setq js-indent-level 2
-        js-expr-indent-offset 2
-        indent-tabs-mode nil)
-  ;; switchのcaseラベルをインデントする関数を定義
-  (defun my/js-indent-line ()
-    (interactive)
-    (let* ((parse-status (save-excursion (syntax-ppss (point-at-bol))))
-           (offset (- (current-column) (current-indentation)))
-           (indentation (js--proper-indentation parse-status)))
-      (back-to-indentation)
-      (if (looking-at "case\\s-")
-          (indent-line-to (+ indentation 2))
-        (js-indent-line))
-      (when (> offset 0) (forward-char offset))))
-  ;; caseラベルのインデント処理をセット
-  (set (make-local-variable 'indent-line-function) 'my/js-indent-line))
-(add-hook 'js-mode-hook 'js2-minor-mode)
-
-(use-package ac-js2
-  :config
-  (add-hook 'js2-mode 'ac-js2-mode)
-  (setq ac-js2-evaluate-calls t))
-
-(use-package js2-mode
-  :mode
-  ("\\.js\\'" . js2-mode)
-  :interpreter
-  ("node" . js2-mode)
-  :init
-  (add-hook 'js-mode-hook 'js-indent-hook)
-  (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
-  (add-hook 'js2-mode-hook 'smart-newline-mode)
-  (add-hook 'js2-mode-hook 'tern-mode)
-  (add-hook 'js2-mode-hook 'emmet-mode)
-  :config
-  ;; (add-hook 'js2-mode-hook
-  ;; 	    '(lambda ()
-  ;; 	       (setq js2-basic-offset 2)))
-  (add-hook 'js2-mode-hook 'js-indent-hook)
-  (use-package jquery-doc
-    :config
-    (add-hook 'js2-mode-hook 'jquery-doc-setup))
-  (use-package tern-auto-complete
-    :config
-    (tern-ac-setup)))
-
-;; (add-hook 'coffee-mode-hook 'smartchr-keybindings-coffee)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;
