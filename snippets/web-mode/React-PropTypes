@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: React-PropTypes
+# key: pt
+# --
+React.PropTypes.$1.isRequired,$0

@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: ES6-const
+# key: c
+# --
+const $1 = $2;$0

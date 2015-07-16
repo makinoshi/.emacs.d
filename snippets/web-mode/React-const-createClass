@@ -1,0 +1,7 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: React-const-createClass
+# key: ccc
+# --
+const $1 = React.createClass({
+  $0
+});

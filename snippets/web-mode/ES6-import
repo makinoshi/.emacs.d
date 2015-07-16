@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: ES6-import
+# key: im
+# --
+import $1 from '$2';$0
