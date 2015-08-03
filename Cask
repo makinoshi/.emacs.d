@@ -198,6 +198,14 @@
 ;; Groovy
 (depends-on "groovy-mode")
 
+;; Clojure
+(depends-on "clojure-mode")
+(depends-on "cider")
+(depends-on "ac-cider")
+(depends-on "clojure-cheatsheet")
+(depends-on "clojure-test-mode")
+(depends-on "slamhound")
+
 ;; haskell
 (depends-on "haskell-mode")
 
