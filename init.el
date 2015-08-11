@@ -134,11 +134,7 @@
     (setq default-input-method "japanese-mozc")
     (setq mozc-candidate-style 'overlay))
   ;; font
-  (set-frame-font "ricty-12")
-  ;; editorconfig
-  ;; (setq edconf-exec-path "/usr/bin/editorconfig")
-  ;; (load "editorconfig")
-  )
+  (set-frame-font "ricty-11"))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only for windows                                              ;;;
@@ -931,7 +927,7 @@
   :init
   (unless (require 'smartchr nil t)
     (install-elisp
-     "https://raw.githubusercontent.com/imakado/emacs-smartchr/master/smartchr.el")))
+     "https://github.com/imakado/emacs-smartchr.git")))
 
 (defun my/smartchr-braces ()
   "Insert a pair of braces."
@@ -990,8 +986,8 @@
   (local-set-key (kbd ",")  (smartchr '(", " ",")))
   (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
   (local-set-key (kbd "~")  (smartchr '(" =~ " "~")))
-  (local-set-key (kbd "+")  (smartchr '(" + " "+" " += ")))
-  (local-set-key (kbd "-")  (smartchr '(" - " "-" " -= ")))
+  (local-set-key (kbd "+")  (smartchr '("+" " + " " += ")))
+  (local-set-key (kbd "-")  (smartchr '("-" " - " " -= ")))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
   (local-set-key (kbd ">")  (smartchr '(">" " => " " > " " >= " "->")))
   (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
@@ -1069,7 +1065,7 @@
   (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
   (local-set-key (kbd "*")  (smartchr '("*" " * " " *= " "**")))
   (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
-  (local-set-key (kbd "=")  (smartchr '("=\"`!!'\""  "=" " = " " === ")))
+  (local-set-key (kbd "=")  (smartchr '("=" " = " " === " )))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
   (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= ")))
   (local-set-key (kbd "!")  (smartchr '("!" " !== " " != ")))
@@ -1193,6 +1189,7 @@
   ("\\.mustache\\'" . web-mode)
   ("\\.djhtml\\'" . web-mode)
   ("\\.html?\\'" . web-mode)
+  ("\\.js?\\'" . web-mode)
   ("\\.jsx?\\'" . web-mode)
   ("\\.css?\\'" . web-mode)
   :init
@@ -1284,7 +1281,7 @@
 
 (use-package js2-mode
   :mode
-  ("\\.js\\'" . js2-mode)
+  ;; ("\\.js\\'" . js2-mode)
   :interpreter
   ("node" . js2-mode)
   :init
@@ -1361,6 +1358,19 @@
 (use-package ac-python
   :config
   (add-to-list 'ac-modes 'python-2-mode))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ Java                                                          ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun java-mode-hooks ()
+  "Java mode hooks"
+  (setq tab-width 4
+        indent-tabs-mode nil))
+(add-hook 'java-mode-hook 'java-mode-hooks)
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ Scala                                                         ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;

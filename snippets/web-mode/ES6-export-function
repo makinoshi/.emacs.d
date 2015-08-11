@@ -1,0 +1,7 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: ES6-export-function
+# key: exf
+# --
+export function $1($2) {
+  $0
+}

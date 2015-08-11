@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: JS-return
+# key: ret
+# binding: direct-keybinding
+# --
+return ($0);

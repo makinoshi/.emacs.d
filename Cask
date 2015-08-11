@@ -192,7 +192,9 @@
 ;; php
 (depends-on "php-mode")
 
-;; scala
+;; Java
+
+;; Scala
 (depends-on "scala-mode")
 
 ;; Groovy

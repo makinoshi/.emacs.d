@@ -1,0 +1,7 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: ES6-export-default
+# key: exd
+# --
+export default class $1 extends $2 {
+  $0
+}
