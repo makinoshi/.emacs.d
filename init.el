@@ -39,8 +39,8 @@
             (normal-top-level-add-subdirs-to-load-path))))))
 
 ;; 引数のディレクトリとそのサブディレクトリをload-pathに追加
-;; (add-to-load-path "elisp" ".cask/24.4.1/elpa")
-(add-to-load-path "elisp")
+(add-to-load-path "elisp" ".cask/24.4.1/elpa")
+;; (add-to-load-path "elisp")
 
 ;; include PATH from Shell
 (exec-path-from-shell-initialize)
@@ -115,6 +115,8 @@
 (when (eq system-type 'darwin)
   (setq ns-command-modifier (quote meta))
   (global-set-key (kbd "C-M-¥") 'indent-region)
+  ;; font
+  (set-frame-font "ricty-13")
   ;; ファイル名の文字コード
   (use-package ucs-normalize)
   (set-file-name-coding-system 'utf-8-hfs)
@@ -742,10 +744,10 @@
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
   (global-set-key (kbd "C-c o")   'helm-swoop)
   (global-set-key (kbd "M-y")     'helm-show-kill-ring)
+  (global-set-key (kbd "C-c C-s") 'helm-ag)
   (space-chord-define global-map "f"     'helm-for-files)
   (space-chord-define global-map "i"     'helm-imenu)
   (space-chord-define global-map "b"     'helm-descbinds)
-  (space-chord-define global-map "s"     'helm-ag)
   (space-chord-define global-map "r"     'helm-resume)
   ;; 検索wordをhelm-swoopで一覧化してくれる設定。isearchの時にC-oを押すと一覧が出る。
   (define-key isearch-mode-map (kbd "C-o") 'helm-swoop-from-isearch)
@@ -931,7 +933,7 @@
   :init
   (unless (require 'smartchr nil t)
     (install-elisp
-     "https://github.com/imakado/emacs-smartchr.git")))
+     "https://raw.githubusercontent.com/imakado/emacs-smartchr/master/smartchr.el")))
 
 (defun my/smartchr-braces ()
   "Insert a pair of braces."
