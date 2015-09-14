@@ -754,20 +754,23 @@
 (use-package helm-config
   :config
   (helm-mode 1)
-  (use-package helm-ls-git)
+  (require 'helm-files)
+  (use-package helm-ls-git
+    :config
+    (custom-set-variables
+     '(helm-truncate-lines t)
+     '(helm-delete-minibuffer-contents-from-point t)
+     '(helm-mini-default-sources '(helm-source-buffers-list
+				   helm-source-files-in-current-dir
+				   helm-source-ls-git
+				   helm-source-recentf))))
   ;; helm-miniに表示するものをカスタマイズ
-  (custom-set-variables
-   '(helm-truncate-lines t)
-   '(helm-delete-minibuffer-contents-from-point t)
-   '(helm-mini-default-sources '(helm-source-buffers-list
-                                 helm-source-files-in-current-dir
-                                 helm-source-ls-git
-                                 helm-source-recentf)))
   ;; キーバインドを設定
   (global-set-key (kbd "M-x")     'helm-M-x)
   (global-set-key (kbd "M-m")     'helm-mini)
   (global-set-key (kbd "C-x f")   'helm-find)
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-c b")   'helm-browse-project)
   (global-set-key (kbd "C-c o")   'helm-swoop)
   (global-set-key (kbd "C-c s")   'helm-ag)
   (global-set-key (kbd "M-y")     'helm-show-kill-ring)
