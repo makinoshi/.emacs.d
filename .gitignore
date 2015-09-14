@@ -5,3 +5,5 @@ recentf
 undohist
 ac-comphist.dat
 elisp
+.mc*
+elscreen
