@@ -45,8 +45,9 @@
 ;; Screen - linum
 (depends-on "hlinum")
 
-;; Screen - tab
-(depends-on "tabbar")
+;; Screen - elscreen
+(depends-on "elscreen")
+(depends-on "elscreen-persist")
 
 ;; FileManager
 (depends-on "dired+")

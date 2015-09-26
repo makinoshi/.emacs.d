@@ -115,8 +115,6 @@
 (when (eq system-type 'darwin)
   (setq ns-command-modifier (quote meta))
   (global-set-key (kbd "C-M-¥") 'indent-region)
-  ;; font
-  (set-frame-font "ricty-13")
   ;; ファイル名の文字コード
   (use-package ucs-normalize)
   (set-file-name-coding-system 'utf-8-hfs)
@@ -413,31 +411,49 @@
  '(linum-highlight-face ((t (:foreground "black" :background "red")))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ screen - tabbar                                               ;;;
+;;; @ screen - elscreen                                             ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(when (eq system-type 'darwin)
-  (use-package tabbar
+;; C-z C-c 新しいelscreenを作る
+;; C-z C-k 現在のelscreenを削除する
+;; C-z M-k 現在のelscreenをバッファごと削除する
+;; C-z K   ほかの全elscreenを削除する！
+;; C-z C-n 次のelscreenを選択
+;; C-z C-p 前のelscreenを選択
+;; C-z C-a 直前に選択したelscreenを選択
+;; C-z C-f 新しいelscreenでファイルを開く
+;; C-z b   新しいelscreenでバッファを開く
+;; C-z d   新しいelscreenでdiredを開く
+(use-package elscreen
   :config
-  (call-interactively 'tabbar-mode t)
-  ;; ボタン非表示
-  ;; (dolist (btn '(tabbar-buffer-home-button
-  ;;                tabbar-scroll-left-button
-  ;;                tabbar-scroll-right-button))
-  ;;   (set btn (cons (cons "" nil) (cons "" nil))))
-  ;; タブ切替にマウスホイールを使用（0：有効，-1：無効）
-  ;; (call-interactively 'tabbar-mwheel-mode -1)
-  ;; (remove-hook 'tabbar-mode-hook      'tabbar-mwheel-follow)
-  ;; (remove-hook 'mouse-wheel-mode-hook 'tabbar-mwheel-follow)
-  ;; タブグループを使用（t：有効，nil：無効）
-  (defvar tabbar-buffer-groups-function nil)
-  (setq tabbar-buffer-groups-function nil)
-  ;; タブの表示間隔
-  (defvar tabbar-separator nil)
-  (setq tabbar-separator '(1.0))
-  :bind
-  ;; タブ切り替え
-  ("<C-tab>" . tabbar-forward-tab)
-  ("<C-S-tab>" . tabbar-backward-tab)))
+  ;; プレフィクスキーはC-z
+  (setq elscreen-prefix-key (kbd "C-z"))
+  (elscreen-start)
+  (elscreen-persist-mode 1)
+  ;; タブの先頭に[X]を表示しない
+  (setq elscreen-tab-display-kill-screen nil)
+  ;; header-lineの先頭に[<->]を表示しない
+  (setq elscreen-tab-display-control nil)
+  ;; バッファ名・モード名からタブに表示させる内容を決定する(デフォルト設定)
+  (setq elscreen-buffer-to-nickname-alist
+	'(("^dired-mode$" .
+	   (lambda ()
+	     (format "Dired(%s)" dired-directory)))
+	  ("^Info-mode$" .
+	   (lambda ()
+	     (format "Info(%s)" (file-name-nondirectory Info-current-file))))
+	  ("^mew-draft-mode$" .
+	   (lambda ()
+	     (format "Mew(%s)" (buffer-name (current-buffer)))))
+	  ("^mew-" . "Mew")
+	  ("^irchat-" . "IRChat")
+	  ("^liece-" . "Liece")
+	  ("^lookup-" . "Lookup")))
+  (setq elscreen-mode-to-nickname-alist
+	'(("[Ss]hell" . "shell")
+	  ("compilation" . "compile")
+	  ("-telnet" . "telnet")
+	  ("dict" . "OnlineDict")
+	  ("*WL:Message*" . "Wanderlust"))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
@@ -1381,6 +1397,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Clojure                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(use-package clojure-mode)
+(put 'letfn 'clojure-backtracking-indent '((2) 2))
+(put 'macrolet 'clojure-backtracking-indent '((2) 2))
 ;; cider
 (add-hook 'clojure-mode-hook 'cider-mode)
 ;; mini bufferに関数の引数を表示させる
