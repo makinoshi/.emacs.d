@@ -6,4 +6,5 @@ undohist
 ac-comphist.dat
 elisp
 *tar.gz
+.mc*
 elscreen

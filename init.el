@@ -413,6 +413,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - elscreen                                             ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; プレフィクスキーはC-z
 ;; C-z C-c 新しいelscreenを作る
 ;; C-z C-k 現在のelscreenを削除する
 ;; C-z M-k 現在のelscreenをバッファごと削除する
@@ -753,12 +754,25 @@
 (use-package helm-config
   :config
   (helm-mode 1)
+  (require 'helm-files)
+  (use-package helm-ls-git
+    :config
+    (custom-set-variables
+     '(helm-truncate-lines t)
+     '(helm-delete-minibuffer-contents-from-point t)
+     '(helm-mini-default-sources '(helm-source-buffers-list
+				   helm-source-files-in-current-dir
+				   helm-source-ls-git
+				   helm-source-recentf))))
+  ;; helm-miniに表示するものをカスタマイズ
   ;; キーバインドを設定
   (global-set-key (kbd "M-x")     'helm-M-x)
   (global-set-key (kbd "M-m")     'helm-mini)
   (global-set-key (kbd "C-x f")   'helm-find)
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-c b")   'helm-browse-project)
   (global-set-key (kbd "C-c o")   'helm-swoop)
+  (global-set-key (kbd "C-c s")   'helm-ag)
   (global-set-key (kbd "M-y")     'helm-show-kill-ring)
   (global-set-key (kbd "C-c C-s") 'helm-ag)
   (space-chord-define global-map "f"     'helm-for-files)
@@ -767,7 +781,6 @@
   (space-chord-define global-map "r"     'helm-resume)
   ;; 検索wordをhelm-swoopで一覧化してくれる設定。isearchの時にC-oを押すと一覧が出る。
   (define-key isearch-mode-map (kbd "C-o") 'helm-swoop-from-isearch)
-
   (define-key helm-map (kbd "C-h") 'delete-backward-char)
   (define-key helm-find-files-map (kbd "C-h") 'delete-backward-char)
   (define-key helm-find-files-map (kbd "TAB") 'helm-execute-persistent-action)
@@ -828,13 +841,17 @@
 (global-ace-isearch-mode 1)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ magit                                                         ;;;
+;;; @ git                                                           ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package magit
   :bind
   ("C-c g" . magit-status))
 ;; :config
 ;; (push '("^\*magit*" :regexp t) popwin:special-display-config))
+
+(use-package git-gutter
+  :config
+  (global-git-gutter-mode t))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ coding support                                                ;;;
@@ -940,6 +957,14 @@
   :bind
   ("C-c C-q" . quickrun)
   ("C-c q" . quickrun-with-arg))
+
+;; ctags
+;; 注意！exuberant-ctagsを指定する必要がある
+;; Emacs標準のctagsでは動作しない！！
+(setq ctags-update-command "/usr/bin/ctags")
+;; 使う言語で有効にしよう
+(add-hook 'c-mode-common-hook  'turn-on-ctags-auto-update-mode)
+(add-hook 'emacs-lisp-mode-hook  'turn-on-ctags-auto-update-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ smartchr                                                      ;;;
@@ -1093,7 +1118,7 @@
   (local-set-key (kbd "!")  (smartchr '("!" " !== " " != ")))
   (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
   (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
-  (local-set-key (kbd "/")  (smartchr '("/" " / " " /= " "/`!!'/")))
+  (local-set-key (kbd "/")  (smartchr '("/" "/`!!'/" " / " " /= ")))
   (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
   (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
   (local-set-key (kbd "{")  (smartchr '("{`!!'}" my/smartchr-braces "{")))
@@ -1179,9 +1204,8 @@
 (use-package yasnippet
   :config
   (yas-global-mode 1)
-  (use-package react-snippets)
   :bind
-  ("C-:" . yas-expand))
+  ("C-'" . yas-expand))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ emacs lisp                                                    ;;;
@@ -1199,7 +1223,13 @@
   "Hooks for web-mode"
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2))
+        web-mode-code-indent-offset 2
+	indent-tabs-mode nil
+	comment-start "//"
+	comment-end ""
+	web-mode-comment-beginning "//"
+	web-mode-comment-end ""
+	web-mode-comment-style 2))
 
 (use-package web-mode
   :mode
@@ -1216,10 +1246,18 @@
   ("\\.css?\\'" . web-mode)
   :init
   (add-hook 'web-mode-hook 'web-mode-hooks)
+  (add-hook 'web-mode-hook 'tern-mode)
+  (add-hook 'web-mode-hook  'turn-on-ctags-auto-update-mode)
   :config
   (add-hook 'web-mode-hook 'smartchr-keybindings-web)
   (bind-keys :map web-mode-map
-             ("C-c t" . my/underscore-html-template)))
+             ("C-c t" . my/underscore-html-template))
+  (use-package jquery-doc
+    :config
+    (add-hook 'web-mode-hook 'jquery-doc-setup))
+  (use-package tern-auto-complete
+    :config
+    (tern-ac-setup)))
 
 ;; Emment
 (defun emmet-mode-hooks ()
@@ -1320,8 +1358,6 @@
   (use-package tern-auto-complete
     :config
     (tern-ac-setup)))
-
-;; (add-hook 'coffee-mode-hook 'smartchr-keybindings-coffee)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ markdown                                                      ;;;

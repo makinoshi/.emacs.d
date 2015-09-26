@@ -65,6 +65,7 @@
 (depends-on "popup")
 (depends-on "smooth-scroll")
 (depends-on "yascroll")
+(depends-on "ctags-update")
 
 ;; Kaizen Visual
 (depends-on "highlight-symbol")
@@ -92,6 +93,7 @@
 
 ;; git
 (depends-on "magit")
+(depends-on "git-gutter")
 (depends-on "git-commit-mode")
 (depends-on "git-gutter-fringe")
 (depends-on "git-rebase-mode")
@@ -111,7 +113,6 @@
 (depends-on "helm-swoop")
 (depends-on "helm-robe")
 
-
 ;; edit assist
 (depends-on "auto-complete")
 (depends-on "ac-dabbrev")
@@ -123,7 +124,6 @@
 (depends-on "sequential-command")
 (depends-on "flex-autopair")
 (depends-on "key-chord")
-
 
 ;; coding assist
 (depends-on "flycheck")
@@ -162,7 +162,6 @@
 (depends-on "tern")
 (depends-on "tern-auto-complete")
 (depends-on "jquery-doc")
-(depends-on "react-snippets")
 
 ;; altjs
 (depends-on "coffee-mode")
