@@ -424,37 +424,37 @@
 ;; C-z C-f 新しいelscreenでファイルを開く
 ;; C-z b   新しいelscreenでバッファを開く
 ;; C-z d   新しいelscreenでdiredを開く
-(use-package elscreen
-  :config
-  ;; プレフィクスキーはC-z
-  (setq elscreen-prefix-key (kbd "C-z"))
-  (elscreen-start)
-  (elscreen-persist-mode 1)
-  ;; タブの先頭に[X]を表示しない
-  (setq elscreen-tab-display-kill-screen nil)
-  ;; header-lineの先頭に[<->]を表示しない
-  (setq elscreen-tab-display-control nil)
-  ;; バッファ名・モード名からタブに表示させる内容を決定する(デフォルト設定)
-  (setq elscreen-buffer-to-nickname-alist
-	'(("^dired-mode$" .
-	   (lambda ()
-	     (format "Dired(%s)" dired-directory)))
-	  ("^Info-mode$" .
-	   (lambda ()
-	     (format "Info(%s)" (file-name-nondirectory Info-current-file))))
-	  ("^mew-draft-mode$" .
-	   (lambda ()
-	     (format "Mew(%s)" (buffer-name (current-buffer)))))
-	  ("^mew-" . "Mew")
-	  ("^irchat-" . "IRChat")
-	  ("^liece-" . "Liece")
-	  ("^lookup-" . "Lookup")))
-  (setq elscreen-mode-to-nickname-alist
-	'(("[Ss]hell" . "shell")
-	  ("compilation" . "compile")
-	  ("-telnet" . "telnet")
-	  ("dict" . "OnlineDict")
-	  ("*WL:Message*" . "Wanderlust"))))
+;; (use-package elscreen
+;;   :config
+;;   ;; プレフィクスキーはC-z
+;;   (setq elscreen-prefix-key (kbd "C-z"))
+;;   (elscreen-start)
+;;   (elscreen-persist-mode 1)
+;;   ;; タブの先頭に[X]を表示しない
+;;   (setq elscreen-tab-display-kill-screen nil)
+;;   ;; header-lineの先頭に[<->]を表示しない
+;;   (setq elscreen-tab-display-control nil)
+;;   ;; バッファ名・モード名からタブに表示させる内容を決定する(デフォルト設定)
+;;   (setq elscreen-buffer-to-nickname-alist
+;; 	'(("^dired-mode$" .
+;; 	   (lambda ()
+;; 	     (format "Dired(%s)" dired-directory)))
+;; 	  ("^Info-mode$" .
+;; 	   (lambda ()
+;; 	     (format "Info(%s)" (file-name-nondirectory Info-current-file))))
+;; 	  ("^mew-draft-mode$" .
+;; 	   (lambda ()
+;; 	     (format "Mew(%s)" (buffer-name (current-buffer)))))
+;; 	  ("^mew-" . "Mew")
+;; 	  ("^irchat-" . "IRChat")
+;; 	  ("^liece-" . "Liece")
+;; 	  ("^lookup-" . "Lookup")))
+;;   (setq elscreen-mode-to-nickname-alist
+;; 	'(("[Ss]hell" . "shell")
+;; 	  ("compilation" . "compile")
+;; 	  ("-telnet" . "telnet")
+;; 	  ("dict" . "OnlineDict")
+;; 	  ("*WL:Message*" . "Wanderlust"))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
@@ -1246,18 +1246,15 @@
   ("\\.css?\\'" . web-mode)
   :init
   (add-hook 'web-mode-hook 'web-mode-hooks)
-  (add-hook 'web-mode-hook 'tern-mode)
   (add-hook 'web-mode-hook  'turn-on-ctags-auto-update-mode)
+  (add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
   :config
   (add-hook 'web-mode-hook 'smartchr-keybindings-web)
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template))
   (use-package jquery-doc
     :config
-    (add-hook 'web-mode-hook 'jquery-doc-setup))
-  (use-package tern-auto-complete
-    :config
-    (tern-ac-setup)))
+    (add-hook 'web-mode-hook 'jquery-doc-setup)))
 
 ;; Emment
 (defun emmet-mode-hooks ()
