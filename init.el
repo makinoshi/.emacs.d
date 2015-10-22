@@ -228,7 +228,25 @@
 (add-to-list 'default-mode-line-format
              '(:eval (count-lines-and-chars)))
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(use-package powerline
+  :config
+  (powerline-default-theme)
+  (set-face-attribute 'mode-line nil
+		      :foreground "#fff"
+		      :background "#FF0066"
+		      :box nil)
+
+  (set-face-attribute 'powerline-active1 nil
+		      :foreground "#fff"
+		      :background "#FF6699"
+		      :inherit 'mode-line)
+
+  (set-face-attribute 'powerline-active2 nil
+		      :foreground "#000"
+		      :background "#ffaeb9"
+		      :inherit 'mode-line))
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; バッファ画面外文字の切り詰め表示
@@ -1229,7 +1247,8 @@
 	comment-end ""
 	web-mode-comment-beginning "//"
 	web-mode-comment-end ""
-	web-mode-comment-style 2))
+	web-mode-comment-style 2
+	web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'"))))
 
 (use-package web-mode
   :mode
@@ -1246,8 +1265,12 @@
   ("\\.css?\\'" . web-mode)
   :init
   (add-hook 'web-mode-hook 'web-mode-hooks)
-  (add-hook 'web-mode-hook  'turn-on-ctags-auto-update-mode)
-  (add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
+  (add-hook 'web-mode-hook
+	    (lambda ()
+	      (when (equal web-mode-content-type "jsx")
+		(add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
+		(flycheck-add-mode 'javascript-eslint 'web-mode)
+		(flycheck-mode t))))
   :config
   (add-hook 'web-mode-hook 'smartchr-keybindings-web)
   (bind-keys :map web-mode-map
@@ -1290,11 +1313,7 @@
   :mode
   ("\\.scss\\'" . scss-mode)
   :config
-  (add-hook 'scss-mode-hook 'scss-mode-hooks)
-  ;; (bind-keys :map scss-mode-map
-  ;;            ("{" . my/curly-brace))
-             ;; (";" . my/semicolon))
-  )
+  (add-hook 'scss-mode-hook 'scss-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ JavaScript                                                    ;;;
@@ -1327,9 +1346,6 @@
 (setq-default flycheck-disabled-checkers
 	      (append flycheck-disabled-checkers
 		      '(javascript-jshint)))
-
-;; use eslint with web-mode for jsx files
-(flycheck-add-mode 'javascript-eslint 'web-mode)
 
 ;; disable json-jsonlist checking for json files
 (setq-default flycheck-disabled-checkers
