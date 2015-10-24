@@ -54,7 +54,6 @@
 (require 's)
 (require 'f)
 (require 'ht)
-(require 'paredit)
 (require 'slime)
 (require 'bind-key)
 (require 'use-package)
@@ -295,6 +294,7 @@
 (show-paren-mode t) ; 有効化
 ;; parenのスタイル: expressionは括弧内も強調表示
 (setq show-paren-style 'expression)
+
 ;; フェイスを変更する
 (set-face-background 'show-paren-match-face nil)
 (set-face-underline-p 'show-paren-match-face "yellow")
@@ -424,37 +424,38 @@
 ;; C-z C-f 新しいelscreenでファイルを開く
 ;; C-z b   新しいelscreenでバッファを開く
 ;; C-z d   新しいelscreenでdiredを開く
-(use-package elscreen
-  :config
-  ;; プレフィクスキーはC-z
-  (setq elscreen-prefix-key (kbd "C-z"))
-  (elscreen-start)
-  (elscreen-persist-mode 1)
-  ;; タブの先頭に[X]を表示しない
-  (setq elscreen-tab-display-kill-screen nil)
-  ;; header-lineの先頭に[<->]を表示しない
-  (setq elscreen-tab-display-control nil)
-  ;; バッファ名・モード名からタブに表示させる内容を決定する(デフォルト設定)
-  (setq elscreen-buffer-to-nickname-alist
-	'(("^dired-mode$" .
-	   (lambda ()
-	     (format "Dired(%s)" dired-directory)))
-	  ("^Info-mode$" .
-	   (lambda ()
-	     (format "Info(%s)" (file-name-nondirectory Info-current-file))))
-	  ("^mew-draft-mode$" .
-	   (lambda ()
-	     (format "Mew(%s)" (buffer-name (current-buffer)))))
-	  ("^mew-" . "Mew")
-	  ("^irchat-" . "IRChat")
-	  ("^liece-" . "Liece")
-	  ("^lookup-" . "Lookup")))
-  (setq elscreen-mode-to-nickname-alist
-	'(("[Ss]hell" . "shell")
-	  ("compilation" . "compile")
-	  ("-telnet" . "telnet")
-	  ("dict" . "OnlineDict")
-	  ("*WL:Message*" . "Wanderlust"))))
+
+;; (use-package elscreen
+  ;; :config
+  ;; ;; プレフィクスキーはC-z
+  ;; (setq elscreen-prefix-key (kbd "C-z"))
+  ;; (elscreen-start)
+  ;; ;; (elscreen-persist-mode 1)
+  ;; ;; タブの先頭に[X]を表示しない
+  ;; (setq elscreen-tab-display-kill-screen nil)
+  ;; ;; header-lineの先頭に[<->]を表示しない
+  ;; (setq elscreen-tab-display-control nil)
+  ;; ;; バッファ名・モード名からタブに表示させる内容を決定する(デフォルト設定)
+  ;; (setq elscreen-buffer-to-nickname-alist
+  ;; 	'(("^dired-mode$" .
+  ;; 	   (lambda ()
+  ;; 	     (format "Dired(%s)" dired-directory)))
+  ;; 	  ("^Info-mode$" .
+  ;; 	   (lambda ()
+  ;; 	     (format "Info(%s)" (file-name-nondirectory Info-current-file))))
+  ;; 	  ("^mew-draft-mode$" .
+  ;; 	   (lambda ()
+  ;; 	     (format "Mew(%s)" (buffer-name (current-buffer)))))
+  ;; 	  ("^mew-" . "Mew")
+  ;; 	  ("^irchat-" . "IRChat")
+  ;; 	  ("^liece-" . "Liece")
+  ;; 	  ("^lookup-" . "Lookup")))
+  ;; (setq elscreen-mode-to-nickname-alist
+  ;; 	'(("[Ss]hell" . "shell")
+  ;; 	  ("compilation" . "compile")
+  ;; 	  ("-telnet" . "telnet")
+  ;; 	  ("dict" . "OnlineDict")
+  ;; 	  ("*WL:Message*" . "Wanderlust"))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
@@ -845,9 +846,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package magit
   :bind
-  ("C-c g" . magit-status))
-;; :config
-;; (push '("^\*magit*" :regexp t) popwin:special-display-config))
+  ("C-c g" . magit-status)
+  :config
+  (push '("^\*magit*" :regexp t) popwin:special-display-config))
 
 (use-package git-gutter
   :config
@@ -889,6 +890,7 @@
                (concat user-emacs-directory "elisp/ac-dict/"))
   (ac-config-default)
   (global-auto-complete-mode t)
+  (setq ac-dwim t)
   (robe-mode))
 
 ;; hippie-expand
@@ -1427,8 +1429,13 @@
 (add-hook 'java-mode-hook 'java-mode-hooks)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Scala                                                         ;;;
+;;; @ Lisp                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(use-package paredit
+  :config
+  (add-hook 'clojure-mode-hook 'enable-paredit-mode)
+  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Clojure                                                       ;;;
