@@ -1,28 +1,10 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Cask                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(when (and (not (equal window-system 'w32))
-           (or (require 'cask nil t) 	; for MacOS X (homebrew)
-               (require 'cask "~/.cask/cask.el" t))) ;for Linux (install by curl)
-  (cask-initialize)
-  (require 'pallet))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ el-get                                                        ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; (when load-file-name
-;;   (setq user-emacs-directory (file-name-directory load-file-name)))
-
-;; ;; enabling el-get (install el-get from GitHub if not installed)
-;; (add-to-list 'load-path (locate-user-emacs-file "el-get/el-get"))
-;; (unless (require 'el-get nil 'noerror)
-;;   (with-current-buffer
-;;       (url-retrieve-synchronously
-;;        "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
-;;     (goto-char (point-max))
-;;     (eval-print-last-sexp)))
-
-;; (load "~/.emacs.d/package-bundle")
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+(require 'pallet)
+(pallet-mode t)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ PATH                                                          ;;;
@@ -39,8 +21,7 @@
             (normal-top-level-add-subdirs-to-load-path))))))
 
 ;; 引数のディレクトリとそのサブディレクトリをload-pathに追加
-(add-to-load-path "elisp" ".cask/24.4.1/elpa")
-;; (add-to-load-path "elisp")
+(add-to-load-path "elisp")
 
 ;; include PATH from Shell
 (exec-path-from-shell-initialize)
@@ -95,10 +76,10 @@
   :init
   (unless (require 'auto-async-byte-compile nil t)
     (install-elisp-from-emacswiki "auto-async-byte-compile.el"))
+  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
   :config
   ;; 自動コンパイルを無効にするファイル名の正規表現
-  (setq auto-async-byte-compile-exclude-files-regexp "init.el")
-  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
+  (setq auto-async-byte-compile-exclude-files-regexp "init.el"))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system                                      ;;;
@@ -120,7 +101,20 @@
   ;; キーボード入力の文字コード
   (set-keyboard-coding-system 'utf-8-unix)
   ;; サブプロセスのデフォルト文字コード
-  (setq default-process-coding-system '(undecided-dos . utf-8-unix)))
+  (setq default-process-coding-system '(undecided-dos . utf-8-unix))
+  ;; font
+  (let* ((size 15)
+	 (asciifont "Ricty")
+	 (jpfont "Ricty")
+	 (h (* size 10))
+	 (fontspec (font-spec :family asciifont))
+	 (jp-fontspec (font-spec :family jpfont)))
+    (set-face-attribute 'default nil :family asciifont :height h)
+    (set-fontset-font nil 'japanese-jisx0213.2004-1 jp-fontspec)
+    (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
+    (set-fontset-font nil 'katakana-jisx0201 jp-fontspec)
+    (set-fontset-font nil '(#x0080 . #x024F) fontspec) 
+    (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only for ubuntu                                               ;;;
@@ -147,7 +141,8 @@
 ;;; @ screen - frame                                                ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (setq default-frame-alist
-      (append '((width                . 204)  ; フレーム幅
+      (append '(
+		;; (width                . 204) ; フレーム幅
                 (height               . 60 ) ; フレーム高
                 ;;		(left                 . 70 ) ; 配置左位置
                 ;;		(top                  . 28 ) ; 配置上位置
@@ -160,7 +155,7 @@
                 ;;                (scroll-bar-width     . 17 ) ; スクロールバー幅
                 (cursor-type          . bar) ; カーソル種別
                 (alpha                . 90 ) ; 透明度
-                ) default-frame-alist) )
+                ) default-frame-alist))
 (setq initial-frame-alist default-frame-alist)
 
 ;; フレーム タイトル
@@ -180,9 +175,8 @@
 
 ;; popwin
 (use-package popwin
-  :init
-  (setq pop-up-windows nil)
   :config
+  (setq pop-up-windows nil)
   (setq display-buffer-function 'popwin:display-buffer)
   (setq popwin:popup-window-position 'bottom))
 
@@ -226,6 +220,10 @@
     ""))
 (add-to-list 'default-mode-line-format
              '(:eval (count-lines-and-chars)))
+
+(use-package powerline
+  :config
+  (powerline-default-theme))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
@@ -315,15 +313,17 @@
   (add-hook 'web-mode-hook  'rainbow-mode))
 
 ;; かっこに色をつける
-(defun my/rainbow-delimiters-mode-turn-on ()
-  (rainbow-delimiters-mode t))
-(add-hook 'css-mode-hook  'my/rainbow-delimiters-mode-turn-on)
-(add-hook 'scss-mode-hook 'my/rainbow-delimiters-mode-turn-on)
-(add-hook 'php-mode-hook  'my/rainbow-delimiters-mode-turn-on)
-(add-hook 'web-mode-hook  'my/rainbow-delimiters-mode-turn-on)
-(add-hook 'js2-mode-hook  'my/rainbow-delimiters-mode-turn-on)
-(add-hook 'ruby-mode-hook  'my/rainbow-delimiters-mode-turn-on)
-(add-hook 'ess-mode-hook  'my/rainbow-delimiters-mode-turn-on)
+(use-package rainbow-delimiters
+  :config
+  (use-package color
+    :config
+    (--each (number-sequence 1 rainbow-delimiters-max-face-count)
+      (let ((face (intern (format "rainbow-delimiters-depth-%d-face" it))))
+        (callf color-saturate-name (face-foreground face) 90))))
+  :init
+  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'web-mode-hook #'rainbow-delimiters-mode))
 
 ;; ediff
 (use-package ediff
@@ -334,6 +334,8 @@
   (setq ediff-split-window-function 'split-window-horizontally))
 
 (use-package expand-region
+  :commands
+  (er/expand-region er/contract-region)
   :bind
   ("C-@" . er/expand-region)
   ("C-`" . er/contract-region))
@@ -411,53 +413,6 @@
  '(linum-highlight-face ((t (:foreground "black" :background "red")))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ screen - elscreen                                             ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; プレフィクスキーはC-z
-;; C-z C-c 新しいelscreenを作る
-;; C-z C-k 現在のelscreenを削除する
-;; C-z M-k 現在のelscreenをバッファごと削除する
-;; C-z K   ほかの全elscreenを削除する！
-;; C-z C-n 次のelscreenを選択
-;; C-z C-p 前のelscreenを選択
-;; C-z C-a 直前に選択したelscreenを選択
-;; C-z C-f 新しいelscreenでファイルを開く
-;; C-z b   新しいelscreenでバッファを開く
-;; C-z d   新しいelscreenでdiredを開く
-
-;; (use-package elscreen
-  ;; :config
-  ;; ;; プレフィクスキーはC-z
-  ;; (setq elscreen-prefix-key (kbd "C-z"))
-  ;; (elscreen-start)
-  ;; ;; (elscreen-persist-mode 1)
-  ;; ;; タブの先頭に[X]を表示しない
-  ;; (setq elscreen-tab-display-kill-screen nil)
-  ;; ;; header-lineの先頭に[<->]を表示しない
-  ;; (setq elscreen-tab-display-control nil)
-  ;; ;; バッファ名・モード名からタブに表示させる内容を決定する(デフォルト設定)
-  ;; (setq elscreen-buffer-to-nickname-alist
-  ;; 	'(("^dired-mode$" .
-  ;; 	   (lambda ()
-  ;; 	     (format "Dired(%s)" dired-directory)))
-  ;; 	  ("^Info-mode$" .
-  ;; 	   (lambda ()
-  ;; 	     (format "Info(%s)" (file-name-nondirectory Info-current-file))))
-  ;; 	  ("^mew-draft-mode$" .
-  ;; 	   (lambda ()
-  ;; 	     (format "Mew(%s)" (buffer-name (current-buffer)))))
-  ;; 	  ("^mew-" . "Mew")
-  ;; 	  ("^irchat-" . "IRChat")
-  ;; 	  ("^liece-" . "Liece")
-  ;; 	  ("^lookup-" . "Lookup")))
-  ;; (setq elscreen-mode-to-nickname-alist
-  ;; 	'(("[Ss]hell" . "shell")
-  ;; 	  ("compilation" . "compile")
-  ;; 	  ("-telnet" . "telnet")
-  ;; 	  ("dict" . "OnlineDict")
-  ;; 	  ("*WL:Message*" . "Wanderlust"))))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; 選択範囲をisearch
@@ -526,7 +481,6 @@
   (ace-pinyin-global-mode 1)
   :bind
   ("C-j" . ace-jump-word-mode)
-  ;; ("C-j" . ace-jump-char-mode) ;うまく動作しない
   ("C-c j" . ace-jump-line-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -606,7 +560,7 @@
 (use-package wdired
   :init
   (bind-keys :map dired-mode-map
-             ("r" . wdired-change-to-dired-mode)))
+             ("r" . wdired-change-to-wdired-mode)))
 
 ;; image+
 (use-package image+
@@ -848,7 +802,7 @@
   :bind
   ("C-c g" . magit-status)
   :config
-  (push '("^\*magit*" :regexp t) popwin:special-display-config))
+  (push '("^\*magit*" :regexp t :height 0.5) popwin:special-display-config))
 
 (use-package git-gutter
   :config
@@ -941,7 +895,7 @@
   ([f3] . highlight-symbol-next)
   ([shift f3] . highlight-symbol-prev)
   ([(meta f3)] . highlight-symbol-query-replace)
-  :config
+  :init
   (add-hook 'emacs-lisp-mode-hook 'highlight-symbol-mode)
   (add-hook 'web-mode-hook 'highlight-symbol-mode)
   (add-hook 'ruby-mode-hook 'highlight-symbol-mode)
@@ -965,8 +919,7 @@
 ;; Emacs標準のctagsでは動作しない！！
 (setq ctags-update-command "/usr/bin/ctags")
 ;; 使う言語で有効にしよう
-(add-hook 'c-mode-common-hook  'turn-on-ctags-auto-update-mode)
-(add-hook 'emacs-lisp-mode-hook  'turn-on-ctags-auto-update-mode)
+;; (add-hook 'emacs-lisp-mode-hook  'turn-on-ctags-auto-update-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ smartchr                                                      ;;;
@@ -1092,10 +1045,10 @@
   (local-set-key (kbd ".")  (smartchr '("." " . " " .= ")))
   (local-set-key (kbd ",")  (smartchr '(", " ",")))
   (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
-  (local-set-key (kbd "+")  (smartchr '(" + " "++" " += " "+")))
-  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
+  (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += ")))
+  (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
   (local-set-key (kbd ">")  (smartchr '(" > " "->" " => " " >= " ">")))
-  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
+  (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
   (local-set-key (kbd "!")  (smartchr '(" != " "!")))
   (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
   (local-set-key (kbd "*")  (smartchr '(" * " " *= " "**" "*")))
@@ -1104,7 +1057,7 @@
   (local-set-key (kbd "/")  (smartchr '(" / " " /= " "/`!!'/" "/")))
   (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
   (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
-  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
+  (local-set-key (kbd "{")  (smartchr '("{`!!'}" "{{`!!'}}" "{")))
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
@@ -1113,7 +1066,7 @@
   (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
   (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
   (local-set-key (kbd "*")  (smartchr '("*" " * " " *= " "**")))
-  (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
+  (local-set-key (kbd "%")  (smartchr '("%" "%`!!'%" " % " " %= ")))
   (local-set-key (kbd "=")  (smartchr '("=" " = " " === " )))
   (local-set-key (kbd "<")  (smartchr '("<" " < " " << " " <= ")))
   (local-set-key (kbd ">")  (smartchr '(">" " > " " => " " >= ")))
@@ -1123,7 +1076,7 @@
   (local-set-key (kbd "/")  (smartchr '("/" "/`!!'/" " / " " /= ")))
   (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
   (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
-  (local-set-key (kbd "{")  (smartchr '("{`!!'}" my/smartchr-braces "{")))
+  (local-set-key (kbd "{")  (smartchr '("{`!!'}" "{{ `!!' }}" "{")))
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
@@ -1248,8 +1201,6 @@
   ("\\.css?\\'" . web-mode)
   :init
   (add-hook 'web-mode-hook 'web-mode-hooks)
-  (add-hook 'web-mode-hook 'tern-mode)
-  (add-hook 'web-mode-hook  'turn-on-ctags-auto-update-mode)
   :config
   (add-hook 'web-mode-hook 'smartchr-keybindings-web)
   (bind-keys :map web-mode-map
@@ -1420,6 +1371,25 @@
   (add-to-list 'ac-modes 'python-2-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ PHP                                                           ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(use-package php-mode
+  :mode
+  ("\\.php\\'" . php-mode))
+
+(add-hook 'php-mode-hook
+          (lambda ()
+            (require 'php-completion)
+            (php-completion-mode t)
+            (define-key php-mode-map (kbd "C-o") 'phpcmp-complete)
+            (make-local-variable 'ac-sources)
+            (setq ac-sources '(
+                               ac-source-words-in-same-mode-buffers
+                               ac-source-php-completion
+                               ac-source-filename
+                               ))))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Java                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (defun java-mode-hooks ()
@@ -1432,7 +1402,7 @@
 ;;; @ Lisp                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package paredit
-  :config
+  :init
   (add-hook 'clojure-mode-hook 'enable-paredit-mode)
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-mode-hook 'enable-paredit-mode))
@@ -1440,27 +1410,34 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Clojure                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package clojure-mode)
-(put 'letfn 'clojure-backtracking-indent '((2) 2))
-(put 'macrolet 'clojure-backtracking-indent '((2) 2))
-;; cider
-(add-hook 'clojure-mode-hook 'cider-mode)
-;; mini bufferに関数の引数を表示させる
-(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-;; 'C-x b' した時に *nrepl-connection* と *nrepl-server* のbufferを一覧に表示しない
-(setq nrepl-hide-special-buffers t)
-;; RELPのbuffer名を 'project名:nREPLのport番号' と表示する
-;; project名は project.clj で defproject した名前
-(setq nrepl-buffer-name-show-port t)
+(use-package clojure-mode
+  :config
+  (put 'letfn 'clojure-backtracking-indent '((2) 2))
+  (put 'macrolet 'clojure-backtracking-indent '((2) 2)))
 
-(autoload 'ac-cider "ac-cider" nil t)
-(add-hook 'cider-mode-hook 'ac-flyspell-workaround)
-(add-hook 'cider-mode-hook 'ac-cider-setup)
-(add-hook 'cider-repl-mode-hook 'ac-cider-setup)
-(eval-after-load "auto-complete"
-  '(progn
-     (add-to-list 'ac-modes 'cider-mode)
-     (add-to-list 'ac-modes 'cider-repl-mode)))
+;; cider
+(use-package cider-mode
+  :init
+  (add-hook 'clojure-mode-hook 'cider-mode)
+  ;; mini bufferに関数の引数を表示させる
+  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+  :config
+  ;; 'C-x b' した時に *nrepl-connection* と *nrepl-server* のbufferを一覧に表示しない
+  (setq nrepl-hide-special-buffers t)
+  ;; RELPのbuffer名を 'project名:nREPLのport番号' と表示する
+  ;; project名は project.clj で defproject した名前
+  (setq nrepl-buffer-name-show-port t))
+
+(use-package ac-cider
+  :init
+  (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
+  (add-hook 'cider-mode-hook 'ac-cider-setup)
+  (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
+  (eval-after-load "auto-complete"
+    '(progn
+       (add-to-list 'ac-modes 'cider-mode)
+       (add-to-list 'ac-modes 'cider-repl-mode))))
+;; (autoload 'ac-cider "ac-cider" nil t)
 
 ;; Teach compile the syntax of the kibit output
 (autoload 'compile "compile" nil t)
@@ -1493,6 +1470,16 @@ Display the results in a hyperlinked *compilation* buffer."
               (HEAD 2)
               (ANY 2)
               (context 2))))
+
+(use-package clj-refactor
+  :config
+  (clj-refactor-mode 1))
+
+(defun my-clojure-mode-hook ()
+    (yas-minor-mode 1) ; for adding require/use/import
+    (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;

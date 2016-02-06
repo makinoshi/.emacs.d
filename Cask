@@ -1,229 +1,178 @@
+(source "ELPA" "http://tromey.com/elpa/")
+(source "melpa-stable" "http://melpa-stable.milkbox.net/packages/")
 (source gnu)
 (source marmalade)
-(source melpa)
+(source melpa-stable)
 
-;; for cask
-(depends-on "pallet")
-(depends-on "caskxy")
-
-;; Path
-(depends-on "exec-path-from-shell")
-
-;; Package control
-(depends-on "auto-install")
-(depends-on "epl")
-(depends-on "pkg-info")
-
-;; Emacs lisp coding
-(depends-on "dash")
-(depends-on "s")
-(depends-on "f")
-(depends-on "ht")
-(depends-on "paredit")
-(depends-on "slime")
-(depends-on "bind-key")
-(depends-on "use-package")
-
-;; input
-(depends-on "mozc")
-
-;; Screen - frame
-(depends-on "popwin")
-(depends-on "e2wm" :git "https://github.com/myuhe/e2wm-R.el.git")
-(depends-on "e2wm-bookmark" :git "https://github.com/myuhe/e2wm-bookmark.el.git")
-;;(depends-on "svg-clock")
-
-;; Screen - mode line
-
-;; Screen - buffer
-(depends-on "tempbuf")
-(depends-on "solarized-theme")
-(depends-on "zenburn-theme")
-
-;; Screen - cursor
-
-;; Screen - linum
-(depends-on "hlinum")
-
-;; Screen - elscreen
-(depends-on "elscreen")
-(depends-on "elscreen-persist")
-
-;; FileManager
-(depends-on "dired+")
-(depends-on "direx")
-(depends-on "image-dired+")
-(depends-on "image+")
-(depends-on "wdired")
-(depends-on "hiwin")
-
-;; Navigation
+(depends-on "ac-cider")
+(depends-on "ac-dabbrev")
+(depends-on "ac-js2")
+(depends-on "ac-python")
+(depends-on "ace-isearch")
 (depends-on "ace-jump-mode")
 (depends-on "ace-pinyin")
-(depends-on "recentf")
-(depends-on "recentf-ext")
-(depends-on "popup")
-(depends-on "smooth-scroll")
-(depends-on "yascroll")
-(depends-on "ctags-update")
-
-;; Kaizen Visual
-(depends-on "highlight-symbol")
-(depends-on "auto-highlight-symbol")
-(depends-on "volatile-highlights")
-(depends-on "rainbow-delimiters")
-(depends-on "rainbow-mode")
-(depends-on "powerline")
-(depends-on "elisp-slime-nav")
-(depends-on "ido")
-(depends-on "ido-ubiquitous")
-(depends-on "smex")
-
-
-;; Search
-(depends-on "replace-from-region")
-(depends-on "anzu")
 (depends-on "ag")
-(depends-on "wgrep")
-(depends-on "migemo")
-(depends-on "swiper")
-(depends-on "visual-regexp")
-(depends-on "visual-regexp-steroids")
-(depends-on "ace-isearch")
-
-;; git
-(depends-on "magit")
-(depends-on "git-gutter")
+(depends-on "anzu")
+(depends-on "async")
+(depends-on "auto-complete")
+(depends-on "auto-highlight-symbol")
+(depends-on "auto-install")
+(depends-on "avy")
+(depends-on "bind-key")
+(depends-on "cacoo")
+(depends-on "caml")
+(depends-on "cask")
+(depends-on "caskxy")
+(depends-on "cider")
+(depends-on "clj-refactor")
+(depends-on "cljr-helm")
+(depends-on "clojure-cheatsheet")
+(depends-on "clojure-mode")
+(depends-on "coffee-mode")
+(depends-on "concurrent")
+(depends-on "ctable")
+(depends-on "dash")
+(depends-on "deferred")
+(depends-on "diminish")
+(depends-on "dired+")
+(depends-on "direx")
+(depends-on "e2wm")
+(depends-on "e2wm-bookmark")
+(depends-on "edn")
+(depends-on "elisp-slime-nav")
+(depends-on "elscreen")
+(depends-on "elscreen-persist")
+(depends-on "emmet-mode")
+(depends-on "epl")
+(depends-on "ess")
+(depends-on "ess-R-data-view")
+(depends-on "ess-R-object-popup")
+(depends-on "exec-path-from-shell")
+(depends-on "expand-region")
+(depends-on "f")
+(depends-on "flex-autopair")
+(depends-on "flycheck")
+(depends-on "flycheck-pos-tip")
+(depends-on "fringe-helper")
+(depends-on "gh")
+(depends-on "gist")
+(depends-on "git-commit")
 (depends-on "git-commit-mode")
+(depends-on "git-gutter")
 (depends-on "git-gutter-fringe")
 (depends-on "git-rebase-mode")
 (depends-on "gitconfig-mode")
 (depends-on "gitignore-mode")
-(depends-on "gh")
-(depends-on "gist")
-
-;; helm
+(depends-on "google-translate")
+(depends-on "groovy-mode")
+(depends-on "haskell-mode")
 (depends-on "helm")
-(depends-on "helm-ls-git")
-(depends-on "helm-projectile")
-(depends-on "helm-themes")
+(depends-on "helm-R")
 (depends-on "helm-ag")
 (depends-on "helm-descbinds")
+(depends-on "helm-ls-git")
 (depends-on "helm-migemo")
-(depends-on "helm-swoop")
+(depends-on "helm-projectile")
 (depends-on "helm-robe")
-
-;; edit assist
-(depends-on "auto-complete")
-(depends-on "ac-dabbrev")
-(depends-on "redo+")
-(depends-on "undohist")
-(depends-on "undo-tree")
-(depends-on "point-undo")
-(depends-on "move-text")
-(depends-on "sequential-command")
-(depends-on "flex-autopair")
-(depends-on "key-chord")
-
-;; coding assist
-(depends-on "flycheck")
-(depends-on "flycheck-pos-tip")
-(depends-on "yasnippet")
-(depends-on "projectile")
-(depends-on "smart-newline")
-(depends-on "multiple-cursors")
-(depends-on "expand-region")
-(depends-on "smartrep")
-(depends-on "region-bindings-mode")
-(depends-on "smartparens")
-(depends-on "open-junk-file")
-(depends-on "quickrun")
-
-
-;; HTML+CSS
+(depends-on "helm-swoop")
+(depends-on "helm-themes")
+(depends-on "highlight-symbol")
+(depends-on "highlight-thing")
+(depends-on "hiwin")
+(depends-on "hlinum")
+(depends-on "ht")
 (depends-on "htmlize")
-(depends-on "web-mode")
-(depends-on "emmet-mode")
-(depends-on "scss-mode")
-
-;; Markdown
-(depends-on "markdown-mode")
-(depends-on "realtime-preview" :git "https://github.com/niku/realtime-preview.el.git")
-
-;; blog
-(depends-on "weblogger")
-(depends-on "xml-rpc")
-
-;; Javascript
-(depends-on "js2-mode")
-(depends-on "jsx-mode")
-(depends-on "json-mode")
-(depends-on "ac-js2")
-(depends-on "tern")
-(depends-on "tern-auto-complete")
-(depends-on "jquery-doc")
-
-;; altjs
-(depends-on "coffee-mode")
-
-;; Ruby
-(depends-on "ruby-mode")
-(depends-on "ruby-block")
-(depends-on "ruby-end")
+(depends-on "hydra")
+(depends-on "ido-completing-read+")
+(depends-on "ido-ubiquitous")
+(depends-on "image+")
+(depends-on "image-dired+")
 (depends-on "inf-ruby")
+(depends-on "inflections")
+(depends-on "jquery-doc")
+(depends-on "js2-mode")
+(depends-on "json-mode")
+(depends-on "json-reformat")
+(depends-on "json-snatcher")
+(depends-on "jsx-mode")
+(depends-on "key-chord")
+(depends-on "let-alist")
+(depends-on "log4e")
+(depends-on "logito")
+(depends-on "magit")
+(depends-on "magit-popup")
+(depends-on "markdown-mode")
+(depends-on "migemo")
+(depends-on "move-text")
+(depends-on "mozc")
+(depends-on "multi-term")
+(depends-on "multiple-cursors")
+(depends-on "nginx-mode")
+(depends-on "open-junk-file")
+(depends-on "package-build")
+(depends-on "pallet")
+(depends-on "paredit")
+(depends-on "pcache")
+(depends-on "peg")
+(depends-on "php-mode")
+(depends-on "pkg-info")
+(depends-on "point-undo")
+(depends-on "popup")
+(depends-on "popwin")
+(depends-on "powerline")
+(depends-on "projectile")
+(depends-on "python-mode")
+(depends-on "queue")
+(depends-on "quickrun")
+(depends-on "rainbow-delimiters")
+(depends-on "rainbow-mode")
+(depends-on "rbenv")
+(depends-on "react-snippets")
+(depends-on "realtime-preview")
+(depends-on "recentf-ext")
+(depends-on "redo+")
+(depends-on "region-bindings-mode")
+(depends-on "replace-from-region")
+(depends-on "revive")
 (depends-on "robe")
 (depends-on "rspec-mode")
-(depends-on "rbenv")
-
-;; Python
-(depends-on "python-mode")
-(depends-on "ac-python")
-
-;; R
-(depends-on "ess")
-(depends-on "helm-R")
-(depends-on "ess-R-data-view")
-(depends-on "ess-R-object-popup")
-(depends-on "cacoo")
-;;(depends-on "window-layout" :git "https://github.com/kiwanami/emacs-window-layout.git")
-;;(depends-on "inlineR" :git "https://github.com/myuhe/inlineR.el.git")
-;;(depends-on "e2wm-R" :git "https://github.com/myuhe/e2wm-R.el.git")
-
-;; php
-(depends-on "php-mode")
-
-;; Java
-
-;; Scala
+(depends-on "ruby-block")
+(depends-on "ruby-end")
+(depends-on "s")
 (depends-on "scala-mode")
-
-;; Groovy
-(depends-on "groovy-mode")
-
-;; Clojure
-(depends-on "clojure-mode")
-(depends-on "cider")
-(depends-on "ac-cider")
-(depends-on "clojure-cheatsheet")
-(depends-on "clojure-test-mode")
+(depends-on "scss-mode")
+(depends-on "sequential-command")
+(depends-on "shut-up")
+(depends-on "simple-httpd")
+(depends-on "skewer-mode")
 (depends-on "slamhound")
-
-;; haskell
-(depends-on "haskell-mode")
-
-;; nginx
-(depends-on "nginx-mode")
-
-;; yaml
-(depends-on "yaml-mode")
-
-;; ocml
+(depends-on "slime")
+(depends-on "smart-newline")
+(depends-on "smartparens")
+(depends-on "smartrep")
+(depends-on "smex")
+(depends-on "smooth-scroll")
+(depends-on "solarized-theme")
+(depends-on "swiper")
+(depends-on "tabbar")
+(depends-on "tempbuf")
+(depends-on "tern")
+(depends-on "tern-auto-complete")
 (depends-on "tuareg")
-
-;; sql
-
-;; English
-(depends-on "google-translate")
-
-;; term
-(depends-on "multi-term")
+(depends-on "undo-tree")
+(depends-on "undohist")
+(depends-on "use-package")
+(depends-on "visual-regexp")
+(depends-on "visual-regexp-steroids")
+(depends-on "volatile-highlights")
+(depends-on "web-mode")
+(depends-on "weblogger")
+(depends-on "wgrep")
+(depends-on "window-layout")
+(depends-on "with-editor")
+(depends-on "xml-rpc")
+(depends-on "yaml-mode")
+(depends-on "yascroll")
+(depends-on "yasnippet")
+(depends-on "yaxception")
+(depends-on "zenburn-theme")
