@@ -623,7 +623,7 @@
 (use-package wdired
   :init
   (bind-keys :map dired-mode-map
-             ("r" . wdired-change-to-dired-mode)))
+             ("r" . wdired-change-to-wdired-mode)))
 
 ;; image+
 (use-package image+
@@ -863,9 +863,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package magit
   :bind
-  ("C-c g" . magit-status))
-;; :config
-;; (push '("^\*magit*" :regexp t) popwin:special-display-config))
+  ("C-c g" . magit-status)
+  :config
+  (push '("^\*magit*" :regexp t :height 0.5) popwin:special-display-config))
 
 (use-package git-gutter
   :config
@@ -1243,10 +1243,6 @@
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2
 	indent-tabs-mode nil
-	comment-start "//"
-	comment-end ""
-	web-mode-comment-beginning "//"
-	web-mode-comment-end ""
 	web-mode-comment-style 2
 	web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'"))))
 
@@ -1418,6 +1414,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Python                                                        ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(require 'python-mode)
+(setq auto-mode-alist (cons '("\\.py$" . python-mode) auto-mode-alist))
+
 (defun python-mode-hooks ()
   "python mode hooks"
   (setq indent-tabs-mode nil
@@ -1425,6 +1424,7 @@
 	python-pylint t
 	tab-width 4))
 (add-hook 'python-mode-hook 'python-mode-hooks)
+(add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
 
 (use-package ac-python
   :config

@@ -1,6 +1,6 @@
 (source gnu)
 (source marmalade)
-(source melpa)
+(source melpa-stable)
 
 ;; for cask
 (depends-on "pallet")
