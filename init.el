@@ -65,6 +65,7 @@
   (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/"))
   (add-to-list 'package-archives '("ELPA"	. "http://tromey.com/elpa/"))
   (add-to-list 'package-archives '("marmalade"	. "http://marmalade-repo.org/packages/"))
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
   ;; インストールしたパッケージにロードパスを通してロードする
   (package-initialize))
 
@@ -114,7 +115,15 @@
     (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
     (set-fontset-font nil 'katakana-jisx0201 jp-fontspec)
     (set-fontset-font nil '(#x0080 . #x024F) fontspec) 
-    (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
+    (set-fontset-font nil '(#x0370 . #x03FF) fontspec))
+  ;; 日本語入力
+  (use-package skk
+    :config
+    (setq default-input-method "japanese-skk")
+    (setq skk-sticky-key ";")
+    (require 'skk-study)
+    :bind
+    ("C-c C-j" . skk-auto-fill-mode)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only for ubuntu                                               ;;;
@@ -644,13 +653,6 @@
 
 ;; goto-lineコマンドをM-g M-g からM-gへ
 (bind-key "M-g" 'goto-line)
-
-;; 同じコマンドを連続実行したときの振る舞いを変更する
-;; C-a C-a はバッファ先頭、C-e C-eはバッファ末尾
-;; M-uは大文字、M-lは小文字
-(use-package sequential-command-config
-  :config
-  (sequential-command-setup-keys))
 
 ;; 括弧の自動挿入の挙動をオレオレ設定できるflex-autopair.el
 (use-package flex-autopair
@@ -1405,7 +1407,9 @@
   :init
   (add-hook 'clojure-mode-hook 'enable-paredit-mode)
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook 'enable-paredit-mode))
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  :bind
+  ("C-m" . paredit-newline))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Clojure                                                       ;;;
@@ -1476,10 +1480,21 @@ Display the results in a hyperlinked *compilation* buffer."
   (clj-refactor-mode 1))
 
 (defun my-clojure-mode-hook ()
-    (yas-minor-mode 1) ; for adding require/use/import
-    (cljr-add-keybindings-with-prefix "C-c C-m"))
+  (yas-minor-mode 1) ; for adding require/use/import
+  (cljr-add-keybindings-with-prefix "C-c C-m"))
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+
+;; for zou
+(defun my/zou-go ()
+  (interactive)
+  (if current-prefix-arg
+      (progn
+        (save-some-buffers)
+        (cider-interactive-eval
+         "(zou.framework.repl/reset)"))
+    (cider-interactive-eval
+     "(zou.framework.repl/go)")))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;
