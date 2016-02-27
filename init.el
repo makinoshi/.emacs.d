@@ -331,7 +331,6 @@
       (let ((face (intern (format "rainbow-delimiters-depth-%d-face" it))))
         (callf color-saturate-name (face-foreground face) 90))))
   :init
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'web-mode-hook #'rainbow-delimiters-mode))
 
@@ -927,6 +926,8 @@
 ;; 使う言語で有効にしよう
 ;; (add-hook 'emacs-lisp-mode-hook  'turn-on-ctags-auto-update-mode)
 
+(use-package subword)
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ smartchr                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1409,7 +1410,6 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package paredit
   :init
-  (add-hook 'clojure-mode-hook 'enable-paredit-mode)
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-mode-hook 'enable-paredit-mode)
   :bind
@@ -1419,24 +1419,35 @@
 ;;; @ Clojure                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package clojure-mode
-  :config
-  (put 'letfn 'clojure-backtracking-indent '((2) 2))
-  (put 'macrolet 'clojure-backtracking-indent '((2) 2))
-  :bind
-  ("C-j" . paredit-newline))
+  :init
+  (add-hook 'clojure-mode-hook #'enable-paredit-mode)
+  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'clojure-mode-hook #'subword-mode)
+  (add-hook 'clojure-mode-hook #'yas-minor-mode))
 
-;; cider
 (use-package cider-mode
   :init
-  (add-hook 'clojure-mode-hook 'cider-mode)
-  ;; mini bufferに関数の引数を表示させる
-  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+  (add-hook 'cider-mode-hook #'clj-refactor-mode)
+  (add-hook 'cider-mode-hook #'eldoc-mode)
+  (add-hook 'cider-repl-mode-hook #'eldoc-mode)
+  :diminish subword-mode
   :config
-  ;; 'C-x b' した時に *nrepl-connection* と *nrepl-server* のbufferを一覧に表示しない
-  (setq nrepl-hide-special-buffers t)
-  ;; RELPのbuffer名を 'project名:nREPLのport番号' と表示する
-  ;; project名は project.clj で defproject した名前
-  (setq nrepl-buffer-name-show-port t))
+  (setq nrepl-log-messages t
+        cider-repl-display-in-current-window t
+        cider-repl-use-clojure-font-lock t
+        cider-prompt-save-file-on-load 'always-save
+        cider-font-lock-dynamically '(macro core function var)
+        cider-overlays-use-font-lock t)
+  ;; ;; 'c-x b' した時に *nrepl-connection* と *nrepl-server* のbufferを一覧に表示しない
+  ;; (setq nrepl-hide-special-buffers t)
+  ;; ;; RELPのbuffer名を 'project名:nREPLのport番号' と表示する
+  ;; ;; project名は project.clj で defproject した名前
+  ;; (setq nrepl-buffer-name-show-port t)
+  )
+
+(use-package clj-refactor
+  :config
+  (cljr-add-keybindings-with-prefix "C-c j"))
 
 (use-package ac-cider
   :init
@@ -1447,60 +1458,6 @@
     '(progn
        (add-to-list 'ac-modes 'cider-mode)
        (add-to-list 'ac-modes 'cider-repl-mode))))
-;; (autoload 'ac-cider "ac-cider" nil t)
-
-;; Teach compile the syntax of the kibit output
-(autoload 'compile "compile" nil t)
-(add-to-list 'compilation-error-regexp-alist-alist
-             '(kibit "At \\([^:]+\\):\\([[:digit:]]+\\):" 1 2 nil 0))
-(add-to-list 'compilation-error-regexp-alist 'kibit)
-
-;; A convenient command to run "lein kibit" in the project to which
-;; the current emacs buffer belongs to.
-(defun kibit ()
-  "Run kibit on the current project.
-Display the results in a hyperlinked *compilation* buffer."
-  (interactive)
-  (compile "lein kibit"))
-
-(defun kibit-current-file ()
-  "Run kibit on the current file.
-Display the results in a hyperlinked *compilation* buffer."
-  (interactive)
-  (compile (concat "lein kibit " buffer-file-name)))
-
-(add-hook 'clojure-mode-hook
-	  (lambda ()
-            (define-clojure-indent
-              (defroutes 'defun)
-              (GET 2)
-              (POST 2)
-              (PUT 2)
-              (DELETE 2)
-              (HEAD 2)
-              (ANY 2)
-              (context 2))))
-
-(use-package clj-refactor
-  :config
-  (clj-refactor-mode 1))
-
-(defun my-clojure-mode-hook ()
-  (yas-minor-mode 1) ; for adding require/use/import
-  (cljr-add-keybindings-with-prefix "C-c C-m"))
-
-(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
-
-;; for zou
-(defun my/zou-go ()
-  (interactive)
-  (if current-prefix-arg
-      (progn
-        (save-some-buffers)
-        (cider-interactive-eval
-         "(zou.framework.repl/reset)"))
-    (cider-interactive-eval
-     "(zou.framework.repl/go)")))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;
