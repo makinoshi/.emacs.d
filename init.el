@@ -39,7 +39,6 @@
 (require 'bind-key)
 (require 'use-package)
 
-;; use-packageがない場合何もしない
 (unless (require 'use-package nil t)
   (defmacro use-package (&reset args)))
 
@@ -63,8 +62,8 @@
   :config
   ;; パッケージリポジトリにMarmaladeを追加
   (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/"))
-  (add-to-list 'package-archives '("ELPA"	. "http://tromey.com/elpa/"))
-  (add-to-list 'package-archives '("marmalade"	. "http://marmalade-repo.org/packages/"))
+  (add-to-list 'package-archives '("ELPA"      . "http://tromey.com/elpa/"))
+  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
   ;; インストールしたパッケージにロードパスを通してロードする
   (package-initialize))
@@ -123,7 +122,8 @@
     (setq skk-sticky-key ";")
     (require 'skk-study)
     :bind
-    ("C-c C-j" . skk-auto-fill-mode)))
+    ("C-c C-j" . skk-auto-fill-mode)
+    ("C-m" . skk-kakutei)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only for ubuntu                                               ;;;
@@ -310,8 +310,9 @@
 (bind-key "C-c l" 'toggle-truncate-lines)
 
 ;; color-theme
-;; (load-theme 'solarized-dark t)
-(load-theme 'zenburn t)
+(use-package zenburn-theme
+  :config
+  (load-theme 'zenburn t))
 
 ;; 色を表す文字列に色をつける
 (use-package rainbow-mode
@@ -623,9 +624,12 @@
 ;; C-hをBackSpaceにする
 ;; 入力されるキーシーケンスを置き換える
 ;; ?\C-?はDELのキーシケンス
-(keyboard-translate ?\C-h ?\C-?)
 ;; 代わりにC-c h をヘルプに
-(bind-key "C-c h" 'help-command)
+(use-package bind-key
+  :config
+  (bind-keys :map global-map
+             ("C-h" . delete-backward-char)
+	     ("C-c h" . help-command)))
 
 ;; 改行とインデントをRET(C-m)でできるように改善
 (use-package smart-newline
@@ -1409,7 +1413,7 @@
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-mode-hook 'enable-paredit-mode)
   :bind
-  ("C-m" . paredit-newline))
+  ("C-j" . paredit-newline))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Clojure                                                       ;;;
@@ -1417,7 +1421,9 @@
 (use-package clojure-mode
   :config
   (put 'letfn 'clojure-backtracking-indent '((2) 2))
-  (put 'macrolet 'clojure-backtracking-indent '((2) 2)))
+  (put 'macrolet 'clojure-backtracking-indent '((2) 2))
+  :bind
+  ("C-j" . paredit-newline))
 
 ;; cider
 (use-package cider-mode

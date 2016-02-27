@@ -16,6 +16,7 @@
 (depends-on "ag")
 (depends-on "anzu")
 (depends-on "async")
+(depends-on "auto-async-byte-compile")
 (depends-on "auto-complete")
 (depends-on "auto-highlight-symbol")
 (depends-on "auto-install")
