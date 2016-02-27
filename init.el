@@ -61,10 +61,10 @@
 (use-package package
   :config
   ;; パッケージリポジトリにMarmaladeを追加
-  (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/"))
-  (add-to-list 'package-archives '("ELPA"      . "http://tromey.com/elpa/"))
+  (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+  (add-to-list 'package-archives '("ELPA"      . "http://tromey.com/elpa/"))
+  ;; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
   ;; インストールしたパッケージにロードパスを通してロードする
   (package-initialize))
 
