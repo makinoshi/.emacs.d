@@ -1011,62 +1011,6 @@
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
-(defun smartchr-keybindings-c/c++ ()
-  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
-  (local-set-key (kbd ",")  (smartchr '(", " ",")))
-  (local-set-key (kbd "=")  (smartchr '(" = " " == " "=")))
-  (local-set-key (kbd "+")  (smartchr '(" + " "++" " += " "+")))
-  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
-  (local-set-key (kbd ">")  (smartchr '(" > " " >> " " >= " "->" ">")))
-  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
-  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
-  (local-set-key (kbd "&")  (smartchr '(" && " " & " "&")))
-  (local-set-key (kbd "*")  (smartchr '("*" " * " " *= ")))
-  (local-set-key (kbd "<")  (smartchr '(" < " " << " " <= " "<`!!'>" "<")))
-  (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
-  (local-set-key (kbd "/")  (smartchr '("/" " / " " /= ")))
-  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
-  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
-  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
-  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
-  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
-
-(defun smartchr-keybindings-awk ()
-  (local-set-key (kbd ",")  (smartchr '(", " ",")))
-  (local-set-key (kbd "=")  (smartchr '(" = " " == " "=")))
-  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
-  (local-set-key (kbd "~")  (smartchr '(" ~ " " !~ " "~")))
-  (local-set-key (kbd ">")  (smartchr '(" > " " >= " ">")))
-  (local-set-key (kbd "<")  (smartchr '(" < " " <= " "<")))
-  (local-set-key (kbd "+")  (smartchr '(" + " "++" " += " "+")))
-  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
-  (local-set-key (kbd "|")  (smartchr '(" || " "|")))
-  (local-set-key (kbd "&")  (smartchr '(" && " "&")))
-  (local-set-key (kbd "/")  (smartchr '("/`!!'/" " / " "/")))
-  (local-set-key (kbd "{")  (smartchr '("{`!!'}" my/smartchr-braces "{")))
-  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
-
-(defun smartchr-keybindings-php ()
-  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
-  (local-set-key (kbd ".")  (smartchr '("." " . " " .= ")))
-  (local-set-key (kbd ",")  (smartchr '(", " ",")))
-  (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
-  (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += ")))
-  (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
-  (local-set-key (kbd ">")  (smartchr '(" > " "->" " => " " >= " ">")))
-  (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
-  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
-  (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
-  (local-set-key (kbd "*")  (smartchr '(" * " " *= " "**" "*")))
-  (local-set-key (kbd "<")  (smartchr '(" < " " << " " <= " "<")))
-  (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
-  (local-set-key (kbd "/")  (smartchr '(" / " " /= " "/`!!'/" "/")))
-  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
-  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
-  (local-set-key (kbd "{")  (smartchr '("{`!!'}" "{{`!!'}}" "{")))
-  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
-  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
-
 (defun smartchr-keybindings-web ()
   (local-set-key (kbd ",")  (smartchr '(", " ",")))
   (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
@@ -1106,55 +1050,10 @@
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
-(defun smartchr-keybindings-coffee ()
-  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
-  (local-set-key (kbd ",")  (smartchr '(", " ",")))
-  (local-set-key (kbd "=")  (smartchr '(" = " " == " "=")))
-  (local-set-key (kbd "+")  (smartchr '(" + " "++" " += " "+")))
-  (local-set-key (kbd "-")  (smartchr '(" - " "--" " -= " "-")))
-  (local-set-key (kbd ">")  (smartchr '(" > " my/smartchr-arrow " >= " my/smartchr-fat-arrow ">")))
-  (local-set-key (kbd "%")  (smartchr '(" % " " %= " "%")))
-  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
-  (local-set-key (kbd "?")  (smartchr '("?" " ?= ")))
-  (local-set-key (kbd "&")  (smartchr '(" && " " & " "&")))
-  (local-set-key (kbd "*")  (smartchr '("*" " * " " *= ")))
-  (local-set-key (kbd "<")  (smartchr '(" < " " << " " <= " "<`!!'>" "<")))
-  (local-set-key (kbd "|")  (smartchr '("|" " ||= ")))
-  (local-set-key (kbd "/")  (smartchr '("/" " / " " /= ")))
-  (local-set-key (kbd "#")  (smartchr '("#{`!!'}" "#")))
-  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
-  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
-  (local-set-key (kbd "{")  (smartchr '("{`!!'}" "{")))
-  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
-  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
-
-(defun smartchr-keybindings-R ()
-  (local-set-key (kbd ";")  (smartchr '(my/smartchr-semicolon ";")))
-  (local-set-key (kbd ",")  (smartchr '(", " ",")))
-  (local-set-key (kbd "=")  (smartchr '(" = " " == " " === " "=")))
-  (local-set-key (kbd "+")  (smartchr '("+" " + " "++" " += " )))
-  (local-set-key (kbd "-")  (smartchr '("-" " - " "--" " -= ")))
-  (local-set-key (kbd ">")  (smartchr '(" > " " => " " >= " ">")))
-  (local-set-key (kbd "<")  (smartchr '(" <- " "<")))
-  (local-set-key (kbd "%")  (smartchr '("%" " % " " %= ")))
-  (local-set-key (kbd "!")  (smartchr '(" != " "!")))
-  (local-set-key (kbd "&")  (smartchr '(" && " " & " " &= " "&")))
-  (local-set-key (kbd "*")  (smartchr '(" * " " *= " "**" "*")))
-  (local-set-key (kbd "|")  (smartchr '(" || " " |= " "|")))
-  (local-set-key (kbd "/")  (smartchr '(" / " " /= " "/`!!'/" "/")))
-  (local-set-key (kbd "(")  (smartchr '("(`!!')" "(")))
-  (local-set-key (kbd "[")  (smartchr '("[`!!']" "[")))
-  (local-set-key (kbd "{")  (smartchr '(my/smartchr-braces "{`!!'}" "{")))
-  (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
-  (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
-
 (defun smartchr-keybindings-web-erb ()
   (local-set-key (kbd "<") (smartchr '("<%= `!!' %>" "<% `!!' %>" "<`!!'>" "<")))
   (local-set-key (kbd "&") (smartchr '("&" " && " " & " " &= "))))
 
-(add-hook 'c++-mode-hook 'smartchr-keybindings-c/c++)
-(add-hook 'awk-mode-hook 'smartchr-keybindings-awk)
-(add-hook 'php-mode-hook 'smartchr-keybindings-php)
 (add-hook 'projectile-rails-mode-hook
           '(lambda ()
              (and (eq major-mode 'web-mode) (smartchr-keybindings-web-erb))))
@@ -1177,24 +1076,13 @@
   (add-hook 'emacs-lisp-mode-hook #'enable-auto-async-byte-compile-mode)
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'emacs-lisp-mode-hook #'highlight-symbol-mode)
+  (add-hook 'emacs-lisp-mode-hook #'company-mode)
   :config
   (setq indent-tabs-mode nil))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ HTML & CSS                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun web-mode-hooks ()
-  "Hooks for web-mode"
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-	indent-tabs-mode nil
-	comment-start "//"
-	comment-end ""
-	web-mode-comment-beginning "//"
-	web-mode-comment-end ""
-	web-mode-comment-style 2))
-
 (use-package web-mode
   :mode
   ("\\.phtml\\'" . web-mode)
@@ -1209,35 +1097,39 @@
   ("\\.jsx?\\'" . web-mode)
   ("\\.css?\\'" . web-mode)
   :init
-  (add-hook 'web-mode-hook 'web-mode-hooks)
+  (add-hook 'web-mode-hook #'company-mode)
+  (add-hook 'web-mode-hook #'smartchr-keybindings-web)
   :config
-  (add-hook 'web-mode-hook 'smartchr-keybindings-web)
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template))
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+	indent-tabs-mode nil
+	comment-start "//"
+	comment-end ""
+	web-mode-comment-beginning "//"
+	web-mode-comment-end ""
+	web-mode-comment-style 2)
   (use-package jquery-doc
-    :config
+    :init
     (add-hook 'web-mode-hook 'jquery-doc-setup)))
-
-;; Emment
-(defun emmet-mode-hooks ()
-  "Hooks for emmet-mode"
-  (setq emmet-indentation 2
-        emmet-move-cursor-between-quotes t))
 
 (use-package emmet-mode
   :init
-  (add-hook 'emmet-mode-hook 'emmet-mode-hooks)
+  (add-hook 'sgml-mode-hook #'emmet-mode) ;; マークアップ言語全部で使う
+  (add-hook 'css-mode-hook  #'emmet-mode) ;; CSSにも使う
+  (add-hook 'web-mode-hook  #'emmet-mode) ;; web-modeで使う
+  (add-hook 'scss-mode-hook #'emmet-mode)
   :config
-  (add-hook 'sgml-mode-hook 'emmet-mode) ;; マークアップ言語全部で使う
-  (add-hook 'css-mode-hook  'emmet-mode) ;; CSSにも使う
-  (add-hook 'web-mode-hook  'emmet-mode) ;; web-modeで使う
-  (add-hook 'scss-mode-hook 'emmet-mode)
   ;; C-j は newline のままにしておく
   (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
   ;;C-i と Tabの被りを回避
   (keyboard-translate ?\C-i ?\H-i)
   ;; C-i で展開
-  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line))
+  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line)
+  (setq emmet-indentation 2
+        emmet-move-cursor-between-quotes t))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ scss                                                          ;;;
@@ -1299,15 +1191,14 @@
   :interpreter
   ("node" . js2-mode)
   :init
-  (add-hook 'js-mode-hook 'js-indent-hook)
-  (add-hook 'js2-mode-hook 'smartchr-keybindings-js)
-  (add-hook 'js2-mode-hook 'smart-newline-mode)
-  (add-hook 'js2-mode-hook 'tern-mode)
-  (add-hook 'js2-mode-hook 'emmet-mode)
-  :config
-  (add-hook 'js2-mode-hook 'js-indent-hook)
+  (add-hook 'js-mode-hook  #'js-indent-hook)
+  (add-hook 'js2-mode-hook #'smartchr-keybindings-js)
+  (add-hook 'js2-mode-hook #'smart-newline-mode)
+  (add-hook 'js2-mode-hook #'tern-mode)
+  (add-hook 'js2-mode-hook #'emmet-mode)
+  (add-hook 'js2-mode-hook #'js-indent-hook)
   (use-package jquery-doc
-    :config
+    :init
     (add-hook 'js2-mode-hook 'jquery-doc-setup)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1316,8 +1207,8 @@
 (use-package markdown-mode
   :mode
   ("\\.md\\'" . markdown-mode)
-  :config
-  (add-hook 'markdown-mode-hook 'emmet-mode))
+  :init
+  (add-hook 'markdown-mode-hook #'emmet-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Ruby                                                          ;;;
@@ -1330,13 +1221,13 @@
   :interpreter
   ("ruby" . ruby-mode)
   :init
-  (add-hook 'ruby-mode-hook 'smart-newline-mode)
-  (add-hook 'ruby-mode-hook 'smartchr-keybindings-ruby)
-  (add-hook 'ruby-mode-hook 'robe-mode)
+  (add-hook 'ruby-mode-hook #'smart-newline-mode)
+  (add-hook 'ruby-mode-hook #'smartchr-keybindings-ruby)
+  (add-hook 'ruby-mode-hook #'robe-mode)
   :config
-  (setq tab-width 2)
-  (setq indent-tabs-mode nil)
-  (setq ruby-indent-level tab-width)
+  (setq tab-width 2
+        indent-tabs-mode nil
+        ruby-indent-level tab-width)
   (use-package ruby-end)
   (use-package ruby-block
     :config
@@ -1350,40 +1241,28 @@
   (bind-keys :map ruby-mode-map
              ("|" . my/vertical-bar-pair)))
 
-(use-package chef-mode)
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Python                                                        ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun python-mode-hooks ()
-  "python mode hooks"
+(use-package python-mode
+  :config
   (setq indent-tabs-mode nil
 	python-indent 4
 	python-pylint t
 	tab-width 4))
-(add-hook 'python-mode-hook 'python-mode-hooks)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ PHP                                                           ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package php-mode
+  :init
+  (add-hook 'php-mode-hook #'company-mode)
   :mode
   ("\\.php\\'" . php-mode))
 
-(add-hook 'php-mode-hook
-          (lambda ()
-            (require 'php-completion)
-            (php-completion-mode t)
-            (define-key php-mode-map (kbd "C-o") 'phpcmp-complete)))
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Java                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun java-mode-hooks ()
-  "Java mode hooks"
-  (setq tab-width 4
-        indent-tabs-mode nil))
-(add-hook 'java-mode-hook 'java-mode-hooks)
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Lisp                                                          ;;;
@@ -1419,13 +1298,7 @@
         cider-repl-use-clojure-font-lock t
         cider-prompt-save-file-on-load 'always-save
         cider-font-lock-dynamically '(macro core function var)
-        cider-overlays-use-font-lock t)
-  ;; ;; 'c-x b' した時に *nrepl-connection* と *nrepl-server* のbufferを一覧に表示しない
-  ;; (setq nrepl-hide-special-buffers t)
-  ;; ;; RELPのbuffer名を 'project名:nREPLのport番号' と表示する
-  ;; ;; project名は project.clj で defproject した名前
-  ;; (setq nrepl-buffer-name-show-port t)
-  )
+        cider-overlays-use-font-lock t))
 
 (use-package clj-refactor
   :config
@@ -1434,15 +1307,6 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(unless (require 'sql nil t)
-  (install-elisp "http://www.emacswiki.org/emacs/download/sql.el"))
-(unless (require 'sql-indent nil t)
-  (install-elisp "http://www.emacswiki.org/emacs/download/sql-indent.el"))
-;; (unless (require 'sql-complete nil t)
-;;   (install-elisp "http://www.emacswiki.org/emacs/download/sql-complete.el"))
-(unless (require 'sql-transform nil t)
-  (install-elisp "http://www.emacswiki.org/emacs/download/sql-transform.el"))
-
 ;; C-c C-c : 'sql-send-paragraph
 ;; C-c C-r : 'sql-send-region
 ;; C-c C-s : 'sql-send-string
@@ -1451,93 +1315,20 @@
 ;; C-c C-r : 'sql-send-region
 ;; C-c C-s : 'sql-send-string
 ;; C-c C-b : 'sql-send-buffer
-(require 'sql)
-
-(add-hook 'sql-interactive-mode-hook
-          #'(lambda ()
-              (interactive)
-              (set-buffer-process-coding-system 'sjis-unix 'sjis-unix )
-              (setq show-trailing-whitespace nil)))
-
-;; starting SQL mode loading sql-indent / sql-complete
-(eval-after-load "sql"
-  '(progn
-     (load-library "sql-indent")
-     ;; (load-library "sql-complete")
-     (load-library "sql-transform")))
-
-(setq auto-mode-alist
-      (cons '("\\.sql\\'" . sql-mode) auto-mode-alist))
-
-(sql-set-product-feature
- 'ms :font-lock 'sql-mode-ms-font-lock-keywords)
-
-(defcustom sql-ms-program "sqlcmd"
-  "Command to start sqlcmd by SQL Server."
-  :type 'file
-  :group 'SQL)
-
-(sql-set-product-feature
- 'ms :sql-program 'sql-ms-program)
-(sql-set-product-feature
- 'ms :sqli-prompt-regexp "^[0-9]*>")
-(sql-set-product-feature
- 'ms :sqli-prompt-length 5)
-
-(defcustom sql-ms-login-params
-  '(user password server database)
-  "Login parameters to needed to connect to mssql."
-  :type '(repeat (choice
-                  (const user)
-                  (const password)
-                  (const server)
-                  (const database)))
-  :group 'SQL)
-
-(defcustom sql-ms-options '("-U" "-P" "-S" "-d")
-  "List of additional options for `sql-ms-program'."
-  :type '(repeat string)
-  :group 'SQL)
-
-(defun sql-connect-ms ()
-  "Connect ti SQL Server DB in a comint buffer."
-  ;; Do something with `sql-user', `sql-password',
-  ;; `sql-database', and `sql-server'.
-  (let ((f #'(lambda (op val)
-               (unless (string= "" val)
-                 (setq sql-ms-options
-                       (append (list op val) sql-ms-options)))))
-        (params `(("-U" . ,sql-user)("-P" . ,sql-password)
-                  ("-S" . ,sql-server)("-d" . ,sql-database))))
-    (dolist (pair params)
-      (funcall f (car pair)(cdr pair)))
-    (sql-connect-1 sql-ms-program sql-ms-options)))
-
-(sql-set-product-feature
- 'ms :sqli-login 'sql-ms-login-params)
-(sql-set-product-feature
- 'ms :sqli-connect 'sql-connect-ms)
-
-(defun run-mssql ()
-  "Run mssql by SQL Server as an inferior process."
-  (interactive)
-  (sql-product-interactive 'ms))
+(use-package sql)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ nginx                                                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun nginx-mode-hooks ()
-  (setq nginx-indent-level 2)
-  (setq nginx-indent-tabs-mode nil))
-
 (use-package nginx-mode
   :config
-  (add-hook 'nginx-mode-hook 'nginx-mode-hooks))
+  (setq nginx-indent-level 2
+	nginx-indent-tabs-mode nil))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(add-hook 'org-mode-hook 'smart-newline-mode)
+(add-hook 'org-mode-hook #'smart-newline-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ term                                                          ;;;
