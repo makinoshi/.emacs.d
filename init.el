@@ -1295,7 +1295,8 @@
   (add-hook 'clojure-mode-hook #'enable-paredit-mode)
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'yas-minor-mode))
+  (add-hook 'clojure-mode-hook #'yas-minor-mode)
+  (add-hook 'clojure-mode-hook #'midje-mode))
 
 (use-package cider-mode
   :init
@@ -1311,11 +1312,14 @@
         cider-repl-use-clojure-font-lock t
         cider-prompt-save-file-on-load 'always-save
         cider-font-lock-dynamically '(macro core function var)
-        cider-overlays-use-font-lock t))
+        cider-overlays-use-font-lock t)
+  (use-package cider-eval-last-sexp-fu))
 
 (use-package clj-refactor
   :config
   (cljr-add-keybindings-with-prefix "C-c j"))
+
+(use-package midje-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;
