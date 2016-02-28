@@ -231,7 +231,21 @@
 
 (use-package powerline
   :config
-  (powerline-default-theme))
+  (powerline-default-theme)
+  (set-face-attribute 'mode-line nil
+		      :foreground "#fff"
+		      :background "#FF0066"
+		      :box nil)
+
+  (set-face-attribute 'powerline-active1 nil
+		      :foreground "#fff"
+		      :background "#FF6699"
+		      :inherit 'mode-line)
+
+  (set-face-attribute 'powerline-active2 nil
+		      :foreground "#000"
+		      :background "#ffaeb9"
+		      :inherit 'mode-line))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
@@ -1099,6 +1113,12 @@
   :init
   (add-hook 'web-mode-hook #'company-mode)
   (add-hook 'web-mode-hook #'smartchr-keybindings-web)
+  (add-hook 'web-mode-hook
+	    (lambda ()
+	      (when (equal web-mode-content-type "jsx")
+		(add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
+		(flycheck-add-mode 'javascript-eslint 'web-mode)
+		(flycheck-mode t))))
   :config
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template))
@@ -1144,11 +1164,7 @@
   :mode
   ("\\.scss\\'" . scss-mode)
   :config
-  (add-hook 'scss-mode-hook 'scss-mode-hooks)
-  ;; (bind-keys :map scss-mode-map
-  ;;            ("{" . my/curly-brace))
-             ;; (";" . my/semicolon))
-  )
+  (add-hook 'scss-mode-hook 'scss-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ JavaScript                                                    ;;;
@@ -1176,9 +1192,6 @@
 (setq-default flycheck-disabled-checkers
 	      (append flycheck-disabled-checkers
 		      '(javascript-jshint)))
-
-;; use eslint with web-mode for jsx files
-(flycheck-add-mode 'javascript-eslint 'web-mode)
 
 ;; disable json-jsonlist checking for json files
 (setq-default flycheck-disabled-checkers
