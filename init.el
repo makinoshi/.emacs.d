@@ -76,7 +76,6 @@
   :init
   (unless (require 'auto-async-byte-compile nil t)
     (install-elisp-from-emacswiki "auto-async-byte-compile.el"))
-  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
   :config
   ;; 自動コンパイルを無効にするファイル名の正規表現
   (setq auto-async-byte-compile-exclude-files-regexp "init.el"))
@@ -331,7 +330,6 @@
       (let ((face (intern (format "rainbow-delimiters-depth-%d-face" it))))
         (callf color-saturate-name (face-foreground face) 90))))
   :init
-  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'web-mode-hook #'rainbow-delimiters-mode))
 
 ;; ediff
@@ -837,20 +835,23 @@
 ;; C-RETがC-jになるため、C-c C-SPCに矩形選択モードを割り当て
 (define-key global-map (kbd "C-c C-SPC") 'cua-set-rectangle-mark)
 
-;; auto-complete
-(use-package auto-complete-config
+;; company
+(use-package company
   :config
-  (bind-keys :map ac-mode-map
-             ("TAB" . auto-complete))
-  (bind-keys :map ac-completing-map
-             ("C-n" . ac-next)
-             ("C-p" . ac-previous))
-  (add-to-list 'ac-dictionary-directories
-               (concat user-emacs-directory "elisp/ac-dict/"))
-  (ac-config-default)
-  (global-auto-complete-mode t)
-  (setq ac-dwim t)
-  (robe-mode))
+  ;; (global-company-mode)
+  (setq company-idle-delay 0.1
+        company-minimum-prefix-length 2
+        company-selection-wrap-around t)
+
+  (bind-keys :map company-mode-map
+             ("C-i" . company-complete))
+  (bind-keys :map company-active-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)
+             ("C-s" . company-search-words-regexp))
+  (bind-keys :map company-search-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)))
 
 ;; hippie-expand
 (bind-key "M-/" 'hippie-expand)
@@ -901,7 +902,6 @@
   ([shift f3] . highlight-symbol-prev)
   ([(meta f3)] . highlight-symbol-query-replace)
   :init
-  (add-hook 'emacs-lisp-mode-hook 'highlight-symbol-mode)
   (add-hook 'web-mode-hook 'highlight-symbol-mode)
   (add-hook 'ruby-mode-hook 'highlight-symbol-mode)
   (add-hook 'js2-mode-hook 'highlight-symbol-mode)
@@ -924,7 +924,6 @@
 ;; Emacs標準のctagsでは動作しない！！
 (setq ctags-update-command "/usr/bin/ctags")
 ;; 使う言語で有効にしよう
-;; (add-hook 'emacs-lisp-mode-hook  'turn-on-ctags-auto-update-mode)
 
 (use-package subword)
 
@@ -1172,11 +1171,14 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ emacs lisp                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun emacs-lisp-mode-hooks ()
-  "Hooks for emacs lisp"
+(use-package emacs-lisp-mode
+  :init
+  (add-hook 'emacs-lisp-mode-hook #'smart-newline-mode)
+  (add-hook 'emacs-lisp-mode-hook #'enable-auto-async-byte-compile-mode)
+  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'emacs-lisp-mode-hook #'highlight-symbol-mode)
+  :config
   (setq indent-tabs-mode nil))
-
-(add-hook 'emacs-lisp-mode-hook 'smart-newline-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ HTML & CSS                                                    ;;;
@@ -1214,10 +1216,7 @@
              ("C-c t" . my/underscore-html-template))
   (use-package jquery-doc
     :config
-    (add-hook 'web-mode-hook 'jquery-doc-setup))
-  (use-package tern-auto-complete
-    :config
-    (tern-ac-setup)))
+    (add-hook 'web-mode-hook 'jquery-doc-setup)))
 
 ;; Emment
 (defun emmet-mode-hooks ()
@@ -1281,11 +1280,6 @@
   (set (make-local-variable 'indent-line-function) 'my/js-indent-line))
 (add-hook 'js-mode-hook 'js2-minor-mode)
 
-(use-package ac-js2
-  :config
-  (add-hook 'js2-mode 'ac-js2-mode)
-  (setq ac-js2-evaluate-calls t))
-
 ;; disable jshint since we prefer eslint checking
 (setq-default flycheck-disabled-checkers
 	      (append flycheck-disabled-checkers
@@ -1314,10 +1308,7 @@
   (add-hook 'js2-mode-hook 'js-indent-hook)
   (use-package jquery-doc
     :config
-    (add-hook 'js2-mode-hook 'jquery-doc-setup))
-  (use-package tern-auto-complete
-    :config
-    (tern-ac-setup)))
+    (add-hook 'js2-mode-hook 'jquery-doc-setup)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ markdown                                                      ;;;
@@ -1342,7 +1333,6 @@
   (add-hook 'ruby-mode-hook 'smart-newline-mode)
   (add-hook 'ruby-mode-hook 'smartchr-keybindings-ruby)
   (add-hook 'ruby-mode-hook 'robe-mode)
-  (add-hook 'robe-mode-hook 'ac-robe-setup)
   :config
   (setq tab-width 2)
   (setq indent-tabs-mode nil)
@@ -1373,10 +1363,6 @@
 	tab-width 4))
 (add-hook 'python-mode-hook 'python-mode-hooks)
 
-(use-package ac-python
-  :config
-  (add-to-list 'ac-modes 'python-2-mode))
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ PHP                                                           ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1388,13 +1374,7 @@
           (lambda ()
             (require 'php-completion)
             (php-completion-mode t)
-            (define-key php-mode-map (kbd "C-o") 'phpcmp-complete)
-            (make-local-variable 'ac-sources)
-            (setq ac-sources '(
-                               ac-source-words-in-same-mode-buffers
-                               ac-source-php-completion
-                               ac-source-filename
-                               ))))
+            (define-key php-mode-map (kbd "C-o") 'phpcmp-complete)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Java                                                          ;;;
@@ -1428,7 +1408,9 @@
 (use-package cider-mode
   :init
   (add-hook 'cider-mode-hook #'clj-refactor-mode)
+  (add-hook 'cider-mode-hook #'company-mode)
   (add-hook 'cider-mode-hook #'eldoc-mode)
+  (add-hook 'cider-repl-mode-hook #'company-mode)
   (add-hook 'cider-repl-mode-hook #'eldoc-mode)
   :diminish subword-mode
   :config
@@ -1448,16 +1430,6 @@
 (use-package clj-refactor
   :config
   (cljr-add-keybindings-with-prefix "C-c j"))
-
-(use-package ac-cider
-  :init
-  (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
-  (add-hook 'cider-mode-hook 'ac-cider-setup)
-  (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
-  (eval-after-load "auto-complete"
-    '(progn
-       (add-to-list 'ac-modes 'cider-mode)
-       (add-to-list 'ac-modes 'cider-repl-mode))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;

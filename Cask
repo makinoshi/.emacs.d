@@ -2,9 +2,6 @@
 (source "marmalade" "http://marmalade-repo.org/packages/")
 (source "melpa" "http://melpa.org/packages/")
 (source "melpa-stable" "http://melpa-stable.milkbox.net/packages/")
-(source gnu)
-(source marmalade)
-(source melpa-stable)
 
 (depends-on "ac-cider")
 (depends-on "ac-dabbrev")
@@ -32,6 +29,7 @@
 (depends-on "clojure-cheatsheet")
 (depends-on "clojure-mode")
 (depends-on "coffee-mode")
+(depends-on "company")
 (depends-on "concurrent")
 (depends-on "ctable")
 (depends-on "dash")
