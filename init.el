@@ -1,7 +1,8 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Cask                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'cask "~/.cask/cask.el")
+;;(require 'cask "~/.cask/cask.el")
+(require 'cask "/usr/local/opt/cask/cask.el")
 (cask-initialize)
 (require 'pallet)
 (pallet-mode t)
@@ -51,7 +52,7 @@
   ;; インストールディレクトリを設定する 初期値は ~/.emacs.d/auto-install/
   (setq auto-install-directory (concat user-emacs-directory "elisp/"))
   ;; EmacsWikiに登録されているelisp の名前を取得する
-  (auto-install-update-emacswiki-package-name t)
+  ;; (auto-install-update-emacswiki-package-name t)
   ;; 必要であればプロキシの設定を行う
   ;; (setq url-proxy-services '(("http" . "localhost:8339")))
   ;; install-elisp の関数を利用可能にする
@@ -61,6 +62,7 @@
 (use-package package
   :config
   ;; パッケージリポジトリにMarmaladeを追加
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
   (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
   (add-to-list 'package-archives '("ELPA"      . "http://tromey.com/elpa/"))
@@ -314,7 +316,6 @@
 (show-paren-mode t) ; 有効化
 ;; parenのスタイル: expressionは括弧内も強調表示
 (setq show-paren-style 'expression)
-
 ;; フェイスを変更する
 (set-face-background 'show-paren-match-face nil)
 (set-face-underline-p 'show-paren-match-face "yellow")
@@ -499,7 +500,7 @@
   (setq ace-jump-word-mode-use-query-char nil)
   (setq ace-jump-mode-move-keys
         (append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil))
-  (ace-pinyin-global-mode 1)
+  ;; (ace-pinyin-global-mode 1)
   :bind
   ("C-j" . ace-jump-word-mode)
   ("C-c j" . ace-jump-line-mode))
@@ -636,6 +637,7 @@
 ;; 入力されるキーシーケンスを置き換える
 ;; ?\C-?はDELのキーシケンス
 ;; 代わりにC-c h をヘルプに
+(keyboard-translate ?\C-h ?\C-?)
 (use-package bind-key
   :config
   (bind-keys :map global-map

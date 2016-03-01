@@ -1,7 +1,8 @@
 (source "ELPA" "http://tromey.com/elpa/")
-(source "marmalade" "http://marmalade-repo.org/packages/")
-(source "melpa" "http://melpa.org/packages/")
 (source "melpa-stable" "http://melpa-stable.milkbox.net/packages/")
+(source marmalade)
+(source melpa)
+(source gnu)
 
 (depends-on "ac-cider")
 (depends-on "ac-dabbrev")
