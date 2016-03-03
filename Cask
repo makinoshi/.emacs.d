@@ -1,8 +1,8 @@
 (source "ELPA" "http://tromey.com/elpa/")
 (source "melpa-stable" "http://melpa-stable.milkbox.net/packages/")
+(source gnu)
 (source marmalade)
 (source melpa)
-(source gnu)
 
 (depends-on "ac-cider")
 (depends-on "ac-dabbrev")
@@ -41,6 +41,7 @@
 (depends-on "direx")
 (depends-on "e2wm")
 (depends-on "e2wm-bookmark")
+(depends-on "edit-server")
 (depends-on "edn")
 (depends-on "elisp-slime-nav")
 (depends-on "elscreen")

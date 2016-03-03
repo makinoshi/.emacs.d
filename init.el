@@ -1391,8 +1391,17 @@
   (set-buffer (find-file (concat "/sudo::" File))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ English                                                       ;;;
+;;; @ Other                                                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; edit-server
+;; edit browser contents usgin emacs with Google Chrome
+(use-package edit-server
+  :init
+  (add-hook 'edit-server-mode #'markdown-mode)
+  :config
+  (setq edit-server-new-frame nil)
+  (edit-server-start))
+
 ;; aspell
 ;; Have to install
 ;; brew install aspell --lang=en
