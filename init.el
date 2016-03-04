@@ -105,16 +105,16 @@
   (setq default-process-coding-system '(undecided-dos . utf-8-unix))
   ;; font
   (let* ((size 15)
-	 (asciifont "Ricty")
-	 (jpfont "Ricty")
-	 (h (* size 10))
-	 (fontspec (font-spec :family asciifont))
-	 (jp-fontspec (font-spec :family jpfont)))
+         (asciifont "Ricty")
+         (jpfont "Ricty")
+         (h (* size 10))
+         (fontspec (font-spec :family asciifont))
+         (jp-fontspec (font-spec :family jpfont)))
     (set-face-attribute 'default nil :family asciifont :height h)
     (set-fontset-font nil 'japanese-jisx0213.2004-1 jp-fontspec)
     (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
     (set-fontset-font nil 'katakana-jisx0201 jp-fontspec)
-    (set-fontset-font nil '(#x0080 . #x024F) fontspec) 
+    (set-fontset-font nil '(#x0080 . #x024F) fontspec)
     (set-fontset-font nil '(#x0370 . #x03FF) fontspec))
   ;; 日本語入力
   (use-package skk
@@ -152,13 +152,13 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (setq default-frame-alist
       (append '(
-		;; (width                . 204) ; フレーム幅
+                ;; (width                . 204) ; フレーム幅
                 (height               . 60 ) ; フレーム高
-                ;;		(left                 . 70 ) ; 配置左位置
-                ;;		(top                  . 28 ) ; 配置上位置
+                ;;              (left                 . 70 ) ; 配置左位置
+                ;;              (top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
                 (left-fringe          . 5  ) ; 左フリンジ幅
-                (right-fringe	      .	5  ) ; 右フリンジ幅
+                (right-fringe         . 5  ) ; 右フリンジ幅
                 ;;                (menu-bar-lines       . 1  ) ; メニューバー
                 ;;                (tool-bar-lines       . 1  ) ; ツールバー
                 ;;                (vertical-scroll-bars . 1  ) ; スクロールバー
@@ -235,19 +235,19 @@
   :config
   (powerline-default-theme)
   (set-face-attribute 'mode-line nil
-		      :foreground "#fff"
-		      :background "#FF0066"
-		      :box nil)
+                      :foreground "#fff"
+                      :background "#FF0066"
+                      :box nil)
 
   (set-face-attribute 'powerline-active1 nil
-		      :foreground "#fff"
-		      :background "#FF6699"
-		      :inherit 'mode-line)
+                      :foreground "#fff"
+                      :background "#FF6699"
+                      :inherit 'mode-line)
 
   (set-face-attribute 'powerline-active2 nil
-		      :foreground "#000"
-		      :background "#ffaeb9"
-		      :inherit 'mode-line))
+                      :foreground "#000"
+                      :background "#ffaeb9"
+                      :inherit 'mode-line))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
@@ -381,8 +381,8 @@
              ("n" . mc/mark-next-like-this)
              ("m" . mc/mark-more-like-this))
   (region-bindings-mode-enable))
-  ;; 発動させてくないモードを設定
-  ;; (setq region-bindings-mode-disabled-modes '(foo-mode bar-mode))
+;; 発動させてくないモードを設定
+;; (setq region-bindings-mode-disabled-modes '(foo-mode bar-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - cursor                                               ;;;
@@ -642,7 +642,7 @@
   :config
   (bind-keys :map global-map
              ("C-h" . delete-backward-char)
-	     ("C-c h" . help-command)))
+             ("C-c h" . help-command)))
 
 ;; 改行とインデントをRET(C-m)でできるように改善
 (use-package smart-newline
@@ -735,9 +735,9 @@
      '(helm-truncate-lines t)
      '(helm-delete-minibuffer-contents-from-point t)
      '(helm-mini-default-sources '(helm-source-buffers-list
-				   helm-source-files-in-current-dir
-				   helm-source-ls-git
-				   helm-source-recentf))))
+                                   helm-source-files-in-current-dir
+                                   helm-source-ls-git
+                                   helm-source-recentf))))
   ;; helm-miniに表示するものをカスタマイズ
   ;; キーバインドを設定
   (global-set-key (kbd "M-x")     'helm-M-x)
@@ -940,6 +940,87 @@
 
 (bind-key "C-S-k" 'just-one-space)
 
+(defun my/duplicate-region (num &optional start end)
+  "Duplicates the region bounded by START and END NUM times.
+If no START and END is provided, the current region-beginning and
+region-end is used. Adds the duplicated text to the kill ring."
+  (interactive "p")
+  (let* ((start (or start (region-beginning)))
+         (end (or end (region-end)))
+         (region (buffer-substring start end)))
+    (kill-ring-save start end)
+    (goto-char end)
+    (dotimes (i num)
+      (insert region))))
+
+(defun my/duplicate-current-line (num)
+  "Duplicate the current line NUM times."
+  (interactive "p")
+  (my/duplicate-region num (point-at-bol) (1+ (point-at-eol)))
+  (goto-char (1- (point))))
+
+(defun my/duplicate-current-line-or-region (arg)
+  "Duplicates the current line or region ARG times.
+If there's no region, the current line will be duplicated."
+  (interactive "p")
+  (if (region-active-p)
+      (my/duplicate-region arg)
+    (my/duplicate-current-line arg)))
+
+(defun my/rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " filename)))
+        (cond ((get-buffer new-name)
+               (error "A buffer named '%s' already exists!" new-name))
+              (t
+               (rename-file filename new-name 1)
+               (rename-buffer new-name)
+               (set-visited-file-name new-name)
+               (set-buffer-modified-p nil)
+               (message "File '%s' successfully renamed to '%s'" name (file-name-nondirectory new-name))))))))
+
+(defun my/delete-current-buffer-file ()
+  "Removes file connected to current buffer and kills buffer."
+  (interactive)
+  (let ((filename (buffer-file-name))
+        (buffer (current-buffer))
+        (name (buffer-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (ido-kill-buffer)
+      (when (yes-or-no-p "Are you sure you want to remove this file? ")
+        (delete-file filename)
+        (kill-buffer buffer)
+        (message "File '%s' successfully removed" filename)))))
+
+(defun my/untabify-buffer ()
+  (interactive)
+  (untabify (point-min) (point-max)))
+
+(defun my/indent-buffer ()
+  (interactive)
+  (indent-region (point-min) (point-max)))
+
+(defun my/cleanup-buffer-safe ()
+  "Perform a bunch of safe operations on the whitespace content of a buffer.
+Does not indent buffer, because it is used for a before-save-hook, and that
+might be bad."
+  (interactive)
+  (my/untabify-buffer)
+  (delete-trailing-whitespace)
+  (set-buffer-file-coding-system 'utf-8))
+
+(defun my/cleanup-buffer ()
+  "Perform a bunch of operations on the whitespace content of a buffer.
+Including my/indent-buffer, which should not be called automatically on save."
+  (interactive)
+  (my/cleanup-buffer-safe)
+  (my/indent-buffer))
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ smartchr                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1113,23 +1194,23 @@
   (add-hook 'web-mode-hook #'company-mode)
   (add-hook 'web-mode-hook #'smartchr-keybindings-web)
   (add-hook 'web-mode-hook
-	    (lambda ()
-	      (when (equal web-mode-content-type "jsx")
-		(add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
-		(flycheck-add-mode 'javascript-eslint 'web-mode)
-		(flycheck-mode t))))
+            (lambda ()
+              (when (equal web-mode-content-type "jsx")
+                (add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
+                (flycheck-add-mode 'javascript-eslint 'web-mode)
+                (flycheck-mode t))))
   :config
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template))
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2
-	indent-tabs-mode nil
-	comment-start "//"
-	comment-end ""
-	web-mode-comment-beginning "//"
-	web-mode-comment-end ""
-	web-mode-comment-style 2)
+        indent-tabs-mode nil
+        comment-start "//"
+        comment-end ""
+        web-mode-comment-beginning "//"
+        web-mode-comment-end ""
+        web-mode-comment-style 2)
   (use-package jquery-doc
     :init
     (add-hook 'web-mode-hook 'jquery-doc-setup)))
@@ -1189,13 +1270,13 @@
 
 ;; disable jshint since we prefer eslint checking
 (setq-default flycheck-disabled-checkers
-	      (append flycheck-disabled-checkers
-		      '(javascript-jshint)))
+              (append flycheck-disabled-checkers
+                      '(javascript-jshint)))
 
 ;; disable json-jsonlist checking for json files
 (setq-default flycheck-disabled-checkers
-	      (append flycheck-disabled-checkers
-		      '(json-jsonlist)))
+              (append flycheck-disabled-checkers
+                      '(json-jsonlist)))
 
 (use-package js2-mode
   :mode
@@ -1259,9 +1340,9 @@
 (use-package python-mode
   :config
   (setq indent-tabs-mode nil
-	python-indent 4
-	python-pylint t
-	tab-width 4))
+        python-indent 4
+        python-pylint t
+        tab-width 4))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ PHP                                                           ;;;
@@ -1289,6 +1370,9 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Clojure                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun my/clojure-mode-hook ()
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
+
 (use-package clojure-mode
   :init
   (add-hook 'clojure-mode-hook #'enable-paredit-mode)
@@ -1296,7 +1380,8 @@
   (add-hook 'clojure-mode-hook #'subword-mode)
   (add-hook 'clojure-mode-hook #'yas-minor-mode)
   (add-hook 'clojure-mode-hook #'auto-highlight-symbol-mode)
-  (add-hook 'clojure-mode-hook #'highlight-symbol-mode))
+  (add-hook 'clojure-mode-hook #'highlight-symbol-mode)
+  (add-hook 'clojure-mode-hook #'my/clojure-mode-hook))
 
 (use-package cider-mode
   :init
@@ -1337,7 +1422,7 @@
 (use-package nginx-mode
   :config
   (setq nginx-indent-level 2
-	nginx-indent-tabs-mode nil))
+        nginx-indent-tabs-mode nil))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
