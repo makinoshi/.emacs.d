@@ -916,12 +916,7 @@
   ([(control f3)] . highlight-symbol-at-point)
   ([f3] . highlight-symbol-next)
   ([shift f3] . highlight-symbol-prev)
-  ([(meta f3)] . highlight-symbol-query-replace)
-  :init
-  (add-hook 'web-mode-hook 'highlight-symbol-mode)
-  (add-hook 'ruby-mode-hook 'highlight-symbol-mode)
-  (add-hook 'js2-mode-hook 'highlight-symbol-mode)
-  (add-hook 'python-mode-hook 'highlight-symbol-mode))
+  ([(meta f3)] . highlight-symbol-query-replace))
 
 (use-package open-junk-file
   :config
@@ -1299,7 +1294,9 @@
   (add-hook 'clojure-mode-hook #'enable-paredit-mode)
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'yas-minor-mode))
+  (add-hook 'clojure-mode-hook #'yas-minor-mode)
+  (add-hook 'clojure-mode-hook #'auto-highlight-symbol-mode)
+  (add-hook 'clojure-mode-hook #'highlight-symbol-mode))
 
 (use-package cider-mode
   :init
