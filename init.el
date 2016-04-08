@@ -509,10 +509,9 @@
 ;;; @ replace                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 置換のキーバイドを変更
-(bind-key "C-c r" 'query-replace)
+(bind-key "C-c r" 'vr/query-replace)
 ;; 正規表現置換のキーバイドを変更
 ;; (bind-key "C-c C-r" 'query-replace-regexp)
-(bind-key "C-c C-r" 'vr/query-replace)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - migemo                                               ;;;
@@ -686,7 +685,7 @@
 (use-package space-chord
   :init
   (unless (require 'space-chord nil t)
-    (install-elisp-from-emacswiki "space-chord.el"))
+    (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/space-chord.el"))
   :config
   (setq space-chord-delay 0.08))
 
@@ -747,8 +746,8 @@
   (global-set-key (kbd "C-c b")   'helm-browse-project)
   (global-set-key (kbd "C-c o")   'helm-swoop)
   (global-set-key (kbd "C-c s")   'helm-ag)
+  (global-set-key (kbd "C-c C-s") 'helm-do-ag-project-root)
   (global-set-key (kbd "M-y")     'helm-show-kill-ring)
-  (global-set-key (kbd "C-c C-s") 'helm-ag)
   (space-chord-define global-map "f"     'helm-for-files)
   (space-chord-define global-map "i"     'helm-imenu)
   (space-chord-define global-map "b"     'helm-descbinds)
@@ -939,6 +938,13 @@
 (use-package subword)
 
 (bind-key "C-S-k" 'just-one-space)
+
+(use-package paredit
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  :bind
+  ("C-j" . paredit-newline))
 
 (defun my/duplicate-region (num &optional start end)
   "Duplicates the region bounded by START and END NUM times.
@@ -1337,7 +1343,21 @@ Including my/indent-buffer, which should not be called automatically on save."
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Python                                                        ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun my/python-mode-hooks ()
+  (add-to-list 'company-backends 'company-jedi))
+
+(use-package jedi-core
+  :config
+  (setq jedi:complete-on-dot t
+        jedi:use-shortcuts t
+        jedi:environment-root "~/.emacs.d/.cask/24.5.1/elpa/jedi-core-0.2.7"))
+
 (use-package python-mode
+  :init
+  (add-hook 'python-mode-hook #'my/python-mode-hooks)
+  (add-hook 'python-mode-hook #'company-mode)
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (add-hook 'python-mode-hook #'enable-paredit-mode)
   :config
   (setq indent-tabs-mode nil
         python-indent 4
@@ -1352,20 +1372,6 @@ Including my/indent-buffer, which should not be called automatically on save."
   (add-hook 'php-mode-hook #'company-mode)
   :mode
   ("\\.php\\'" . php-mode))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Java                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Lisp                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package paredit
-  :init
-  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-  :bind
-  ("C-j" . paredit-newline))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Clojure                                                       ;;;
@@ -1401,7 +1407,10 @@ Including my/indent-buffer, which should not be called automatically on save."
 
 (use-package clj-refactor
   :config
-  (cljr-add-keybindings-with-prefix "C-c j"))
+  (cljr-add-keybindings-with-prefix "C-c j")
+  (setq cljr-favor-prefix-notation nil))
+
+(use-package midje-mode)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ sql                                                           ;;;
@@ -1414,7 +1423,17 @@ Including my/indent-buffer, which should not be called automatically on save."
 ;; C-c C-r : 'sql-send-region
 ;; C-c C-s : 'sql-send-string
 ;; C-c C-b : 'sql-send-buffer
-(use-package sql)
+(eval-after-load "sql"
+  '(load-library "sql-indent"))
+
+(defun sql-mode-hooks ()
+  (setq sql-indent-offset 2
+	indent-tabs-mode nil)
+  (sql-set-product "postgres"))
+
+(use-package sql
+  :init
+  (add-hook 'sql-mode-hook #'sql-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ nginx                                                         ;;;
