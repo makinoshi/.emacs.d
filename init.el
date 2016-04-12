@@ -1524,3 +1524,9 @@ Including my/indent-buffer, which should not be called automatically on save."
   (push '("*Google Translate*") popwin:special-display-config)
   :bind
   ("C-c C-t" . google-translate-at-point))
+
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ After loaded                                                  ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(set-frame-parameter nil 'fullscreen 'maximized)
