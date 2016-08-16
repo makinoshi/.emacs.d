@@ -329,12 +329,7 @@
   (load-theme 'zenburn t))
 
 ;; 色を表す文字列に色をつける
-(use-package rainbow-mode
-  :config
-  (add-hook 'css-mode-hook  'rainbow-mode)
-  (add-hook 'scss-mode-hook 'rainbow-mode)
-  (add-hook 'php-mode-hook  'rainbow-mode)
-  (add-hook 'web-mode-hook  'rainbow-mode))
+(use-package rainbow-mode)
 
 ;; かっこに色をつける
 (use-package rainbow-delimiters
@@ -343,9 +338,7 @@
     :config
     (--each (number-sequence 1 rainbow-delimiters-max-face-count)
       (let ((face (intern (format "rainbow-delimiters-depth-%d-face" it))))
-        (callf color-saturate-name (face-foreground face) 90))))
-  :init
-  (add-hook 'web-mode-hook #'rainbow-delimiters-mode))
+        (callf color-saturate-name (face-foreground face) 90)))))
 
 ;; ediff
 (use-package ediff
@@ -502,8 +495,7 @@
         (append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil))
   ;; (ace-pinyin-global-mode 1)
   :bind
-  ("C-j" . ace-jump-word-mode)
-  ("C-c j" . ace-jump-line-mode))
+  ("H-i" . ace-jump-word-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ replace                                                       ;;;
@@ -1013,8 +1005,8 @@ If there's no region, the current line will be duplicated."
 
 (defun my/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
-Does not indent buffer, because it is used for a before-save-hook, and that
-might be bad."
+  Does not indent buffer, because it is used for a before-save-hook, and that
+  might be bad."
   (interactive)
   (my/untabify-buffer)
   (delete-trailing-whitespace)
@@ -1022,7 +1014,7 @@ might be bad."
 
 (defun my/cleanup-buffer ()
   "Perform a bunch of operations on the whitespace content of a buffer.
-Including my/indent-buffer, which should not be called automatically on save."
+  Including my/indent-buffer, which should not be called automatically on save."
   (interactive)
   (my/cleanup-buffer-safe)
   (my/indent-buffer))
@@ -1183,6 +1175,20 @@ Including my/indent-buffer, which should not be called automatically on save."
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ HTML & CSS                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun my/web-mode-hooks ()
+  (setq comment-start "//"
+        comment-end ""
+        indent-tabs-mode nil
+        web-mode-code-indent-offset 2
+        web-mode-comment-beginning "//"
+        web-mode-comment-end ""
+        web-mode-comment-style 2
+	web-mode-html-offset 2
+	web-mode-css-offset 2
+	web-mode-script-offset 2
+	web-mode-markup-indent-offset 2)
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
+
 (use-package web-mode
   :mode
   ("\\.phtml\\'" . web-mode)
@@ -1197,8 +1203,13 @@ Including my/indent-buffer, which should not be called automatically on save."
   ("\\.jsx?\\'" . web-mode)
   ("\\.css?\\'" . web-mode)
   :init
+  (add-hook 'web-mode-hook #'my/web-mode-hooks)
+  (add-hook 'web-mode-hook #'smart-newline-mode)
   (add-hook 'web-mode-hook #'company-mode)
   (add-hook 'web-mode-hook #'smartchr-keybindings-web)
+  (add-hook 'web-mode-hook #'rainbow-mode)
+  (add-hook 'web-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'web-mode-hook #'emmet-mode) ;; web-modeで使う
   (add-hook 'web-mode-hook
             (lambda ()
               (when (equal web-mode-content-type "jsx")
@@ -1208,15 +1219,6 @@ Including my/indent-buffer, which should not be called automatically on save."
   :config
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template))
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        indent-tabs-mode nil
-        comment-start "//"
-        comment-end ""
-        web-mode-comment-beginning "//"
-        web-mode-comment-end ""
-        web-mode-comment-style 2)
   (use-package jquery-doc
     :init
     (add-hook 'web-mode-hook 'jquery-doc-setup)))
@@ -1225,8 +1227,6 @@ Including my/indent-buffer, which should not be called automatically on save."
   :init
   (add-hook 'sgml-mode-hook #'emmet-mode) ;; マークアップ言語全部で使う
   (add-hook 'css-mode-hook  #'emmet-mode) ;; CSSにも使う
-  (add-hook 'web-mode-hook  #'emmet-mode) ;; web-modeで使う
-  (add-hook 'scss-mode-hook #'emmet-mode)
   :config
   ;; C-j は newline のままにしておく
   (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
@@ -1244,13 +1244,18 @@ Including my/indent-buffer, which should not be called automatically on save."
   "scss-mode-hook"
   (and
    (set (make-local-variable 'css-indent-offset) 2)
-   (set (make-local-variable 'scss-compile-at-save) nil)))
+   (set (make-local-variable 'scss-compile-at-save) nil))
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
 
 (use-package scss-mode
   :mode
   ("\\.scss\\'" . scss-mode)
-  :config
-  (add-hook 'scss-mode-hook 'scss-mode-hooks))
+  :init
+  (add-hook 'scss-mode-hook #'smart-newline-mode)
+  (add-hook 'scss-mode-hook #'company-mode)
+  (add-hook 'scss-mode-hook #'scss-mode-hooks)
+  (add-hook 'scss-mode-hook #'rainbow-mode)
+  (add-hook 'scss-mode-hook #'emmet-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ JavaScript                                                    ;;;
@@ -1350,14 +1355,14 @@ Including my/indent-buffer, which should not be called automatically on save."
   :config
   (setq jedi:complete-on-dot t
         jedi:use-shortcuts t
-        jedi:environment-root "~/.emacs.d/.cask/24.5.1/elpa/jedi-core-0.2.7"))
+        jedi:environment-root "~/.emacs.d/elisp"))
 
 (use-package python-mode
   :init
+  (add-hook 'python-mode-hook #'smart-newline-mode)
   (add-hook 'python-mode-hook #'my/python-mode-hooks)
   (add-hook 'python-mode-hook #'company-mode)
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (add-hook 'python-mode-hook #'enable-paredit-mode)
+  (add-hook 'python-mode-hook #'jedi:setup)
   :config
   (setq indent-tabs-mode nil
         python-indent 4
@@ -1379,6 +1384,18 @@ Including my/indent-buffer, which should not be called automatically on save."
 (defun my/clojure-mode-hook ()
   (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
 
+(defun my/zou-go ()
+  "zou go commnad"
+  (interactive)
+  (with-current-buffer (cider-current-connection "clj")
+    (if current-prefix-arg
+        (progn
+          (save-some-buffers)
+          (cider-interactive-eval
+           "(zou.framework.repl/reset)"))
+      (cider-interactive-eval
+       "(zou.framework.repl/go)"))))
+
 (use-package clojure-mode
   :init
   (add-hook 'clojure-mode-hook #'enable-paredit-mode)
@@ -1387,7 +1404,32 @@ Including my/indent-buffer, which should not be called automatically on save."
   (add-hook 'clojure-mode-hook #'yas-minor-mode)
   (add-hook 'clojure-mode-hook #'auto-highlight-symbol-mode)
   (add-hook 'clojure-mode-hook #'highlight-symbol-mode)
-  (add-hook 'clojure-mode-hook #'my/clojure-mode-hook))
+  (add-hook 'clojure-mode-hook #'my/clojure-mode-hook)
+  :bind
+  ("C-c C-g" . my/zou-go)
+  :config
+  (put-clojure-indent 'fnk 'defun)
+  (put-clojure-indent 'defnk 'defun)
+  (put-clojure-indent 'for-map 1)
+  (put-clojure-indent 'instance 2)
+  (put-clojure-indent 'inline 1)
+  (put-clojure-indent 'letk 1)
+  (put-clojure-indent 'when-letk 1)
+  (put-clojure-indent 'go-loop 1)
+  (put-clojure-indent 'this-as 'defun)
+  (put-clojure-indent 'when-some '1)
+  (put-clojure-indent 'if-some '1)
+  (put-clojure-indent 'try+ 0)
+  (put 'specify 'clojure-backtracking-indent '((2)))
+  (put 'specify! 'clojure-backtracking-indent '((2)))
+  (put 'defcomponent 'clojure-backtracking-indent '((2)))
+  (put 'defcomponentk 'clojure-backtracking-indent '((2)))
+  (put 'defmixin 'clojure-backtracking-indent '((2)))
+  (put 'clojure.core/defrecord 'clojure-backtracking-indent '(4 4 (2)))
+  (put 's/defrecord 'clojure-backtracking-indent '(4 4 (2)))
+  (put 's/defrecord+ 'clojure-backtracking-indent '(4 4 (2)))
+  (put 'potemkin/deftype+ 'clojure-backtracking-indent '(4 4 (2)))
+  (put 'potemkin/defrecord+ 'clojure-backtracking-indent '(4 4 (2))))
 
 (use-package cider-mode
   :init
@@ -1529,4 +1571,19 @@ Including my/indent-buffer, which should not be called automatically on save."
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ After loaded                                                  ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; 画面最大化
 (set-frame-parameter nil 'fullscreen 'maximized)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
+ '(helm-delete-minibuffer-contents-from-point t)
+ '(helm-mini-default-sources
+   (quote
+    (helm-source-buffers-list helm-source-files-in-current-dir helm-source-ls-git helm-source-recentf)))
+ '(helm-truncate-lines t t)
+ '(safe-local-variable-values
+   (quote
+    ((cider-cljs-lein-repl . "(zou.framework.repl/cljs-repl)")))))

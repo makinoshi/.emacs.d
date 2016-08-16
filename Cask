@@ -1,5 +1,5 @@
-(source "melpa-stable" "http://melpa-stable.milkbox.net/packages/")
 (source "ELPA" "http://tromey.com/elpa/")
+(source "melpa-stable" "http://melpa-stable.milkbox.net/packages/")
 (source gnu)
 (source marmalade)
 
@@ -93,6 +93,7 @@
 (depends-on "image-dired+")
 (depends-on "inf-ruby")
 (depends-on "inflections")
+(depends-on "jedi")
 (depends-on "jquery-doc")
 (depends-on "js2-mode")
 (depends-on "json-mode")
