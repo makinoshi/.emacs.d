@@ -803,7 +803,7 @@
 ;; 1文字→ace-jump-mode
 ;; 2〜5文字→isearch
 ;; 6文字以上→helm-swoop
-(global-ace-isearch-mode 1)
+;; (global-ace-isearch-mode 1)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ git                                                           ;;;
