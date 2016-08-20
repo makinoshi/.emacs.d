@@ -537,6 +537,15 @@
 ;; オートセーブファイルを作らない
 (setq auto-save-default nil)
 
+;; バッファの内容を自動保管 (秒)
+(use-package auto-save-buffers-enhanced
+  :init
+  (unless (require 'auto-save-buffers-enhanced nil t)
+    (install-elisp "https://raw.githubusercontent.com/kentaro/auto-save-buffers-enhanced/master/auto-save-buffers-enhanced.el"))
+  :config
+  (setq auto-save-buffers-enhanced-interval 1) ; 指定のアイドル秒で保存
+  (auto-save-buffers-enhanced t))
+
 ;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
 (setq dired-dwim-target t)
 ;; ディレクトリを再帰的にコピーする
@@ -1572,7 +1581,7 @@ If there's no region, the current line will be duplicated."
 ;;; @ After loaded                                                  ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 画面最大化
-(set-frame-parameter nil 'fullscreen 'maximized)
+;; (set-frame-parameter nil 'fullscreen 'maximized)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
