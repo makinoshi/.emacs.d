@@ -1,7 +1,8 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Cask                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'cask "~/.cask/cask.el")
+;;(require 'cask "~/.cask/cask.el")
+(require 'cask "/usr/local/opt/cask/cask.el")
 (cask-initialize)
 (require 'pallet)
 (pallet-mode t)
@@ -51,7 +52,7 @@
   ;; インストールディレクトリを設定する 初期値は ~/.emacs.d/auto-install/
   (setq auto-install-directory (concat user-emacs-directory "elisp/"))
   ;; EmacsWikiに登録されているelisp の名前を取得する
-  (auto-install-update-emacswiki-package-name t)
+  ;; (auto-install-update-emacswiki-package-name t)
   ;; 必要であればプロキシの設定を行う
   ;; (setq url-proxy-services '(("http" . "localhost:8339")))
   ;; install-elisp の関数を利用可能にする
@@ -61,6 +62,7 @@
 (use-package package
   :config
   ;; パッケージリポジトリにMarmaladeを追加
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
   (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
   (add-to-list 'package-archives '("ELPA"      . "http://tromey.com/elpa/"))
@@ -103,16 +105,16 @@
   (setq default-process-coding-system '(undecided-dos . utf-8-unix))
   ;; font
   (let* ((size 15)
-	 (asciifont "Ricty")
-	 (jpfont "Ricty")
-	 (h (* size 10))
-	 (fontspec (font-spec :family asciifont))
-	 (jp-fontspec (font-spec :family jpfont)))
+         (asciifont "Ricty")
+         (jpfont "Ricty")
+         (h (* size 10))
+         (fontspec (font-spec :family asciifont))
+         (jp-fontspec (font-spec :family jpfont)))
     (set-face-attribute 'default nil :family asciifont :height h)
     (set-fontset-font nil 'japanese-jisx0213.2004-1 jp-fontspec)
     (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
     (set-fontset-font nil 'katakana-jisx0201 jp-fontspec)
-    (set-fontset-font nil '(#x0080 . #x024F) fontspec) 
+    (set-fontset-font nil '(#x0080 . #x024F) fontspec)
     (set-fontset-font nil '(#x0370 . #x03FF) fontspec))
   ;; 日本語入力
   (use-package skk
@@ -150,13 +152,13 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (setq default-frame-alist
       (append '(
-		;; (width                . 204) ; フレーム幅
+                ;; (width                . 204) ; フレーム幅
                 (height               . 60 ) ; フレーム高
-                ;;		(left                 . 70 ) ; 配置左位置
-                ;;		(top                  . 28 ) ; 配置上位置
+                ;;              (left                 . 70 ) ; 配置左位置
+                ;;              (top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
                 (left-fringe          . 5  ) ; 左フリンジ幅
-                (right-fringe	      .	5  ) ; 右フリンジ幅
+                (right-fringe         . 5  ) ; 右フリンジ幅
                 ;;                (menu-bar-lines       . 1  ) ; メニューバー
                 ;;                (tool-bar-lines       . 1  ) ; ツールバー
                 ;;                (vertical-scroll-bars . 1  ) ; スクロールバー
@@ -233,19 +235,19 @@
   :config
   (powerline-default-theme)
   (set-face-attribute 'mode-line nil
-		      :foreground "#fff"
-		      :background "#FF0066"
-		      :box nil)
+                      :foreground "#fff"
+                      :background "#FF0066"
+                      :box nil)
 
   (set-face-attribute 'powerline-active1 nil
-		      :foreground "#fff"
-		      :background "#FF6699"
-		      :inherit 'mode-line)
+                      :foreground "#fff"
+                      :background "#FF6699"
+                      :inherit 'mode-line)
 
   (set-face-attribute 'powerline-active2 nil
-		      :foreground "#000"
-		      :background "#ffaeb9"
-		      :inherit 'mode-line))
+                      :foreground "#000"
+                      :background "#ffaeb9"
+                      :inherit 'mode-line))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
@@ -314,7 +316,6 @@
 (show-paren-mode t) ; 有効化
 ;; parenのスタイル: expressionは括弧内も強調表示
 (setq show-paren-style 'expression)
-
 ;; フェイスを変更する
 (set-face-background 'show-paren-match-face nil)
 (set-face-underline-p 'show-paren-match-face "yellow")
@@ -328,12 +329,7 @@
   (load-theme 'zenburn t))
 
 ;; 色を表す文字列に色をつける
-(use-package rainbow-mode
-  :config
-  (add-hook 'css-mode-hook  'rainbow-mode)
-  (add-hook 'scss-mode-hook 'rainbow-mode)
-  (add-hook 'php-mode-hook  'rainbow-mode)
-  (add-hook 'web-mode-hook  'rainbow-mode))
+(use-package rainbow-mode)
 
 ;; かっこに色をつける
 (use-package rainbow-delimiters
@@ -342,9 +338,7 @@
     :config
     (--each (number-sequence 1 rainbow-delimiters-max-face-count)
       (let ((face (intern (format "rainbow-delimiters-depth-%d-face" it))))
-        (callf color-saturate-name (face-foreground face) 90))))
-  :init
-  (add-hook 'web-mode-hook #'rainbow-delimiters-mode))
+        (callf color-saturate-name (face-foreground face) 90)))))
 
 ;; ediff
 (use-package ediff
@@ -380,8 +374,8 @@
              ("n" . mc/mark-next-like-this)
              ("m" . mc/mark-more-like-this))
   (region-bindings-mode-enable))
-  ;; 発動させてくないモードを設定
-  ;; (setq region-bindings-mode-disabled-modes '(foo-mode bar-mode))
+;; 発動させてくないモードを設定
+;; (setq region-bindings-mode-disabled-modes '(foo-mode bar-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - cursor                                               ;;;
@@ -499,19 +493,17 @@
   (setq ace-jump-word-mode-use-query-char nil)
   (setq ace-jump-mode-move-keys
         (append "asdfghjkl;:]qwertyuiop@zxcvbnm,." nil))
-  (ace-pinyin-global-mode 1)
+  ;; (ace-pinyin-global-mode 1)
   :bind
-  ("C-j" . ace-jump-word-mode)
-  ("C-c j" . ace-jump-line-mode))
+  ("H-i" . ace-jump-word-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ replace                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 置換のキーバイドを変更
-(bind-key "C-c r" 'query-replace)
+(bind-key "C-c r" 'vr/query-replace)
 ;; 正規表現置換のキーバイドを変更
 ;; (bind-key "C-c C-r" 'query-replace-regexp)
-(bind-key "C-c C-r" 'vr/query-replace)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - migemo                                               ;;;
@@ -636,11 +628,12 @@
 ;; 入力されるキーシーケンスを置き換える
 ;; ?\C-?はDELのキーシケンス
 ;; 代わりにC-c h をヘルプに
+(keyboard-translate ?\C-h ?\C-?)
 (use-package bind-key
   :config
   (bind-keys :map global-map
              ("C-h" . delete-backward-char)
-	     ("C-c h" . help-command)))
+             ("C-c h" . help-command)))
 
 ;; 改行とインデントをRET(C-m)でできるように改善
 (use-package smart-newline
@@ -684,7 +677,7 @@
 (use-package space-chord
   :init
   (unless (require 'space-chord nil t)
-    (install-elisp-from-emacswiki "space-chord.el"))
+    (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/space-chord.el"))
   :config
   (setq space-chord-delay 0.08))
 
@@ -733,9 +726,9 @@
      '(helm-truncate-lines t)
      '(helm-delete-minibuffer-contents-from-point t)
      '(helm-mini-default-sources '(helm-source-buffers-list
-				   helm-source-files-in-current-dir
-				   helm-source-ls-git
-				   helm-source-recentf))))
+                                   helm-source-files-in-current-dir
+                                   helm-source-ls-git
+                                   helm-source-recentf))))
   ;; helm-miniに表示するものをカスタマイズ
   ;; キーバインドを設定
   (global-set-key (kbd "M-x")     'helm-M-x)
@@ -745,8 +738,8 @@
   (global-set-key (kbd "C-c b")   'helm-browse-project)
   (global-set-key (kbd "C-c o")   'helm-swoop)
   (global-set-key (kbd "C-c s")   'helm-ag)
+  (global-set-key (kbd "C-c C-s") 'helm-do-ag-project-root)
   (global-set-key (kbd "M-y")     'helm-show-kill-ring)
-  (global-set-key (kbd "C-c C-s") 'helm-ag)
   (space-chord-define global-map "f"     'helm-for-files)
   (space-chord-define global-map "i"     'helm-imenu)
   (space-chord-define global-map "b"     'helm-descbinds)
@@ -810,7 +803,7 @@
 ;; 1文字→ace-jump-mode
 ;; 2〜5文字→isearch
 ;; 6文字以上→helm-swoop
-(global-ace-isearch-mode 1)
+;; (global-ace-isearch-mode 1)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ git                                                           ;;;
@@ -914,12 +907,7 @@
   ([(control f3)] . highlight-symbol-at-point)
   ([f3] . highlight-symbol-next)
   ([shift f3] . highlight-symbol-prev)
-  ([(meta f3)] . highlight-symbol-query-replace)
-  :init
-  (add-hook 'web-mode-hook 'highlight-symbol-mode)
-  (add-hook 'ruby-mode-hook 'highlight-symbol-mode)
-  (add-hook 'js2-mode-hook 'highlight-symbol-mode)
-  (add-hook 'python-mode-hook 'highlight-symbol-mode))
+  ([(meta f3)] . highlight-symbol-query-replace))
 
 (use-package open-junk-file
   :config
@@ -940,6 +928,96 @@
 ;; 使う言語で有効にしよう
 
 (use-package subword)
+
+(bind-key "C-S-k" 'just-one-space)
+
+(use-package paredit
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  :bind
+  ("C-j" . paredit-newline))
+
+(defun my/duplicate-region (num &optional start end)
+  "Duplicates the region bounded by START and END NUM times.
+If no START and END is provided, the current region-beginning and
+region-end is used. Adds the duplicated text to the kill ring."
+  (interactive "p")
+  (let* ((start (or start (region-beginning)))
+         (end (or end (region-end)))
+         (region (buffer-substring start end)))
+    (kill-ring-save start end)
+    (goto-char end)
+    (dotimes (i num)
+      (insert region))))
+
+(defun my/duplicate-current-line (num)
+  "Duplicate the current line NUM times."
+  (interactive "p")
+  (my/duplicate-region num (point-at-bol) (1+ (point-at-eol)))
+  (goto-char (1- (point))))
+
+(defun my/duplicate-current-line-or-region (arg)
+  "Duplicates the current line or region ARG times.
+If there's no region, the current line will be duplicated."
+  (interactive "p")
+  (if (region-active-p)
+      (my/duplicate-region arg)
+    (my/duplicate-current-line arg)))
+
+(defun my/rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " filename)))
+        (cond ((get-buffer new-name)
+               (error "A buffer named '%s' already exists!" new-name))
+              (t
+               (rename-file filename new-name 1)
+               (rename-buffer new-name)
+               (set-visited-file-name new-name)
+               (set-buffer-modified-p nil)
+               (message "File '%s' successfully renamed to '%s'" name (file-name-nondirectory new-name))))))))
+
+(defun my/delete-current-buffer-file ()
+  "Removes file connected to current buffer and kills buffer."
+  (interactive)
+  (let ((filename (buffer-file-name))
+        (buffer (current-buffer))
+        (name (buffer-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (ido-kill-buffer)
+      (when (yes-or-no-p "Are you sure you want to remove this file? ")
+        (delete-file filename)
+        (kill-buffer buffer)
+        (message "File '%s' successfully removed" filename)))))
+
+(defun my/untabify-buffer ()
+  (interactive)
+  (untabify (point-min) (point-max)))
+
+(defun my/indent-buffer ()
+  (interactive)
+  (indent-region (point-min) (point-max)))
+
+(defun my/cleanup-buffer-safe ()
+  "Perform a bunch of safe operations on the whitespace content of a buffer.
+  Does not indent buffer, because it is used for a before-save-hook, and that
+  might be bad."
+  (interactive)
+  (my/untabify-buffer)
+  (delete-trailing-whitespace)
+  (set-buffer-file-coding-system 'utf-8))
+
+(defun my/cleanup-buffer ()
+  "Perform a bunch of operations on the whitespace content of a buffer.
+  Including my/indent-buffer, which should not be called automatically on save."
+  (interactive)
+  (my/cleanup-buffer-safe)
+  (my/indent-buffer))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ smartchr                                                      ;;;
@@ -1097,6 +1175,20 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ HTML & CSS                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun my/web-mode-hooks ()
+  (setq comment-start "//"
+        comment-end ""
+        indent-tabs-mode nil
+        web-mode-code-indent-offset 2
+        web-mode-comment-beginning "//"
+        web-mode-comment-end ""
+        web-mode-comment-style 2
+	web-mode-html-offset 2
+	web-mode-css-offset 2
+	web-mode-script-offset 2
+	web-mode-markup-indent-offset 2)
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
+
 (use-package web-mode
   :mode
   ("\\.phtml\\'" . web-mode)
@@ -1111,26 +1203,22 @@
   ("\\.jsx?\\'" . web-mode)
   ("\\.css?\\'" . web-mode)
   :init
+  (add-hook 'web-mode-hook #'my/web-mode-hooks)
+  (add-hook 'web-mode-hook #'smart-newline-mode)
   (add-hook 'web-mode-hook #'company-mode)
   (add-hook 'web-mode-hook #'smartchr-keybindings-web)
+  (add-hook 'web-mode-hook #'rainbow-mode)
+  (add-hook 'web-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'web-mode-hook #'emmet-mode) ;; web-modeで使う
   (add-hook 'web-mode-hook
-	    (lambda ()
-	      (when (equal web-mode-content-type "jsx")
-		(add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
-		(flycheck-add-mode 'javascript-eslint 'web-mode)
-		(flycheck-mode t))))
+            (lambda ()
+              (when (equal web-mode-content-type "jsx")
+                (add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
+                (flycheck-add-mode 'javascript-eslint 'web-mode)
+                (flycheck-mode t))))
   :config
   (bind-keys :map web-mode-map
              ("C-c t" . my/underscore-html-template))
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-	indent-tabs-mode nil
-	comment-start "//"
-	comment-end ""
-	web-mode-comment-beginning "//"
-	web-mode-comment-end ""
-	web-mode-comment-style 2)
   (use-package jquery-doc
     :init
     (add-hook 'web-mode-hook 'jquery-doc-setup)))
@@ -1139,8 +1227,6 @@
   :init
   (add-hook 'sgml-mode-hook #'emmet-mode) ;; マークアップ言語全部で使う
   (add-hook 'css-mode-hook  #'emmet-mode) ;; CSSにも使う
-  (add-hook 'web-mode-hook  #'emmet-mode) ;; web-modeで使う
-  (add-hook 'scss-mode-hook #'emmet-mode)
   :config
   ;; C-j は newline のままにしておく
   (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
@@ -1158,13 +1244,18 @@
   "scss-mode-hook"
   (and
    (set (make-local-variable 'css-indent-offset) 2)
-   (set (make-local-variable 'scss-compile-at-save) nil)))
+   (set (make-local-variable 'scss-compile-at-save) nil))
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
 
 (use-package scss-mode
   :mode
   ("\\.scss\\'" . scss-mode)
-  :config
-  (add-hook 'scss-mode-hook 'scss-mode-hooks))
+  :init
+  (add-hook 'scss-mode-hook #'smart-newline-mode)
+  (add-hook 'scss-mode-hook #'company-mode)
+  (add-hook 'scss-mode-hook #'scss-mode-hooks)
+  (add-hook 'scss-mode-hook #'rainbow-mode)
+  (add-hook 'scss-mode-hook #'emmet-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ JavaScript                                                    ;;;
@@ -1190,13 +1281,13 @@
 
 ;; disable jshint since we prefer eslint checking
 (setq-default flycheck-disabled-checkers
-	      (append flycheck-disabled-checkers
-		      '(javascript-jshint)))
+              (append flycheck-disabled-checkers
+                      '(javascript-jshint)))
 
 ;; disable json-jsonlist checking for json files
 (setq-default flycheck-disabled-checkers
-	      (append flycheck-disabled-checkers
-		      '(json-jsonlist)))
+              (append flycheck-disabled-checkers
+                      '(json-jsonlist)))
 
 (use-package js2-mode
   :mode
@@ -1257,12 +1348,26 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Python                                                        ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun my/python-mode-hooks ()
+  (add-to-list 'company-backends 'company-jedi))
+
+(use-package jedi-core
+  :config
+  (setq jedi:complete-on-dot t
+        jedi:use-shortcuts t
+        jedi:environment-root "~/.emacs.d/elisp"))
+
 (use-package python-mode
+  :init
+  (add-hook 'python-mode-hook #'smart-newline-mode)
+  (add-hook 'python-mode-hook #'my/python-mode-hooks)
+  (add-hook 'python-mode-hook #'company-mode)
+  (add-hook 'python-mode-hook #'jedi:setup)
   :config
   (setq indent-tabs-mode nil
-	python-indent 4
-	python-pylint t
-	tab-width 4))
+        python-indent 4
+        python-pylint t
+        tab-width 4))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ PHP                                                           ;;;
@@ -1274,29 +1379,57 @@
   ("\\.php\\'" . php-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Java                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Lisp                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package paredit
-  :init
-  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-  :bind
-  ("C-j" . paredit-newline))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Clojure                                                       ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun my/clojure-mode-hook ()
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
+
+(defun my/zou-go ()
+  "zou go commnad"
+  (interactive)
+  (with-current-buffer (cider-current-connection "clj")
+    (if current-prefix-arg
+        (progn
+          (save-some-buffers)
+          (cider-interactive-eval
+           "(zou.framework.repl/reset)"))
+      (cider-interactive-eval
+       "(zou.framework.repl/go)"))))
+
 (use-package clojure-mode
   :init
   (add-hook 'clojure-mode-hook #'enable-paredit-mode)
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'clojure-mode-hook #'subword-mode)
   (add-hook 'clojure-mode-hook #'yas-minor-mode)
-  (add-hook 'clojure-mode-hook #'midje-mode))
+  (add-hook 'clojure-mode-hook #'auto-highlight-symbol-mode)
+  (add-hook 'clojure-mode-hook #'highlight-symbol-mode)
+  (add-hook 'clojure-mode-hook #'my/clojure-mode-hook)
+  :bind
+  ("C-c C-g" . my/zou-go)
+  :config
+  (put-clojure-indent 'fnk 'defun)
+  (put-clojure-indent 'defnk 'defun)
+  (put-clojure-indent 'for-map 1)
+  (put-clojure-indent 'instance 2)
+  (put-clojure-indent 'inline 1)
+  (put-clojure-indent 'letk 1)
+  (put-clojure-indent 'when-letk 1)
+  (put-clojure-indent 'go-loop 1)
+  (put-clojure-indent 'this-as 'defun)
+  (put-clojure-indent 'when-some '1)
+  (put-clojure-indent 'if-some '1)
+  (put-clojure-indent 'try+ 0)
+  (put 'specify 'clojure-backtracking-indent '((2)))
+  (put 'specify! 'clojure-backtracking-indent '((2)))
+  (put 'defcomponent 'clojure-backtracking-indent '((2)))
+  (put 'defcomponentk 'clojure-backtracking-indent '((2)))
+  (put 'defmixin 'clojure-backtracking-indent '((2)))
+  (put 'clojure.core/defrecord 'clojure-backtracking-indent '(4 4 (2)))
+  (put 's/defrecord 'clojure-backtracking-indent '(4 4 (2)))
+  (put 's/defrecord+ 'clojure-backtracking-indent '(4 4 (2)))
+  (put 'potemkin/deftype+ 'clojure-backtracking-indent '(4 4 (2)))
+  (put 'potemkin/defrecord+ 'clojure-backtracking-indent '(4 4 (2))))
 
 (use-package cider-mode
   :init
@@ -1312,12 +1445,12 @@
         cider-repl-use-clojure-font-lock t
         cider-prompt-save-file-on-load 'always-save
         cider-font-lock-dynamically '(macro core function var)
-        cider-overlays-use-font-lock t)
-  (use-package cider-eval-last-sexp-fu))
+        cider-overlays-use-font-lock t))
 
 (use-package clj-refactor
   :config
-  (cljr-add-keybindings-with-prefix "C-c j"))
+  (cljr-add-keybindings-with-prefix "C-c j")
+  (setq cljr-favor-prefix-notation nil))
 
 (use-package midje-mode)
 
@@ -1332,7 +1465,17 @@
 ;; C-c C-r : 'sql-send-region
 ;; C-c C-s : 'sql-send-string
 ;; C-c C-b : 'sql-send-buffer
-(use-package sql)
+(eval-after-load "sql"
+  '(load-library "sql-indent"))
+
+(defun sql-mode-hooks ()
+  (setq sql-indent-offset 2
+	indent-tabs-mode nil)
+  (sql-set-product "postgres"))
+
+(use-package sql
+  :init
+  (add-hook 'sql-mode-hook #'sql-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ nginx                                                         ;;;
@@ -1340,7 +1483,7 @@
 (use-package nginx-mode
   :config
   (setq nginx-indent-level 2
-	nginx-indent-tabs-mode nil))
+        nginx-indent-tabs-mode nil))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
@@ -1393,8 +1536,17 @@
   (set-buffer (find-file (concat "/sudo::" File))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ English                                                       ;;;
+;;; @ Other                                                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; edit-server
+;; edit browser contents usgin emacs with Google Chrome
+(use-package edit-server
+  :init
+  (add-hook 'edit-server-mode #'markdown-mode)
+  :config
+  (setq edit-server-new-frame nil)
+  (edit-server-start))
+
 ;; aspell
 ;; Have to install
 ;; brew install aspell --lang=en
@@ -1414,3 +1566,24 @@
   (push '("*Google Translate*") popwin:special-display-config)
   :bind
   ("C-c C-t" . google-translate-at-point))
+
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ After loaded                                                  ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;; 画面最大化
+(set-frame-parameter nil 'fullscreen 'maximized)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
+ '(helm-delete-minibuffer-contents-from-point t)
+ '(helm-mini-default-sources
+   (quote
+    (helm-source-buffers-list helm-source-files-in-current-dir helm-source-ls-git helm-source-recentf)))
+ '(helm-truncate-lines t t)
+ '(safe-local-variable-values
+   (quote
+    ((cider-cljs-lein-repl . "(zou.framework.repl/cljs-repl)")))))
