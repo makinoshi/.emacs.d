@@ -1,3 +1,8 @@
+;; C-hをBackSpaceにする
+;; 入力されるキーシーケンスを置き換える
+;; ?\C-?はDELのキーシケンス
+(keyboard-translate ?\C-h ?\C-?)
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Cask                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -59,6 +64,7 @@
   (auto-install-compatibility-setup))
 
 ;; package管理の設定
+(setq package-enable-at-startup nil)
 (use-package package
   :config
   ;; パッケージリポジトリにMarmaladeを追加
@@ -66,12 +72,15 @@
   (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
   (add-to-list 'package-archives '("ELPA"      . "http://tromey.com/elpa/"))
-  ;; (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
   ;; インストールしたパッケージにロードパスを通してロードする
+  (fset 'package-desc-vers 'package--ac-desc-version)
   (package-initialize))
 
 ;; Emacsからの質問をy/nで回答する
 (fset 'yes-or-no-p 'y-or-n-p)
+
+;; 新しい方を見る
+(setq load-prefer-newer t)
 
 ;; 起動時にバイトコンパイルする(emacsは古くても.elcファイルを優先的にロードするため)
 (use-package auto-async-byte-compile
@@ -115,16 +124,7 @@
     (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
     (set-fontset-font nil 'katakana-jisx0201 jp-fontspec)
     (set-fontset-font nil '(#x0080 . #x024F) fontspec)
-    (set-fontset-font nil '(#x0370 . #x03FF) fontspec))
-  ;; 日本語入力
-  (use-package skk
-    :config
-    (setq default-input-method "japanese-skk")
-    (setq skk-sticky-key ";")
-    (require 'skk-study)
-    :bind
-    ("C-c C-j" . skk-auto-fill-mode)
-    ("C-m" . skk-kakutei)))
+    (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ only for ubuntu                                               ;;;
@@ -190,18 +190,6 @@
   (setq display-buffer-function 'popwin:display-buffer)
   (setq popwin:popup-window-position 'bottom))
 
-;; e2wm(IDE likeなフレームを提供)
-(use-package e2wm
-  :config
-  (use-package e2wm-bookmark)
-  (autoload 'e2wm:start-management "e2wm-vcs" "load e2wm-vcs" t)
-  (autoload 'e2wm:dp-vcs "e2wm-vcs" "load e2wm-vcs" t)
-  (autoload 'e2wm:start-management "e2wm-bookmark" "load e2wm-bookmark" t)
-  (use-package e2wm-R)
-  :bind
-  ("M-+" . e2wm:start-management)
-  ("C-c R" . e2wm:start-R-code))
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - mode line                                            ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -230,24 +218,6 @@
     ""))
 (add-to-list 'default-mode-line-format
              '(:eval (count-lines-and-chars)))
-
-(use-package powerline
-  :config
-  (powerline-default-theme)
-  (set-face-attribute 'mode-line nil
-                      :foreground "#fff"
-                      :background "#FF0066"
-                      :box nil)
-
-  (set-face-attribute 'powerline-active1 nil
-                      :foreground "#fff"
-                      :background "#FF6699"
-                      :inherit 'mode-line)
-
-  (set-face-attribute 'powerline-active2 nil
-                      :foreground "#000"
-                      :background "#ffaeb9"
-                      :inherit 'mode-line))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
@@ -354,6 +324,7 @@
   :bind
   ("C-@" . er/expand-region)
   ("C-`" . er/contract-region))
+
 (use-package multiple-cursors)
 
 ;; 最初のキーに続けて入力したものは指定したコマンドとして扱う
@@ -393,14 +364,14 @@
 (use-package linum)
 
 ;; 行移動を契機に描画
-(defvar linum-line-number 0)
-(declare-function linum-update-current "linum" ())
-(defadvice linum-update-current
-    (around linum-update-current-around activate compile)
-  (unless (= linum-line-number (line-number-at-pos))
-    (setq linum-line-number (line-number-at-pos))
-    ad-do-it
-    ))
+;; (defvar linum-line-number 0)
+;; (declare-function linum-update-current "linum" ())
+;; (defadvice linum-update-current
+;;     (around linum-update-current-around activate compile)
+;;   (unless (= linum-line-number (line-number-at-pos))
+;;     (setq linum-line-number (line-number-at-pos))
+;;     ad-do-it
+;;     ))
 
 ;; バッファ中の行番号表示の遅延設定
 (defvar linum-delay nil)
@@ -419,13 +390,13 @@
 (set-face-attribute 'linum nil :height 0.75)
 
 ;; 現在行の行番号をハイライト
-(use-package hlinum)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(linum-highlight-face ((t (:foreground "black" :background "red")))))
+;; (use-package hlinum)
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(linum-highlight-face ((t (:foreground "black" :background "red")))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
@@ -543,7 +514,7 @@
   (unless (require 'auto-save-buffers-enhanced nil t)
     (install-elisp "https://raw.githubusercontent.com/kentaro/auto-save-buffers-enhanced/master/auto-save-buffers-enhanced.el"))
   :config
-  (setq auto-save-buffers-enhanced-interval 1) ; 指定のアイドル秒で保存
+  (setq auto-save-buffers-enhanced-interval 10) ; 指定のアイドル秒で保存
   (auto-save-buffers-enhanced t))
 
 ;; diredを2つのウィンドウで開いている時に、デフォルトの移動orコピー先をもう一方のdiredで開いているディレクトリにする
@@ -633,11 +604,7 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ keybinds                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; C-hをBackSpaceにする
-;; 入力されるキーシーケンスを置き換える
-;; ?\C-?はDELのキーシケンス
 ;; 代わりにC-c h をヘルプに
-(keyboard-translate ?\C-h ?\C-?)
 (use-package bind-key
   :config
   (bind-keys :map global-map
@@ -693,20 +660,6 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ my macros                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; "{"の挿入に対して改行と"}"を挿入
-(defun my/curly-brace ()
-  (interactive)
-  (insert "{}")
-  (backward-char)
-  (smart-newline)
-  (smart-newline))
-
-;; ";"の入力に対して改行を自動挿入
-(defun my/semicolon ()
-  (interactive)
-  (insert ";")
-  (smart-newline))
-
 ;; "|"をpairにする
 (defun my/vertical-bar-pair ()
   ;; (add-to-list 'flex-autopair-pairs '(?| . ?|))
@@ -728,6 +681,7 @@
 (use-package helm-config
   :config
   (helm-mode 1)
+  (helm-migemo-mode 1)
   (require 'helm-files)
   (use-package helm-ls-git
     :config
@@ -792,22 +746,6 @@
   ;; popwinに登録
   (push '("^\*helm .+\*\\'" :regexp t) popwin:special-display-config))
 
-;; helm-migemo
-(use-package helm-migemo)
-;; http://rubikitch.com/2014/12/19/helm-migemo/
-(eval-after-load "helm-migemo"
-  '(defun helm-compile-source--candidates-in-buffer (source)
-     (helm-aif (assoc 'candidates-in-buffer source)
-         (append source
-                 `((candidates
-                    . ,(or (cdr it)
-                           (lambda ()
-                             ;; Do not use `source' because other plugins
-                             ;; (such as helm-migemo) may change it
-                             (helm-candidates-in-buffer (helm-get-current-source)))))
-                   (volatile) (match identity)))
-       source)))
-
 ;; ace-isearch
 ;; 1文字→ace-jump-mode
 ;; 2〜5文字→isearch
@@ -825,7 +763,10 @@
 
 (use-package git-gutter
   :config
-  (global-git-gutter-mode t))
+  (global-git-gutter-mode t)
+  (smartrep-define-key
+      global-map "C-x" '(("p" . 'git-gutter:previous-hunk)
+                         ("n" . 'git-gutter:next-hunk))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ coding support                                                ;;;
@@ -836,6 +777,9 @@
 (setq auto-insert-directory (concat user-emacs-directory "insert/"))
 ;; 次で"\\.rb$"の代わりに'ruby-modeにすると、メジャーモードがruby-modeのときに挿入してくれる
 ;;(define-auto-insert "\\.rb\\'" "ruby-template.rb")
+
+;;; indentを基本spaceで
+(setq-default indent-tabs-mode nil)
 
 ;; redoの設定
 (use-package redo+
@@ -1151,14 +1095,6 @@ If there's no region, the current line will be duplicated."
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
 
-(defun smartchr-keybindings-web-erb ()
-  (local-set-key (kbd "<") (smartchr '("<%= `!!' %>" "<% `!!' %>" "<`!!'>" "<")))
-  (local-set-key (kbd "&") (smartchr '("&" " && " " & " " &= "))))
-
-(add-hook 'projectile-rails-mode-hook
-          '(lambda ()
-             (and (eq major-mode 'web-mode) (smartchr-keybindings-web-erb))))
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ yasnippet                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -1185,18 +1121,24 @@ If there's no region, the current line will be duplicated."
 ;;; @ HTML & CSS                                                    ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (defun my/web-mode-hooks ()
-  (setq comment-start "//"
-        comment-end ""
-        indent-tabs-mode nil
+  (setq web-mode-markup-indent-offset 2
         web-mode-code-indent-offset 2
-        web-mode-comment-beginning "//"
-        web-mode-comment-end ""
         web-mode-comment-style 2
-	web-mode-html-offset 2
-	web-mode-css-offset 2
-	web-mode-script-offset 2
-	web-mode-markup-indent-offset 2)
+        web-mode-html-offset 2
+        web-mode-css-offset 2
+        web-mode-script-offset 2)
   (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
+
+(use-package emmet-mode
+  :config
+  ;; C-j は newline のままにしておく
+  (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
+  ;;C-i と Tabの被りを回避
+  (keyboard-translate ?\C-i ?\H-i)
+  ;; C-i で展開
+  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line)
+  (setq emmet-indentation 2
+        emmet-move-cursor-between-quotes t))
 
 (use-package web-mode
   :mode
@@ -1212,10 +1154,9 @@ If there's no region, the current line will be duplicated."
   ("\\.jsx?\\'" . web-mode)
   ("\\.css?\\'" . web-mode)
   :init
-  (add-hook 'web-mode-hook #'my/web-mode-hooks)
   (add-hook 'web-mode-hook #'smart-newline-mode)
   (add-hook 'web-mode-hook #'company-mode)
-  (add-hook 'web-mode-hook #'smartchr-keybindings-web)
+  ;; (add-hook 'web-mode-hook #'smartchr-keybindings-web)
   (add-hook 'web-mode-hook #'rainbow-mode)
   (add-hook 'web-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'web-mode-hook #'emmet-mode) ;; web-modeで使う
@@ -1225,26 +1166,11 @@ If there's no region, the current line will be duplicated."
                 (add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
                 (flycheck-add-mode 'javascript-eslint 'web-mode)
                 (flycheck-mode t))))
-  :config
-  (bind-keys :map web-mode-map
-             ("C-c t" . my/underscore-html-template))
-  (use-package jquery-doc
-    :init
-    (add-hook 'web-mode-hook 'jquery-doc-setup)))
-
-(use-package emmet-mode
-  :init
-  (add-hook 'sgml-mode-hook #'emmet-mode) ;; マークアップ言語全部で使う
-  (add-hook 'css-mode-hook  #'emmet-mode) ;; CSSにも使う
-  :config
-  ;; C-j は newline のままにしておく
-  (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
-  ;;C-i と Tabの被りを回避
-  (keyboard-translate ?\C-i ?\H-i)
-  ;; C-i で展開
-  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line)
-  (setq emmet-indentation 2
-        emmet-move-cursor-between-quotes t))
+  (add-hook 'web-mode-hook #'my/web-mode-hooks)
+  ;; :config
+  ;; (bind-keys :map web-mode-map
+  ;;            ("C-c t" . my/underscore-html-template))
+  )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ scss                                                          ;;;
@@ -1358,25 +1284,30 @@ If there's no region, the current line will be duplicated."
 ;;; @ Python                                                        ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (defun my/python-mode-hooks ()
-  (add-to-list 'company-backends 'company-jedi))
-
-(use-package jedi-core
-  :config
-  (setq jedi:complete-on-dot t
-        jedi:use-shortcuts t
-        jedi:environment-root "~/.emacs.d/elisp"))
-
-(use-package python-mode
-  :init
-  (add-hook 'python-mode-hook #'smart-newline-mode)
-  (add-hook 'python-mode-hook #'my/python-mode-hooks)
-  (add-hook 'python-mode-hook #'company-mode)
-  (add-hook 'python-mode-hook #'jedi:setup)
-  :config
   (setq indent-tabs-mode nil
+        indent-level 4
         python-indent 4
         python-pylint t
-        tab-width 4))
+        tab-width 4)
+  ;; (add-to-list 'company-backends 'company-jedi)
+  )
+
+;; (use-package jedi-core
+;;   :config
+;;   (setq jedi:complete-on-dot t
+;;         jedi:use-shortcuts t
+;;         jedi:environment-root "~/.emacs.d/elisp"))
+
+(use-package python-mode
+  :mode
+  ("\\.py\\'" . python-mode)
+  :init
+  (add-hook 'python-mode-hook #'smart-newline-mode)
+  ;; (add-hook 'python-mode-hook #'company-mode)
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (add-hook 'python-mode-hook #'my/python-mode-hooks)
+  :config
+  (setq jedi:complete-on-dot t))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ PHP                                                           ;;;
@@ -1479,7 +1410,7 @@ If there's no region, the current line will be duplicated."
 
 (defun sql-mode-hooks ()
   (setq sql-indent-offset 2
-	indent-tabs-mode nil)
+        indent-tabs-mode nil)
   (sql-set-product "postgres"))
 
 (use-package sql
@@ -1489,10 +1420,14 @@ If there's no region, the current line will be duplicated."
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ nginx                                                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun my/nginx-mode-hooks ()
+  (setq nginx-indent-level 4
+        nginx-indent-tabs-mode nil
+        tab-width 4))
+
 (use-package nginx-mode
-  :config
-  (setq nginx-indent-level 2
-        nginx-indent-tabs-mode nil))
+  :init
+  (add-hook 'nginx-mode #'my/nginx-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
@@ -1503,7 +1438,7 @@ If there's no region, the current line will be duplicated."
 ;;; @ term                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; multi-term→起動しない
-(use-package multi-term)
+;; (use-package multi-term)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ tramp                                                         ;;;
@@ -1581,7 +1516,8 @@ If there's no region, the current line will be duplicated."
 ;;; @ After loaded                                                  ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 画面最大化
-;; (set-frame-parameter nil 'fullscreen 'maximized)
+(set-frame-parameter nil 'fullscreen 'maximized)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -1593,6 +1529,21 @@ If there's no region, the current line will be duplicated."
    (quote
     (helm-source-buffers-list helm-source-files-in-current-dir helm-source-ls-git helm-source-recentf)))
  '(helm-truncate-lines t t)
+ '(package-selected-packages
+   (quote
+    (auto-highlight-symbol flex-autopair hlinum midje-mode python-mode company
+                           zenburn-theme yaxception yasnippet yascroll yaml-mode
+                           window-layout wgrep weblogger web-mode volatile-highlights
+                           visual-regexp-steroids use-package undo-tree tuareg
+                           swiper spinner solarized-theme smooth-scroll smex smartparens
+                           slamhound skewer-mode scss-mode scala-mode ruby-end rspec-mode robe
+                           rbenv rainbow-mode rainbow-delimiters quickrun queue powerline popwin
+                           php-mode peg paredit pallet nginx-mode multiple-cursors markdown-mode
+                           magit log4e jsx-mode json-mode jedi inflections image-dired+ image+
+                           ido-ubiquitous hydra htmlize ht highlight-symbol helm-themes helm-swoop
+                           helm-robe helm-projectile helm-migemo helm-ls-git helm-descbinds helm-ag
+                           haskell-mode groovy-mode google-translate gitignore-mode gitconfig-mode
+                           git-gutter-fringe gist flycheck-pos-tip expand-region exec-path-from-shell)))
  '(safe-local-variable-values
    (quote
     ((cider-cljs-lein-repl . "(zou.framework.repl/cljs-repl)")))))
