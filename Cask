@@ -1,7 +1,7 @@
 (source "ELPA" "http://tromey.com/elpa/")
-(source "melpa-stable" "http://melpa-stable.milkbox.net/packages/")
 (source "gnu" "http://elpa.gnu.org/packages/")
 (source "marmalade" "http://marmalade-repo.org/packages/")
+(source "melpa-stable" "http://melpa-stable.milkbox.net/packages/")
 
 (depends-on "ac-dabbrev")
 (depends-on "ac-js2")
@@ -82,6 +82,7 @@
 (depends-on "image-dired+")
 (depends-on "inf-ruby")
 (depends-on "inflections")
+(depends-on "init-loader")
 (depends-on "jedi")
 (depends-on "jquery-doc")
 (depends-on "js2-mode")

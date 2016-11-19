@@ -1,12 +1,16 @@
 ;; C-hをBackSpaceにする
 ;; 入力されるキーシーケンスを置き換える
 ;; ?\C-?はDELのキーシケンス
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (keyboard-translate ?\C-h ?\C-?)
 
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Cask                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;(require 'cask "~/.cask/cask.el")
+;; cask config
 (require 'cask "/usr/local/opt/cask/cask.el")
 (cask-initialize)
 (require 'pallet)
@@ -20,8 +24,8 @@
   "引数に与えたパスをロードする"
   (let (path)
     (dolist (path paths paths)
-      (let ((default-directory
-              (expand-file-name (concat user-emacs-directory path))))
+      (let ((default-directory 
+             (expand-file-name (concat user-emacs-directory path))))
         (add-to-list 'load-path default-directory)
         (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
             (normal-top-level-add-subdirs-to-load-path))))))
@@ -29,160 +33,16 @@
 ;; 引数のディレクトリとそのサブディレクトリをload-pathに追加
 (add-to-load-path "elisp")
 
+;; Load other init file
+(require 'init-loader)
+(init-loader-load "~/.emacs.d/inits")
+
 ;; include PATH from Shell
 (exec-path-from-shell-initialize)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Emacs Lisp conding                                            ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; Emacs Lisp ライブラリ
-(require 'cl)
-(require 'dash)
-(require 's)
-(require 'f)
-(require 'ht)
-(require 'slime)
-(require 'bind-key)
-(require 'use-package)
-
-(unless (require 'use-package nil t)
-  (defmacro use-package (&reset args)))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Package control                                               ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; auto-installの設定
-(use-package auto-install
-  :config
-  ;; インストールディレクトリを設定する 初期値は ~/.emacs.d/auto-install/
-  (setq auto-install-directory (concat user-emacs-directory "elisp/"))
-  ;; EmacsWikiに登録されているelisp の名前を取得する
-  ;; (auto-install-update-emacswiki-package-name t)
-  ;; 必要であればプロキシの設定を行う
-  ;; (setq url-proxy-services '(("http" . "localhost:8339")))
-  ;; install-elisp の関数を利用可能にする
-  (auto-install-compatibility-setup))
-
-;; package管理の設定
-(setq package-enable-at-startup nil)
-(use-package package
-  :config
-  ;; パッケージリポジトリにMarmaladeを追加
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
-  (add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
-  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
-  (add-to-list 'package-archives '("ELPA"      . "http://tromey.com/elpa/"))
-  ;; インストールしたパッケージにロードパスを通してロードする
-  (fset 'package-desc-vers 'package--ac-desc-version)
-  (package-initialize))
-
-;; Emacsからの質問をy/nで回答する
-(fset 'yes-or-no-p 'y-or-n-p)
-
-;; 新しい方を見る
-(setq load-prefer-newer t)
-
-;; 起動時にバイトコンパイルする(emacsは古くても.elcファイルを優先的にロードするため)
-(use-package auto-async-byte-compile
-  :init
-  (unless (require 'auto-async-byte-compile nil t)
-    (install-elisp-from-emacswiki "auto-async-byte-compile.el"))
-  :config
-  ;; 自動コンパイルを無効にするファイル名の正規表現
-  (setq auto-async-byte-compile-exclude-files-regexp "init.el"))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ language - coding system                                      ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; デフォルトの文字コード
-(set-default-coding-systems 'utf-8-unix)
-;; テキストファイル／新規バッファの文字コード
-(prefer-coding-system 'utf-8-unix)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ only for mac                                                  ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(when (eq system-type 'darwin)
-  (setq ns-command-modifier (quote meta))
-  (global-set-key (kbd "C-M-¥") 'indent-region)
-  ;; ファイル名の文字コード
-  (use-package ucs-normalize)
-  (set-file-name-coding-system 'utf-8-hfs)
-  ;; キーボード入力の文字コード
-  (set-keyboard-coding-system 'utf-8-unix)
-  ;; サブプロセスのデフォルト文字コード
-  (setq default-process-coding-system '(undecided-dos . utf-8-unix))
-  ;; font
-  (let* ((size 15)
-         (asciifont "Ricty")
-         (jpfont "Ricty")
-         (h (* size 10))
-         (fontspec (font-spec :family asciifont))
-         (jp-fontspec (font-spec :family jpfont)))
-    (set-face-attribute 'default nil :family asciifont :height h)
-    (set-fontset-font nil 'japanese-jisx0213.2004-1 jp-fontspec)
-    (set-fontset-font nil 'japanese-jisx0213-2 jp-fontspec)
-    (set-fontset-font nil 'katakana-jisx0201 jp-fontspec)
-    (set-fontset-font nil '(#x0080 . #x024F) fontspec)
-    (set-fontset-font nil '(#x0370 . #x03FF) fontspec)))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ only for ubuntu                                               ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(when (eq system-type 'gnu/linux)
-  ;; input method
-  (use-package mozc
-    :config
-    (set-language-environment "UTF-8")
-    (setq default-input-method "japanese-mozc")
-    (setq mozc-candidate-style 'overlay))
-  ;; font
-  (set-frame-font "ricty-11"))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ only for windows                                              ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(when (eq window-system 'w32)
-  (set-file-name-coding-system 'cp932)
-  (setq locale-coding-system 'cp932)
-  (set-frame-font "consolas"))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - frame                                                ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(setq default-frame-alist
-      (append '(
-                ;; (width                . 204) ; フレーム幅
-                (height               . 60 ) ; フレーム高
-                ;;              (left                 . 70 ) ; 配置左位置
-                ;;              (top                  . 28 ) ; 配置上位置
-                (line-spacing         . 0  ) ; 文字間隔
-                (left-fringe          . 5  ) ; 左フリンジ幅
-                (right-fringe         . 5  ) ; 右フリンジ幅
-                ;;                (menu-bar-lines       . 1  ) ; メニューバー
-                ;;                (tool-bar-lines       . 1  ) ; ツールバー
-                ;;                (vertical-scroll-bars . 1  ) ; スクロールバー
-                ;;                (scroll-bar-width     . 17 ) ; スクロールバー幅
-                (cursor-type          . bar) ; カーソル種別
-                (alpha                . 90 ) ; 透明度
-                ) default-frame-alist))
-(setq initial-frame-alist default-frame-alist)
-
-;; フレーム タイトル
-(setq frame-title-format
-      '("emacs " emacs-version (buffer-file-name " - %f")))
-
-;; 初期画面の非表示
-(setq inhibit-startup-message t)
-(setq inhibit-startup-screen t)
-
-;; ターミナル以外はツールバー、スクロールバーを非表示
-(tool-bar-mode 0)
-(scroll-bar-mode 0)
-
-;; メニューバーを非表示
-(menu-bar-mode 0)
-
 ;; popwin
 (use-package popwin
   :config
@@ -191,62 +51,14 @@
   (setq popwin:popup-window-position 'bottom))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ screen - mode line                                            ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; 行番号の表示
-(line-number-mode t)
-;; 列番号の表示
-(column-number-mode t)
-;; ファイルサイズを表示
-(size-indication-mode t)
-;; 時計を表示（好みに応じてフォーマットを変更可能）
-(setq display-time-day-and-date t) ; 曜日・月・日を表示
-(setq display-time-24hr-format t)  ; 24時表示
-(display-time-mode t)
-;; バッテリー残量を表示
-(display-battery-mode t)
-
-;; リージョン内の行数と文字数をモードラインに表示する（範囲指定時のみ）
-;; http://d.hatena.ne.jp/sonota88/20110224/1298557375
-(defun count-lines-and-chars ()
-  (if mark-active
-      (format "%d lines,%d chars "
-              (count-lines (region-beginning) (region-end))
-              (- (region-end) (region-beginning)))
-    ;; これだとエコーエリアがチラつく
-    ;;(count-lines-region (region-beginning) (region-end))
-    ""))
-(add-to-list 'default-mode-line-format
-             '(:eval (count-lines-and-chars)))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; バッファ画面外文字の切り詰め表示
-(setq truncate-lines nil)
-
-;; ウィンドウ縦分割時のバッファ画面外文字の切り詰め表示
-(setq truncate-partial-width-windows t)
-
 ;; 同一バッファ名にディレクトリ付与
 (use-package uniquify
   :config
   (setq uniquify-buffer-name-style 'forward)
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
   (setq uniquify-ignore-buffers-re "*[^*]+*"))
-
-;; file名の補完で大文字小文字の区別をしない
-(setq completion-ignore-case t)
-
-;; 他でファイルが編集されたときに、bufferを再読み込みさせる
-(global-auto-revert-mode 1)
-
-;;; ファイル名補完キーマップで?をそのまま入力できるようにする
-(define-key minibuffer-local-filename-completion-map (kbd "?") nil)
-;;; ffapでワイルドカードを指定するとdiredを開くようにする
-(setq ffap-pass-wildcards-to-dired t)
-;;; C-x C-fなどをffap関係のコマンドに割り当てる
-(ffap-bindings)
 
 ;; 使わないバッファを自動的に消す
 (use-package tempbuf
@@ -255,40 +67,6 @@
   (add-hook 'find-file-hooks 'turn-on-tempbuf-mode)
   ;; diredバッファに対してtempbufを有効にする
   (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
-
-;;; 現在行のハイライト
-(defface my/hl-line-face
-  ;; 背景がdarkならば背景色を紺に
-  '((((class color) (background dark))
-     (:background "Navy" t))
-    ;; 背景がlightならば背景色を緑に
-    (((class color) (background light))
-     (:background "LightGoldenrodYellow" t))
-    (t (:bold t)))
-  "hl-line's my face")
-(setq hl-line-face 'my/hl-line-face)
-
-;; カーソル移動が重くなる原因に対処
-;; http://rubikitch.com/2015/05/14/global-hl-line-mode-timer/
-(global-hl-line-mode t)
-(defun global-hl-line-timer-function ()
-  (global-hl-line-unhighlight-all)
-  (let ((global-hl-line-mode t))
-    (global-hl-line-highlight)))
-(setq global-hl-line-timer
-      (run-with-idle-timer 0.1 t 'global-hl-line-timer-function))
-(global-hl-line-mode 0)
-;; (cancel-timer global-hl-line-timer)
-
-;; 括弧の対応関係のハイライト
-;; paren-mode：対応する括弧を強調して表示する
-(setq show-paren-delay 0) ; 表示までの秒数。初期値は0.125
-(show-paren-mode t) ; 有効化
-;; parenのスタイル: expressionは括弧内も強調表示
-(setq show-paren-style 'expression)
-;; フェイスを変更する
-(set-face-background 'show-paren-match-face nil)
-(set-face-underline-p 'show-paren-match-face "yellow")
 
 ;; 行の折り返し表示の切替
 (bind-key "C-c l" 'toggle-truncate-lines)
@@ -349,74 +127,25 @@
 ;; (setq region-bindings-mode-disabled-modes '(foo-mode bar-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ screen - cursor                                               ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; カーソルの点滅
-(blink-cursor-mode 0)
-;; 非アクティブウィンドウのカーソル表示
-(setq-default cursor-in-non-selected-windows t)
-;; 論理行 (画面上の改行)単位ではなく物理行 (改行文字まで)単位で移動する
-(setq line-move-visual nil)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - linum                                                ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package linum)
+(use-package linum
+  :config
+  (setq linum-format "%4d"))
 
 ;; 行移動を契機に描画
-;; (defvar linum-line-number 0)
-;; (declare-function linum-update-current "linum" ())
-;; (defadvice linum-update-current
-;;     (around linum-update-current-around activate compile)
-;;   (unless (= linum-line-number (line-number-at-pos))
-;;     (setq linum-line-number (line-number-at-pos))
-;;     ad-do-it
-;;     ))
-
-;; バッファ中の行番号表示の遅延設定
-(defvar linum-delay nil)
-(setq linum-delay t)
-(defadvice linum-schedule (around linum-schedule-around () activate)
-  (run-with-idle-timer 1.0 nil #'linum-update-current))
-
-;; 行番号の書式
-(defvar linum-format nil)
-(setq linum-format "%5d")
-
-;; バッファ中の行番号表示
-(global-linum-mode t)
-
-;; 文字サイズ
-(set-face-attribute 'linum nil :height 0.75)
-
-;; 現在行の行番号をハイライト
-;; (use-package hlinum)
-;; (custom-set-faces
-;;  ;; custom-set-faces was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(linum-highlight-face ((t (:foreground "black" :background "red")))))
+(defvar linum-line-number 0)
+(declare-function linum-update-current "linum" ())
+(defadvice linum-update-current
+    (around linum-update-current-around activate compile)
+  (unless (= linum-line-number (line-number-at-pos))
+    (setq linum-line-number (line-number-at-pos))
+    ad-do-it
+    ))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; 選択範囲をisearch
-(defadvice isearch-mode (around isearch-mode-default-string (forward &optional regexp op-fun recursive-edit word-p) activate)
-  (if (and transient-mark-mode mark-active (not (eq (mark) (point))))
-      (progn
-        (isearch-update-ring (buffer-substring-no-properties (mark) (point)))
-        (deactivate-mark)
-        ad-do-it
-        (if (not forward)
-            (isearch-repeat-backward)
-          (goto-char (mark))
-          (isearch-repeat-forward)))
-    ad-do-it))
-
-;; 大文字・小文字を区別しないでサーチ
-(setq-default case-fold-search t)
-
 ;; Tabで検索文字列を補完
 (define-key isearch-mode-map (kbd "TAB") 'isearch-yank-word)
 
@@ -445,15 +174,12 @@
   ;; (global-set-key (kbd "C-c A") 'anzu-query-replace-regexp)
   )
 
-(defun isearch-forward-or-swiper (use-swiper)
-  (interactive "P")
-  (let (current-prefix-arg)
-    (call-interactively (if use-swiper 'swiper 'isearch-forward))))
+
 ;;; バックエンドのivyがスペースを".*"に置換してしまうため、無効にする
 ;;; これをしないと純粋に正規表現isearchの置き換えにならない
 (use-package ivy
   :init
-  (bind-key "C-s" 'isearch-forward-or-swiper)
+  (bind-key "C-s" 'my/isearch-forward-or-swiper)
   :config
   (fset 'ivy--regex 'identity))
 
@@ -1423,7 +1149,8 @@ If there's no region, the current line will be duplicated."
 (defun my/nginx-mode-hooks ()
   (setq nginx-indent-level 4
         nginx-indent-tabs-mode nil
-        tab-width 4))
+        tab-width 4)
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
 
 (use-package nginx-mode
   :init
@@ -1531,19 +1258,13 @@ If there's no region, the current line will be duplicated."
  '(helm-truncate-lines t t)
  '(package-selected-packages
    (quote
-    (auto-highlight-symbol flex-autopair hlinum midje-mode python-mode company
-                           zenburn-theme yaxception yasnippet yascroll yaml-mode
-                           window-layout wgrep weblogger web-mode volatile-highlights
-                           visual-regexp-steroids use-package undo-tree tuareg
-                           swiper spinner solarized-theme smooth-scroll smex smartparens
-                           slamhound skewer-mode scss-mode scala-mode ruby-end rspec-mode robe
-                           rbenv rainbow-mode rainbow-delimiters quickrun queue powerline popwin
-                           php-mode peg paredit pallet nginx-mode multiple-cursors markdown-mode
-                           magit log4e jsx-mode json-mode jedi inflections image-dired+ image+
-                           ido-ubiquitous hydra htmlize ht highlight-symbol helm-themes helm-swoop
-                           helm-robe helm-projectile helm-migemo helm-ls-git helm-descbinds helm-ag
-                           haskell-mode groovy-mode google-translate gitignore-mode gitconfig-mode
-                           git-gutter-fringe gist flycheck-pos-tip expand-region exec-path-from-shell)))
+    (init-loader auto-highlight-symbol flex-autopair hlinum midje-mode python-mode company zenburn-theme yaxception yasnippet yascroll yaml-mode window-layout wgrep weblogger web-mode volatile-highlights visual-regexp-steroids use-package undo-tree tuareg swiper spinner solarized-theme smooth-scroll smex smartparens slamhound skewer-mode scss-mode scala-mode ruby-end rspec-mode robe rbenv rainbow-mode rainbow-delimiters quickrun queue powerline popwin php-mode peg paredit pallet nginx-mode multiple-cursors markdown-mode magit log4e jsx-mode json-mode jedi inflections image-dired+ image+ ido-ubiquitous hydra htmlize ht highlight-symbol helm-themes helm-swoop helm-robe helm-projectile helm-migemo helm-ls-git helm-descbinds helm-ag haskell-mode groovy-mode google-translate gitignore-mode gitconfig-mode git-gutter-fringe gist flycheck-pos-tip expand-region exec-path-from-shell)))
  '(safe-local-variable-values
    (quote
     ((cider-cljs-lein-repl . "(zou.framework.repl/cljs-repl)")))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
