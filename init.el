@@ -343,7 +343,8 @@
   ("C-m" . smart-newline))
 
 (defadvice smart-newline (around C-u activate)
-  "C-uを押したら元のC-mの挙動をするようにした。org-modeなどで活用。"
+  "C-uを押したら元のC-mの挙動をするようにした。org-modeなどで活用。
+  http://emacs.rubikitch.com/smart-newline/"
   (if (not current-prefix-arg)
       ad-do-it
     (let (current-prefix-arg)
@@ -611,9 +612,6 @@
 (bind-key "C-S-k" 'just-one-space)
 
 (use-package paredit
-  :init
-  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
   :bind
   ("C-j" . paredit-newline))
 
@@ -835,11 +833,12 @@ If there's no region, the current line will be duplicated."
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package emacs-lisp-mode
   :init
-  (add-hook 'emacs-lisp-mode-hook #'smart-newline-mode)
-  (add-hook 'emacs-lisp-mode-hook #'enable-auto-async-byte-compile-mode)
-  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
-  (add-hook 'emacs-lisp-mode-hook #'highlight-symbol-mode)
-  (add-hook 'emacs-lisp-mode-hook #'company-mode)
+  (add-hook 'emacs-lisp-mode-hook 'smart-newline-mode)
+  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
+  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'emacs-lisp-mode-hook 'highlight-symbol-mode)
+  (add-hook 'emacs-lisp-mode-hook 'company-mode)
+  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
   :config
   (setq indent-tabs-mode nil))
 
@@ -853,6 +852,11 @@ If there's no region, the current line will be duplicated."
         web-mode-html-offset 2
         web-mode-css-offset 2
         web-mode-script-offset 2)
+  (when (equal web-mode-content-type "jsx")
+    (add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
+    (flycheck-mode t))
+  (smart-newline-mode t)
   (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
 
 (use-package emmet-mode
@@ -880,23 +884,12 @@ If there's no region, the current line will be duplicated."
   ("\\.jsx?\\'" . web-mode)
   ("\\.css?\\'" . web-mode)
   :init
-  (add-hook 'web-mode-hook #'smart-newline-mode)
-  (add-hook 'web-mode-hook #'company-mode)
-  ;; (add-hook 'web-mode-hook #'smartchr-keybindings-web)
-  (add-hook 'web-mode-hook #'rainbow-mode)
-  (add-hook 'web-mode-hook #'rainbow-delimiters-mode)
-  (add-hook 'web-mode-hook #'emmet-mode) ;; web-modeで使う
-  (add-hook 'web-mode-hook
-            (lambda ()
-              (when (equal web-mode-content-type "jsx")
-                (add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
-                (flycheck-add-mode 'javascript-eslint 'web-mode)
-                (flycheck-mode t))))
-  (add-hook 'web-mode-hook #'my/web-mode-hooks)
-  ;; :config
-  ;; (bind-keys :map web-mode-map
-  ;;            ("C-c t" . my/underscore-html-template))
-  )
+  (add-hook 'web-mode-hook 'company-mode)
+  ;; (add-hook 'web-mode-hook 'smartchr-keybindings-web)
+  (add-hook 'web-mode-hook 'rainbow-mode)
+  (add-hook 'web-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'web-mode-hook 'emmet-mode) ;; web-modeで使う
+  (add-hook 'web-mode-hook 'my/web-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ scss                                                          ;;;
@@ -906,17 +899,17 @@ If there's no region, the current line will be duplicated."
   (and
    (set (make-local-variable 'css-indent-offset) 2)
    (set (make-local-variable 'scss-compile-at-save) nil))
-  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t)
+  (smart-newline-mode t))
 
 (use-package scss-mode
   :mode
   ("\\.scss\\'" . scss-mode)
   :init
-  (add-hook 'scss-mode-hook #'smart-newline-mode)
-  (add-hook 'scss-mode-hook #'company-mode)
-  (add-hook 'scss-mode-hook #'scss-mode-hooks)
-  (add-hook 'scss-mode-hook #'rainbow-mode)
-  (add-hook 'scss-mode-hook #'emmet-mode))
+  (add-hook 'scss-mode-hook 'company-mode)
+  (add-hook 'scss-mode-hook 'scss-mode-hooks)
+  (add-hook 'scss-mode-hook 'rainbow-mode)
+  (add-hook 'scss-mode-hook 'emmet-mode))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ JavaScript                                                    ;;;
@@ -958,7 +951,6 @@ If there's no region, the current line will be duplicated."
   :init
   (add-hook 'js-mode-hook  #'js-indent-hook)
   (add-hook 'js2-mode-hook #'smartchr-keybindings-js)
-  (add-hook 'js2-mode-hook #'smart-newline-mode)
   (add-hook 'js2-mode-hook #'tern-mode)
   (add-hook 'js2-mode-hook #'emmet-mode)
   (add-hook 'js2-mode-hook #'js-indent-hook)
@@ -978,6 +970,11 @@ If there's no region, the current line will be duplicated."
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Ruby                                                          ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+(defun my/ruby-mode-hooks ()
+  "ruby mode hook"
+  (interactive "P")
+  (smart-newline-mode t))
+
 (use-package ruby-mode
   :mode
   ("\\.rb\\'" . ruby-mode)
@@ -986,9 +983,9 @@ If there's no region, the current line will be duplicated."
   :interpreter
   ("ruby" . ruby-mode)
   :init
-  (add-hook 'ruby-mode-hook #'smart-newline-mode)
-  (add-hook 'ruby-mode-hook #'smartchr-keybindings-ruby)
-  (add-hook 'ruby-mode-hook #'robe-mode)
+  ;; (add-hook 'ruby-mode-hook 'smartchr-keybindings-ruby)
+  ;; (add-hook 'ruby-mode-hook 'robe-mode)
+  (add-hook 'ruby-mode-hook 'my/ruby-mode-hooks)
   :config
   (setq tab-width 2
         indent-tabs-mode nil
@@ -1015,25 +1012,14 @@ If there's no region, the current line will be duplicated."
         python-indent 4
         python-pylint t
         tab-width 4)
-  ;; (add-to-list 'company-backends 'company-jedi)
-  )
-
-;; (use-package jedi-core
-;;   :config
-;;   (setq jedi:complete-on-dot t
-;;         jedi:use-shortcuts t
-;;         jedi:environment-root "~/.emacs.d/elisp"))
+  (smart-newline-mode t))
 
 (use-package python-mode
   :mode
   ("\\.py\\'" . python-mode)
   :init
-  (add-hook 'python-mode-hook #'smart-newline-mode)
-  ;; (add-hook 'python-mode-hook #'company-mode)
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (add-hook 'python-mode-hook #'my/python-mode-hooks)
-  :config
-  (setq jedi:complete-on-dot t))
+  (add-hook 'python-mode-hook 'company-mode)
+  (add-hook 'python-mode-hook 'my/python-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ PHP                                                           ;;;
@@ -1064,13 +1050,13 @@ If there's no region, the current line will be duplicated."
 
 (use-package clojure-mode
   :init
-  (add-hook 'clojure-mode-hook #'enable-paredit-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
-  (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'yas-minor-mode)
-  (add-hook 'clojure-mode-hook #'auto-highlight-symbol-mode)
-  (add-hook 'clojure-mode-hook #'highlight-symbol-mode)
-  (add-hook 'clojure-mode-hook #'my/clojure-mode-hook)
+  (add-hook 'clojure-mode-hook 'enable-paredit-mode)
+  (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'clojure-mode-hook 'subword-mode)
+  (add-hook 'clojure-mode-hook 'yas-minor-mode)
+  (add-hook 'clojure-mode-hook 'auto-highlight-symbol-mode)
+  (add-hook 'clojure-mode-hook 'highlight-symbol-mode)
+  (add-hook 'clojure-mode-hook 'my/clojure-mode-hook)
   :bind
   ("C-c C-g" . my/zou-go)
   :config
@@ -1099,11 +1085,11 @@ If there's no region, the current line will be duplicated."
 
 (use-package cider-mode
   :init
-  (add-hook 'cider-mode-hook #'clj-refactor-mode)
-  (add-hook 'cider-mode-hook #'company-mode)
-  (add-hook 'cider-mode-hook #'eldoc-mode)
-  (add-hook 'cider-repl-mode-hook #'company-mode)
-  (add-hook 'cider-repl-mode-hook #'eldoc-mode)
+  (add-hook 'cider-mode-hook 'clj-refactor-mode)
+  (add-hook 'cider-mode-hook 'company-mode)
+  (add-hook 'cider-mode-hook 'eldoc-mode)
+  (add-hook 'cider-repl-mode-hook 'company-mode)
+  (add-hook 'cider-repl-mode-hook 'eldoc-mode)
   :diminish subword-mode
   :config
   (setq nrepl-log-messages t
@@ -1137,7 +1123,8 @@ If there's no region, the current line will be duplicated."
 (defun sql-mode-hooks ()
   (setq sql-indent-offset 2
         indent-tabs-mode nil)
-  (sql-set-product "postgres"))
+  (sql-set-product "postgres")
+  (smart-newline-mode t))
 
 (use-package sql
   :init
@@ -1150,16 +1137,22 @@ If there's no region, the current line will be duplicated."
   (setq nginx-indent-level 4
         nginx-indent-tabs-mode nil
         tab-width 4)
-  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
+  (add-hook 'before-save-hook 'my/cleanup-buffer nil t)
+  (smart-newline-mode t))
 
 (use-package nginx-mode
   :init
-  (add-hook 'nginx-mode #'my/nginx-mode-hooks))
+  (add-hook 'nginx-mode 'my/nginx-mode-hooks))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ org-mode                                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(add-hook 'org-mode-hook #'smart-newline-mode)
+(defun my/org-mode-hooks ()
+  "my org-mode hook"
+  (interactive "P")
+  (smart-newline-mode t))
+
+(add-hook 'org-mode-hook 'my/org-mode-hooks)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ term                                                          ;;;
