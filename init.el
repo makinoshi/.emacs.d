@@ -1,14 +1,13 @@
 ;; C-hをBackSpaceにする
 ;; 入力されるキーシーケンスを置き換える
 ;; ?\C-?はDELのキーシケンス
+(keyboard-translate ?\C-h ?\C-?)
 
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 (package-initialize)
-
-(keyboard-translate ?\C-h ?\C-?)
 
 ;; cask config
 (require 'cask "/usr/local/opt/cask/cask.el")
@@ -24,8 +23,8 @@
   "引数に与えたパスをロードする"
   (let (path)
     (dolist (path paths paths)
-      (let ((default-directory 
-             (expand-file-name (concat user-emacs-directory path))))
+      (let ((default-directory
+              (expand-file-name (concat user-emacs-directory path))))
         (add-to-list 'load-path default-directory)
         (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
             (normal-top-level-add-subdirs-to-load-path))))))
@@ -41,33 +40,8 @@
 (exec-path-from-shell-initialize)
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ screen - frame                                                ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; popwin
-(use-package popwin
-  :config
-  (setq pop-up-windows nil)
-  (setq display-buffer-function 'popwin:display-buffer)
-  (setq popwin:popup-window-position 'bottom))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; 同一バッファ名にディレクトリ付与
-(use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-  (setq uniquify-ignore-buffers-re "*[^*]+*"))
-
-;; 使わないバッファを自動的に消す
-(use-package tempbuf
-  :config
-  ;; ファイルを開いたら自動でtempbufを有効にする
-  (add-hook 'find-file-hooks 'turn-on-tempbuf-mode)
-  ;; diredバッファに対してtempbufを有効にする
-  (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
-
 ;; 行の折り返し表示の切替
 (bind-key "C-c l" 'toggle-truncate-lines)
 
@@ -337,20 +311,6 @@
              ("C-h" . delete-backward-char)
              ("C-c h" . help-command)))
 
-;; 改行とインデントをRET(C-m)でできるように改善
-(use-package smart-newline
-  :bind
-  ("C-m" . smart-newline))
-
-(defadvice smart-newline (around C-u activate)
-  "C-uを押したら元のC-mの挙動をするようにした。org-modeなどで活用。
-  http://emacs.rubikitch.com/smart-newline/"
-  (if (not current-prefix-arg)
-      ad-do-it
-    (let (current-prefix-arg)
-      (let (smart-newline-mode)
-        (call-interactively (key-binding (kbd "C-m")))))))
-
 ;; 折り返しトグルコマンド
 (bind-key "C-c l" 'toggle-truncate-lines)
 
@@ -364,25 +324,6 @@
 
 ;; goto-lineコマンドをM-g M-g からM-gへ
 (bind-key "M-g" 'goto-line)
-
-;; 括弧の自動挿入の挙動をオレオレ設定できるflex-autopair.el
-(use-package flex-autopair
-  :config
-  (flex-autopair-mode 1))
-
-;; キーボード同時押しでコマンドを実行する
-(use-package key-chord
-  :config
-  (setq key-chord-two-keys-delay 0.04)
-  (key-chord-mode 1))
-
-;; 「スペースから始まるkey-chord」を定義するEmacs Lisp
-(use-package space-chord
-  :init
-  (unless (require 'space-chord nil t)
-    (install-elisp "http://www.emacswiki.org/cgi-bin/wiki/download/space-chord.el"))
-  :config
-  (setq space-chord-delay 0.08))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ my macros                                                     ;;;
@@ -829,338 +770,6 @@ If there's no region, the current line will be duplicated."
   ("C-'" . yas-expand))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ emacs lisp                                                    ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package emacs-lisp-mode
-  :init
-  (add-hook 'emacs-lisp-mode-hook 'smart-newline-mode)
-  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
-  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'emacs-lisp-mode-hook 'highlight-symbol-mode)
-  (add-hook 'emacs-lisp-mode-hook 'company-mode)
-  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  :config
-  (setq indent-tabs-mode nil))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ HTML & CSS                                                    ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun my/web-mode-hooks ()
-  (setq web-mode-markup-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-comment-style 2
-        web-mode-html-offset 2
-        web-mode-css-offset 2
-        web-mode-script-offset 2)
-  (when (equal web-mode-content-type "jsx")
-    (add-to-list 'web-mode-comment-formats '("jsx" . "// " ))
-    (flycheck-add-mode 'javascript-eslint 'web-mode)
-    (flycheck-mode t))
-  (smart-newline-mode t)
-  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
-
-(use-package emmet-mode
-  :config
-  ;; C-j は newline のままにしておく
-  (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
-  ;;C-i と Tabの被りを回避
-  (keyboard-translate ?\C-i ?\H-i)
-  ;; C-i で展開
-  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line)
-  (setq emmet-indentation 2
-        emmet-move-cursor-between-quotes t))
-
-(use-package web-mode
-  :mode
-  ("\\.phtml\\'" . web-mode)
-  ("\\.tpl\\.php\\'" . web-mode)
-  ("\\.[agj]sp\\'" . web-mode)
-  ("\\.as[cp]x\\'" . web-mode)
-  ("\\.erb\\'" . web-mode)
-  ("\\.mustache\\'" . web-mode)
-  ("\\.djhtml\\'" . web-mode)
-  ("\\.html?\\'" . web-mode)
-  ("\\.js?\\'" . web-mode)
-  ("\\.jsx?\\'" . web-mode)
-  ("\\.css?\\'" . web-mode)
-  :init
-  (add-hook 'web-mode-hook 'company-mode)
-  ;; (add-hook 'web-mode-hook 'smartchr-keybindings-web)
-  (add-hook 'web-mode-hook 'rainbow-mode)
-  (add-hook 'web-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'web-mode-hook 'emmet-mode) ;; web-modeで使う
-  (add-hook 'web-mode-hook 'my/web-mode-hooks))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ scss                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun scss-mode-hooks ()
-  "scss-mode-hook"
-  (and
-   (set (make-local-variable 'css-indent-offset) 2)
-   (set (make-local-variable 'scss-compile-at-save) nil))
-  (add-hook 'before-save-hook 'my/cleanup-buffer nil t)
-  (smart-newline-mode t))
-
-(use-package scss-mode
-  :mode
-  ("\\.scss\\'" . scss-mode)
-  :init
-  (add-hook 'scss-mode-hook 'company-mode)
-  (add-hook 'scss-mode-hook 'scss-mode-hooks)
-  (add-hook 'scss-mode-hook 'rainbow-mode)
-  (add-hook 'scss-mode-hook 'emmet-mode))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ JavaScript                                                    ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun js-indent-hook ()
-  (setq js-indent-level 2
-        js-expr-indent-offset 2
-        indent-tabs-mode nil)
-  ;; switchのcaseラベルをインデントする関数を定義
-  (defun my/js-indent-line ()
-    (interactive)
-    (let* ((parse-status (save-excursion (syntax-ppss (point-at-bol))))
-           (offset (- (current-column) (current-indentation)))
-           (indentation (js--proper-indentation parse-status)))
-      (back-to-indentation)
-      (if (looking-at "case\\s-")
-          (indent-line-to (+ indentation 2))
-        (js-indent-line))
-      (when (> offset 0) (forward-char offset))))
-  ;; caseラベルのインデント処理をセット
-  (set (make-local-variable 'indent-line-function) 'my/js-indent-line))
-(add-hook 'js-mode-hook 'js2-minor-mode)
-
-;; disable jshint since we prefer eslint checking
-(setq-default flycheck-disabled-checkers
-              (append flycheck-disabled-checkers
-                      '(javascript-jshint)))
-
-;; disable json-jsonlist checking for json files
-(setq-default flycheck-disabled-checkers
-              (append flycheck-disabled-checkers
-                      '(json-jsonlist)))
-
-(use-package js2-mode
-  :mode
-  ;; ("\\.js\\'" . js2-mode)
-  :interpreter
-  ("node" . js2-mode)
-  :init
-  (add-hook 'js-mode-hook  #'js-indent-hook)
-  (add-hook 'js2-mode-hook #'smartchr-keybindings-js)
-  (add-hook 'js2-mode-hook #'tern-mode)
-  (add-hook 'js2-mode-hook #'emmet-mode)
-  (add-hook 'js2-mode-hook #'js-indent-hook)
-  (use-package jquery-doc
-    :init
-    (add-hook 'js2-mode-hook 'jquery-doc-setup)))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ markdown                                                      ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package markdown-mode
-  :mode
-  ("\\.md\\'" . markdown-mode)
-  :init
-  (add-hook 'markdown-mode-hook #'emmet-mode))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Ruby                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun my/ruby-mode-hooks ()
-  "ruby mode hook"
-  (interactive "P")
-  (smart-newline-mode t))
-
-(use-package ruby-mode
-  :mode
-  ("\\.rb\\'" . ruby-mode)
-  ("Capfile\\'" . ruby-mode)
-  ("Gemfile\\'" . ruby-mode)
-  :interpreter
-  ("ruby" . ruby-mode)
-  :init
-  ;; (add-hook 'ruby-mode-hook 'smartchr-keybindings-ruby)
-  ;; (add-hook 'ruby-mode-hook 'robe-mode)
-  (add-hook 'ruby-mode-hook 'my/ruby-mode-hooks)
-  :config
-  (setq tab-width 2
-        indent-tabs-mode nil
-        ruby-indent-level tab-width)
-  (use-package ruby-end)
-  (use-package ruby-block
-    :config
-    (ruby-block-mode t)
-    (setq ruby-block-highlight-toggle t))
-  (use-package inf-ruby)
-  (use-package rbenv
-    :config
-    (global-rbenv-mode)
-    (setq rbenv-installation-dir "~/.rbenv/bin/rbenv"))
-  (bind-keys :map ruby-mode-map
-             ("|" . my/vertical-bar-pair)))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Python                                                        ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun my/python-mode-hooks ()
-  (setq indent-tabs-mode nil
-        indent-level 4
-        python-indent 4
-        python-pylint t
-        tab-width 4)
-  (smart-newline-mode t))
-
-(use-package python-mode
-  :mode
-  ("\\.py\\'" . python-mode)
-  :init
-  (add-hook 'python-mode-hook 'company-mode)
-  (add-hook 'python-mode-hook 'my/python-mode-hooks))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ PHP                                                           ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package php-mode
-  :init
-  (add-hook 'php-mode-hook #'company-mode)
-  :mode
-  ("\\.php\\'" . php-mode))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Clojure                                                       ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun my/clojure-mode-hook ()
-  (add-hook 'before-save-hook 'my/cleanup-buffer nil t))
-
-(defun my/zou-go ()
-  "zou go commnad"
-  (interactive)
-  (with-current-buffer (cider-current-connection "clj")
-    (if current-prefix-arg
-        (progn
-          (save-some-buffers)
-          (cider-interactive-eval
-           "(zou.framework.repl/reset)"))
-      (cider-interactive-eval
-       "(zou.framework.repl/go)"))))
-
-(use-package clojure-mode
-  :init
-  (add-hook 'clojure-mode-hook 'enable-paredit-mode)
-  (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'clojure-mode-hook 'subword-mode)
-  (add-hook 'clojure-mode-hook 'yas-minor-mode)
-  (add-hook 'clojure-mode-hook 'auto-highlight-symbol-mode)
-  (add-hook 'clojure-mode-hook 'highlight-symbol-mode)
-  (add-hook 'clojure-mode-hook 'my/clojure-mode-hook)
-  :bind
-  ("C-c C-g" . my/zou-go)
-  :config
-  (put-clojure-indent 'fnk 'defun)
-  (put-clojure-indent 'defnk 'defun)
-  (put-clojure-indent 'for-map 1)
-  (put-clojure-indent 'instance 2)
-  (put-clojure-indent 'inline 1)
-  (put-clojure-indent 'letk 1)
-  (put-clojure-indent 'when-letk 1)
-  (put-clojure-indent 'go-loop 1)
-  (put-clojure-indent 'this-as 'defun)
-  (put-clojure-indent 'when-some '1)
-  (put-clojure-indent 'if-some '1)
-  (put-clojure-indent 'try+ 0)
-  (put 'specify 'clojure-backtracking-indent '((2)))
-  (put 'specify! 'clojure-backtracking-indent '((2)))
-  (put 'defcomponent 'clojure-backtracking-indent '((2)))
-  (put 'defcomponentk 'clojure-backtracking-indent '((2)))
-  (put 'defmixin 'clojure-backtracking-indent '((2)))
-  (put 'clojure.core/defrecord 'clojure-backtracking-indent '(4 4 (2)))
-  (put 's/defrecord 'clojure-backtracking-indent '(4 4 (2)))
-  (put 's/defrecord+ 'clojure-backtracking-indent '(4 4 (2)))
-  (put 'potemkin/deftype+ 'clojure-backtracking-indent '(4 4 (2)))
-  (put 'potemkin/defrecord+ 'clojure-backtracking-indent '(4 4 (2))))
-
-(use-package cider-mode
-  :init
-  (add-hook 'cider-mode-hook 'clj-refactor-mode)
-  (add-hook 'cider-mode-hook 'company-mode)
-  (add-hook 'cider-mode-hook 'eldoc-mode)
-  (add-hook 'cider-repl-mode-hook 'company-mode)
-  (add-hook 'cider-repl-mode-hook 'eldoc-mode)
-  :diminish subword-mode
-  :config
-  (setq nrepl-log-messages t
-        cider-repl-display-in-current-window t
-        cider-repl-use-clojure-font-lock t
-        cider-prompt-save-file-on-load 'always-save
-        cider-font-lock-dynamically '(macro core function var)
-        cider-overlays-use-font-lock t))
-
-(use-package clj-refactor
-  :config
-  (cljr-add-keybindings-with-prefix "C-c j")
-  (setq cljr-favor-prefix-notation nil))
-
-(use-package midje-mode)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ sql                                                           ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; C-c C-c : 'sql-send-paragraph
-;; C-c C-r : 'sql-send-region
-;; C-c C-s : 'sql-send-string
-;; C-c C-b : 'sql-send-buffer
-;; C-c C-c : 'sql-send-paragraph
-;; C-c C-r : 'sql-send-region
-;; C-c C-s : 'sql-send-string
-;; C-c C-b : 'sql-send-buffer
-(eval-after-load "sql"
-  '(load-library "sql-indent"))
-
-(defun sql-mode-hooks ()
-  (setq sql-indent-offset 2
-        indent-tabs-mode nil)
-  (sql-set-product "postgres")
-  (smart-newline-mode t))
-
-(use-package sql
-  :init
-  (add-hook 'sql-mode-hook #'sql-mode-hooks))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ nginx                                                         ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun my/nginx-mode-hooks ()
-  (setq nginx-indent-level 4
-        nginx-indent-tabs-mode nil
-        tab-width 4)
-  (add-hook 'before-save-hook 'my/cleanup-buffer nil t)
-  (smart-newline-mode t))
-
-(use-package nginx-mode
-  :init
-  (add-hook 'nginx-mode 'my/nginx-mode-hooks))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ org-mode                                                      ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(defun my/org-mode-hooks ()
-  "my org-mode hook"
-  (interactive "P")
-  (smart-newline-mode t))
-
-(add-hook 'org-mode-hook 'my/org-mode-hooks)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ term                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; multi-term→起動しない
-;; (use-package multi-term)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ tramp                                                         ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (use-package tramp
@@ -1251,7 +860,7 @@ If there's no region, the current line will be duplicated."
  '(helm-truncate-lines t t)
  '(package-selected-packages
    (quote
-    (init-loader auto-highlight-symbol flex-autopair hlinum midje-mode python-mode company zenburn-theme yaxception yasnippet yascroll yaml-mode window-layout wgrep weblogger web-mode volatile-highlights visual-regexp-steroids use-package undo-tree tuareg swiper spinner solarized-theme smooth-scroll smex smartparens slamhound skewer-mode scss-mode scala-mode ruby-end rspec-mode robe rbenv rainbow-mode rainbow-delimiters quickrun queue powerline popwin php-mode peg paredit pallet nginx-mode multiple-cursors markdown-mode magit log4e jsx-mode json-mode jedi inflections image-dired+ image+ ido-ubiquitous hydra htmlize ht highlight-symbol helm-themes helm-swoop helm-robe helm-projectile helm-migemo helm-ls-git helm-descbinds helm-ag haskell-mode groovy-mode google-translate gitignore-mode gitconfig-mode git-gutter-fringe gist flycheck-pos-tip expand-region exec-path-from-shell)))
+    (key-chord key-combo init-loader auto-highlight-symbol flex-autopair hlinum midje-mode python-mode company zenburn-theme yaxception yasnippet yascroll yaml-mode window-layout wgrep weblogger web-mode volatile-highlights visual-regexp-steroids use-package undo-tree tuareg swiper spinner solarized-theme smooth-scroll smex smartparens slamhound skewer-mode scss-mode scala-mode ruby-end rspec-mode robe rbenv rainbow-mode rainbow-delimiters quickrun queue powerline popwin php-mode peg paredit pallet nginx-mode multiple-cursors markdown-mode magit log4e jsx-mode json-mode jedi inflections image-dired+ image+ ido-ubiquitous hydra htmlize ht highlight-symbol helm-themes helm-swoop helm-robe helm-projectile helm-migemo helm-ls-git helm-descbinds helm-ag haskell-mode groovy-mode google-translate gitignore-mode gitconfig-mode git-gutter-fringe gist flycheck-pos-tip expand-region exec-path-from-shell)))
  '(safe-local-variable-values
    (quote
     ((cider-cljs-lein-repl . "(zou.framework.repl/cljs-repl)")))))

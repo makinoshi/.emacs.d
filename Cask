@@ -90,6 +90,8 @@
 (depends-on "json-reformat")
 (depends-on "json-snatcher")
 (depends-on "jsx-mode")
+(depends-on "key-chord")
+(depends-on "key-combo")
 (depends-on "let-alist")
 (depends-on "log4e")
 (depends-on "logito")
