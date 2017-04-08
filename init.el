@@ -281,9 +281,10 @@
 ;;; @ server                                                        ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; emacs-server起動
-(require 'server)
-(unless (server-running-p)
-  (server-start))
+(use-package server
+  :config
+  (unless (server-running-p)
+    (server-start)))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ Edit support                                                  ;;;
@@ -860,7 +861,7 @@ If there's no region, the current line will be duplicated."
  '(helm-truncate-lines t t)
  '(package-selected-packages
    (quote
-    (key-chord key-combo init-loader auto-highlight-symbol flex-autopair hlinum midje-mode python-mode company zenburn-theme yaxception yasnippet yascroll yaml-mode window-layout wgrep weblogger web-mode volatile-highlights visual-regexp-steroids use-package undo-tree tuareg swiper spinner solarized-theme smooth-scroll smex smartparens slamhound skewer-mode scss-mode scala-mode ruby-end rspec-mode robe rbenv rainbow-mode rainbow-delimiters quickrun queue powerline popwin php-mode peg paredit pallet nginx-mode multiple-cursors markdown-mode magit log4e jsx-mode json-mode jedi inflections image-dired+ image+ ido-ubiquitous hydra htmlize ht highlight-symbol helm-themes helm-swoop helm-robe helm-projectile helm-migemo helm-ls-git helm-descbinds helm-ag haskell-mode groovy-mode google-translate gitignore-mode gitconfig-mode git-gutter-fringe gist flycheck-pos-tip expand-region exec-path-from-shell)))
+    (rust-mode key-chord key-combo init-loader auto-highlight-symbol flex-autopair hlinum midje-mode python-mode company zenburn-theme yaxception yasnippet yascroll yaml-mode window-layout wgrep weblogger web-mode volatile-highlights visual-regexp-steroids use-package undo-tree tuareg swiper spinner solarized-theme smooth-scroll smex smartparens slamhound skewer-mode scss-mode scala-mode ruby-end rspec-mode robe rbenv rainbow-mode rainbow-delimiters quickrun queue powerline popwin php-mode peg paredit pallet nginx-mode multiple-cursors markdown-mode magit log4e jsx-mode json-mode jedi inflections image-dired+ image+ ido-ubiquitous hydra htmlize ht highlight-symbol helm-themes helm-swoop helm-robe helm-projectile helm-migemo helm-ls-git helm-descbinds helm-ag haskell-mode groovy-mode google-translate gitignore-mode gitconfig-mode git-gutter-fringe gist flycheck-pos-tip expand-region exec-path-from-shell)))
  '(safe-local-variable-values
    (quote
     ((cider-cljs-lein-repl . "(zou.framework.repl/cljs-repl)")))))
