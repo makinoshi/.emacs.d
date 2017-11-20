@@ -19,4 +19,5 @@
   ("\\.py\\'" . python-mode)
   :init
   (add-hook 'python-mode-hook 'company-mode)
-  (add-hook 'python-mode-hook 'my/python-mode-hooks))
+  (add-hook 'python-mode-hook 'my/python-mode-hooks)
+  (add-hook 'python-mode-hook 'auto-virtualenvwrapper-activate))
