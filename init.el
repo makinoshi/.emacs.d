@@ -42,9 +42,6 @@
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - buffer                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; 行の折り返し表示の切替
-(bind-key "C-c l" 'toggle-truncate-lines)
-
 ;; color-theme
 (use-package zenburn-theme
   :config
@@ -224,6 +221,9 @@
 ;; diredバッファでC-sした時にファイル名だけにマッチするように
 (setq dired-isearch-filenames t)
 
+;;; dired-x
+(use-package dired-x)
+
 ;; direx
 (use-package direx
   :bind
@@ -312,7 +312,7 @@
              ("C-h" . delete-backward-char)
              ("C-c h" . help-command)))
 
-;; 折り返しトグルコマンド
+;; 行の折り返し表示の切替
 (bind-key "C-c l" 'toggle-truncate-lines)
 
 ;; "C-t" でウィンドウを切り替える。分割していない時は左右分割して移動
@@ -367,6 +367,7 @@
   (global-set-key (kbd "M-m")     'helm-mini)
   (global-set-key (kbd "C-x f")   'helm-find)
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-;")     'helm-recentf)
   (global-set-key (kbd "C-c b")   'helm-browse-project)
   (global-set-key (kbd "C-c o")   'helm-swoop)
   (global-set-key (kbd "C-c s")   'helm-ag)
@@ -415,12 +416,6 @@
   ;; popwinに登録
   (push '("^\*helm .+\*\\'" :regexp t) popwin:special-display-config))
 
-;; ace-isearch
-;; 1文字→ace-jump-mode
-;; 2〜5文字→isearch
-;; 6文字以上→helm-swoop
-;; (global-ace-isearch-mode 1)
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ git                                                           ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -436,207 +431,6 @@
   (smartrep-define-key
       global-map "C-x" '(("p" . 'git-gutter:previous-hunk)
                          ("n" . 'git-gutter:next-hunk))))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ coding support                                                ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;; ファイル作成時にテンプレートを挿入
-(auto-insert-mode)
-;; 次に指定したディレクトリをロードする (最後の/は必須)
-(setq auto-insert-directory (concat user-emacs-directory "insert/"))
-;; 次で"\\.rb$"の代わりに'ruby-modeにすると、メジャーモードがruby-modeのときに挿入してくれる
-;;(define-auto-insert "\\.rb\\'" "ruby-template.rb")
-
-;;; indentを基本spaceで
-(setq-default indent-tabs-mode nil)
-
-;; redoの設定
-(use-package redo+
-  :bind ("C-S-/" . redo))
-
-;; 大量のredoに耐えられるようにする
-(setq undo-limit 600000)
-(setq undo-strong-limit 900000)
-
-;; cua-modeの設定(矩形選択を可能に)
-(cua-mode t)
-(setq cua-enable-cua-keys nil) ; CUAキーバインドを無効にする
-;; C-RETがC-jになるため、C-c C-SPCに矩形選択モードを割り当て
-(define-key global-map (kbd "C-c C-SPC") 'cua-set-rectangle-mark)
-
-;; company
-(use-package company
-  :config
-  ;; (global-company-mode)
-  (setq company-idle-delay 0.1
-        company-minimum-prefix-length 2
-        company-selection-wrap-around t)
-
-  (bind-keys :map company-mode-map
-             ("C-i" . company-complete))
-  (bind-keys :map company-active-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous)
-             ("C-s" . company-search-words-regexp))
-  (bind-keys :map company-search-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous)))
-
-;; hippie-expand
-(bind-key "M-/" 'hippie-expand)
-;; 補完候補探索順を指定
-(setq hippie-expand-try-functions-list
-      '(try-expand-dabbrev
-        try-expand-dabbrev-all-buffers
-        try-expand-dabbrev-from-kill
-        try-complete-file-name-partially
-        try-complete-file-name))
-
-
-;; 補完時に大文字小文字を区別しない
-(setq read-file-name-completion-ignore-case t)
-
-;; undohistの設定
-(use-package undohist
-  :config
-  (undohist-initialize))
-
-;; undo-treeの設定
-(use-package undo-tree
-  :config
-  (global-undo-tree-mode))
-
-;; flycheck
-(require 'flycheck)
-(add-hook 'after-init-hook #'global-flycheck-mode)
-;; ツールチップに表示
-(eval-after-load 'flycheck
-  '(custom-set-variables
-    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
-
-;; flycheck-pos-tip
-(eval-after-load 'flycheck
-  '(custom-set-variables
-    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
-
-;; highlight
-(use-package auto-highlight-symbol
-  :config
-  (global-auto-highlight-symbol-mode t))
-
-(use-package highlight-symbol
-  :bind
-  ([(control f3)] . highlight-symbol-at-point)
-  ([f3] . highlight-symbol-next)
-  ([shift f3] . highlight-symbol-prev)
-  ([(meta f3)] . highlight-symbol-query-replace))
-
-(use-package open-junk-file
-  :config
-  (setq open-junk-file-format "~/junk/%Y-%m-%d-%H%M%S."))
-
-;; バッファをコンパイル・実行
-(use-package quickrun
-  :config
-  (push '("*quickrun*") popwin:special-display-config)
-  :bind
-  ("C-c C-q" . quickrun)
-  ("C-c q" . quickrun-with-arg))
-
-;; ctags
-;; 注意！exuberant-ctagsを指定する必要がある
-;; Emacs標準のctagsでは動作しない！！
-(setq ctags-update-command "/usr/bin/ctags")
-;; 使う言語で有効にしよう
-
-(use-package subword)
-
-(bind-key "C-S-k" 'just-one-space)
-
-(use-package paredit
-  :bind
-  ("C-j" . paredit-newline))
-
-(defun my/duplicate-region (num &optional start end)
-  "Duplicates the region bounded by START and END NUM times.
-If no START and END is provided, the current region-beginning and
-region-end is used. Adds the duplicated text to the kill ring."
-  (interactive "p")
-  (let* ((start (or start (region-beginning)))
-         (end (or end (region-end)))
-         (region (buffer-substring start end)))
-    (kill-ring-save start end)
-    (goto-char end)
-    (dotimes (i num)
-      (insert region))))
-
-(defun my/duplicate-current-line (num)
-  "Duplicate the current line NUM times."
-  (interactive "p")
-  (my/duplicate-region num (point-at-bol) (1+ (point-at-eol)))
-  (goto-char (1- (point))))
-
-(defun my/duplicate-current-line-or-region (arg)
-  "Duplicates the current line or region ARG times.
-If there's no region, the current line will be duplicated."
-  (interactive "p")
-  (if (region-active-p)
-      (my/duplicate-region arg)
-    (my/duplicate-current-line arg)))
-
-(defun my/rename-current-buffer-file ()
-  "Renames current buffer and file it is visiting."
-  (interactive)
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (if (not (and filename (file-exists-p filename)))
-        (error "Buffer '%s' is not visiting a file!" name)
-      (let ((new-name (read-file-name "New name: " filename)))
-        (cond ((get-buffer new-name)
-               (error "A buffer named '%s' already exists!" new-name))
-              (t
-               (rename-file filename new-name 1)
-               (rename-buffer new-name)
-               (set-visited-file-name new-name)
-               (set-buffer-modified-p nil)
-               (message "File '%s' successfully renamed to '%s'" name (file-name-nondirectory new-name))))))))
-
-(defun my/delete-current-buffer-file ()
-  "Removes file connected to current buffer and kills buffer."
-  (interactive)
-  (let ((filename (buffer-file-name))
-        (buffer (current-buffer))
-        (name (buffer-name)))
-    (if (not (and filename (file-exists-p filename)))
-        (ido-kill-buffer)
-      (when (yes-or-no-p "Are you sure you want to remove this file? ")
-        (delete-file filename)
-        (kill-buffer buffer)
-        (message "File '%s' successfully removed" filename)))))
-
-(defun my/untabify-buffer ()
-  (interactive)
-  (untabify (point-min) (point-max)))
-
-(defun my/indent-buffer ()
-  (interactive)
-  (indent-region (point-min) (point-max)))
-
-(defun my/cleanup-buffer-safe ()
-  "Perform a bunch of safe operations on the whitespace content of a buffer.
-  Does not indent buffer, because it is used for a before-save-hook, and that
-  might be bad."
-  (interactive)
-  (my/untabify-buffer)
-  (delete-trailing-whitespace)
-  (set-buffer-file-coding-system 'utf-8))
-
-(defun my/cleanup-buffer ()
-  "Perform a bunch of operations on the whitespace content of a buffer.
-  Including my/indent-buffer, which should not be called automatically on save."
-  (interactive)
-  (my/cleanup-buffer-safe)
-  (my/indent-buffer))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ smartchr                                                      ;;;
@@ -760,15 +554,6 @@ If there's no region, the current line will be duplicated."
   (local-set-key (kbd "{")  (smartchr '("{`!!'}" my/smartchr-braces "{")))
   (local-set-key (kbd "'")  (smartchr '("'`!!''" "'")))
   (local-set-key (kbd "\"") (smartchr '("\"`!!'\"" "\""))))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ yasnippet                                                     ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(use-package yasnippet
-  :config
-  (yas-global-mode 1)
-  :bind
-  ("C-'" . yas-expand))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ tramp                                                         ;;;

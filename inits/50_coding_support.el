@@ -1,5 +1,147 @@
 ;;; 50_coding_support.el --- For coding support libs                 -*- lexical-binding: t; -*-
 
+;; ファイル作成時にテンプレートを挿入
+(auto-insert-mode)
+;; 次に指定したディレクトリをロードする (最後の/は必須)
+(setq auto-insert-directory (concat user-emacs-directory "insert/"))
+;; 次で"\\.rb$"の代わりに'ruby-modeにすると、メジャーモードがruby-modeのときに挿入してくれる
+;;(define-auto-insert "\\.rb\\'" "ruby-template.rb")
+
+;;; indentを基本spaceで
+(setq-default indent-tabs-mode nil)
+
+;; redoの設定
+(use-package redo+
+  :bind ("C-S-/" . redo)
+  :config
+  ;; 大量のredoに耐えられるようにする
+  (setq undo-limit 600000
+        undo-strong-limit 900000))
+
+;; cua-modeの設定(矩形選択を可能に)
+(when (cua-mode t)
+  ;; CUAキーバインドを無効にする
+  (setq cua-enable-cua-keys nil)
+  ;; C-RETがC-jになるため、C-c C-SPCに矩形選択モードを割り当て
+  (define-key global-map (kbd "C-c C-SPC") 'cua-set-rectangle-mark))
+
+;; company
+(use-package company
+  :config
+  ;; (global-company-mode)
+  (setq company-idle-delay 0.1
+        company-minimum-prefix-length 2
+        company-selection-wrap-around t)
+
+  (bind-keys :map company-mode-map
+             ("C-i" . company-complete))
+  (bind-keys :map company-active-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)
+             ("C-s" . company-search-words-regexp))
+  (bind-keys :map company-search-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)))
+
+;; hippie-expand
+(bind-key "M-/" 'hippie-expand)
+;; 補完候補探索順を指定
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-file-name-partially
+        try-complete-file-name))
+
+
+;; 補完時に大文字小文字を区別しない
+(setq read-file-name-completion-ignore-case t)
+
+;; undohistの設定
+(use-package undohist
+  :config
+  (undohist-initialize))
+
+;; undo-treeの設定
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
+
+;; flycheck
+(require 'flycheck)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+;; ツールチップに表示
+(eval-after-load 'flycheck
+  '(custom-set-variables
+    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+
+;; flycheck-pos-tip
+(eval-after-load 'flycheck
+  '(custom-set-variables
+    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+
+;; highlight
+(use-package auto-highlight-symbol
+  :config
+  (global-auto-highlight-symbol-mode t))
+
+(use-package highlight-symbol
+  :bind
+  ([(control f3)] . highlight-symbol-at-point)
+  ([f3] . highlight-symbol-next)
+  ([shift f3] . highlight-symbol-prev)
+  ([(meta f3)] . highlight-symbol-query-replace))
+
+(use-package open-junk-file
+  :config
+  (setq open-junk-file-format "~/junk/%Y-%m-%d-%H%M%S."))
+
+;; バッファをコンパイル・実行
+(use-package quickrun
+  :config
+  (push '("*quickrun*") popwin:special-display-config)
+  :bind
+  ("C-c C-q" . quickrun)
+  ("C-c q" . quickrun-with-arg))
+
+;; ctags
+;; 注意！exuberant-ctagsを指定する必要がある
+;; Emacs標準のctagsでは動作しない！！
+(setq ctags-update-command "/usr/bin/ctags")
+;; 使う言語で有効にしよう
+
+(use-package subword)
+
+(bind-key "C-S-k" 'just-one-space)
+
+(use-package paredit
+  :bind
+  ("C-j" . paredit-newline))
+
+(defun my/untabify-buffer ()
+  (interactive)
+  (untabify (point-min) (point-max)))
+
+(defun my/indent-buffer ()
+  (interactive)
+  (indent-region (point-min) (point-max)))
+
+(defun my/cleanup-buffer-safe ()
+  "Perform a bunch of safe operations on the whitespace content of a buffer.
+  Does not indent buffer, because it is used for a before-save-hook, and that
+  might be bad."
+  (interactive)
+  (my/untabify-buffer)
+  (delete-trailing-whitespace)
+  (set-buffer-file-coding-system 'utf-8))
+
+(defun my/cleanup-buffer ()
+  "Perform a bunch of operations on the whitespace content of a buffer.
+  Including my/indent-buffer, which should not be called automatically on save."
+  (interactive)
+  (my/cleanup-buffer-safe)
+  (my/indent-buffer))
+
 (use-package smart-newline
   :bind
   ("C-m" . smart-newline))
@@ -34,13 +176,8 @@
   :config
   (flex-autopair-mode 1))
 
-(use-package emmet-mode
+(use-package yasnippet
   :config
-  ;; C-j は newline のままにしておく
-  (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
-  ;;C-i と Tabの被りを回避
-  (keyboard-translate ?\C-i ?\H-i)
-  ;; C-i で展開
-  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line)
-  (setq emmet-indentation 2
-        emmet-move-cursor-between-quotes t))
+  (yas-global-mode 1)
+  :bind
+  ("C-'" . yas-expand))

@@ -1,5 +1,16 @@
 ;;; 52_web.el --- For Web(HTML/CSS/JS)                   -*- lexical-binding: t; -*-
 
+(use-package emmet-mode
+  :config
+  ;; C-j は newline のままにしておく
+  (eval-after-load "emmet-mode" '(define-key emmet-mode-keymap (kbd "C-j") nil))
+  ;;C-i と Tabの被りを回避
+  (keyboard-translate ?\C-i ?\H-i)
+  ;; C-i で展開
+  (define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line)
+  (setq emmet-indentation 2
+        emmet-move-cursor-between-quotes t))
+
 (defun my/web-mode-hooks ()
   (setq web-mode-markup-indent-offset 2
         web-mode-code-indent-offset 2
