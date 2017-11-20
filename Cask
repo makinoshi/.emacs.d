@@ -166,5 +166,4 @@
 (depends-on "flycheck-rust")
 (depends-on "racer")
 (depends-on "company-jedi")
-(depends-on "virtualenvwrapper")
-(depends-on "auto-virtualenvwrapper")
+(depends-on "py-autopep8")
