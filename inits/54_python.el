@@ -6,7 +6,13 @@
         python-indent 4
         python-pylint t
         tab-width 4)
-  (smart-newline-mode t))
+  (smart-newline-mode t)
+  (use-package jedi-core
+    :config
+    (setq jedi:complete-on-dot t
+          jedi:use-shortcuts t)
+    (add-hook 'python-mode-hook 'jedi:setup))
+  (add-to-list 'company-backends 'company-jedi))
 
 (use-package python-mode
   :mode

@@ -80,7 +80,6 @@
 (depends-on "inf-ruby")
 (depends-on "inflections")
 (depends-on "init-loader")
-(depends-on "jedi")
 (depends-on "js2-mode")
 (depends-on "json-mode")
 (depends-on "json-reformat")
@@ -166,3 +165,4 @@
 (depends-on "rust-mode")
 (depends-on "flycheck-rust")
 (depends-on "racer")
+(depends-on "company-jedi")

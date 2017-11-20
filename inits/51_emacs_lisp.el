@@ -9,7 +9,6 @@
 (use-package emacs-lisp-mode
   :init
   (add-hook 'emacs-lisp-mode-hook 'smart-newline-mode)
-  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
   (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'emacs-lisp-mode-hook 'highlight-symbol-mode)
   (add-hook 'emacs-lisp-mode-hook 'company-mode)

@@ -12,5 +12,3 @@
   ;; インストールしたパッケージにロードパスを通してロードする
   (fset 'package-desc-vers 'package--ac-desc-version)
   (package-initialize))
-
-(use-package auto-async-byte-compile)
