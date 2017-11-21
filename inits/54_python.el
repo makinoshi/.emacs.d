@@ -19,13 +19,25 @@
     :config
     (add-hook 'find-file-hook 'set-pyenv-version-path)))
 
+(defun my/python-cleanup ()
+  (interactive)
+  (elpy-importmagic-fixup)
+  (elpy-format-code))
+
+(defun my/elpy-init ()
+  (interactive)
+  (remove-hook 'elpy-modules 'elpy-module-flymake)
+  (add-hook 'elpy-mode-hook 'flycheck-mode)
+  (add-hook 'before-save-hook 'my/python-cleanup)
+  (elpy-enable)
+  (elpy-use-ipython)
+  (setq elpy-rpc-backend "jedi"))
+
 (use-package python-mode
   :mode
   ("\\.py\\'" . python-mode)
   :init
   (add-hook 'python-mode-hook 'company-mode)
-  (add-hook 'python-mode-hook 'flycheck-mode)
   (add-hook 'python-mode-hook 'my/python-mode-hooks)
   :config
-  (elpy-enable)
-  (add-hook 'before-save-hook 'elpy-format-code))
+  (my/elpy-init))

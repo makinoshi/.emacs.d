@@ -25,7 +25,7 @@
   ;; C-RETがC-jになるため、C-c C-SPCに矩形選択モードを割り当て
   (define-key global-map (kbd "C-c C-SPC") 'cua-set-rectangle-mark))
 
-;; company
+;; Completion
 (use-package company
   :config
   ;; (global-company-mode)
