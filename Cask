@@ -5,7 +5,6 @@
 (source "melpa" "https://melpa.org/packages/")
 
 (depends-on "ac-dabbrev")
-(depends-on "ac-python")
 (depends-on "ace-isearch")
 (depends-on "ace-jump-mode")
 (depends-on "ace-pinyin")
@@ -167,3 +166,5 @@
 (depends-on "racer")
 (depends-on "company-jedi")
 (depends-on "py-autopep8")
+(depends-on "elpy")
+(depends-on "pyenv-mode")
