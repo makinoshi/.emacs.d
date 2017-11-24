@@ -167,3 +167,5 @@
 (depends-on "py-autopep8")
 (depends-on "elpy")
 (depends-on "pyenv-mode")
+(depends-on "lua-mode")
+(depends-on "company-lua")
