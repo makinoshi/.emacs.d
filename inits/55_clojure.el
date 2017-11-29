@@ -7,8 +7,10 @@
     (add-hook 'cider-mode-hook 'clj-refactor-mode)
     (add-hook 'cider-mode-hook 'company-mode)
     (add-hook 'cider-mode-hook 'eldoc-mode)
+    (add-hook 'cider-mode-hook 'cider-company-enable-fuzzy-completion)
     (add-hook 'cider-repl-mode-hook 'company-mode)
     (add-hook 'cider-repl-mode-hook 'eldoc-mode)
+    (add-hook 'cider-repl-mode-hook 'cider-company-enable-fuzzy-completion)
     :diminish subword-mode
     :config
     (setq nrepl-log-messages t
